@@ -35,7 +35,6 @@ function Homepage() {
           </div>
         </div>
       </section>
-
       {/* Features Section */}
       <section className="features">
         <div className="container">
