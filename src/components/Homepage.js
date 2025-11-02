@@ -16,10 +16,10 @@ function Homepage() {
                 Access premium online courses, expert-led tutorials, and interactive learning tools — all in one platform.
               </p>
               <div className="hero-buttons">
-                <Link to="/get-started" className="btn btn-primary">
+                <Link to="/all-courses" className="btn btn-primary">
                   Get Started
                 </Link>
-                <Link to="/courses" className="btn btn-outline">
+                <Link to="/all-courses" className="btn btn-outline">
                   Browse Courses
                 </Link>
               </div>
