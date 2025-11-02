@@ -3,6 +3,7 @@ import axios from 'axios';
 
 const apiClient = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL
+  // baseURL: process.env.REACT_APP_API_BASE_URL || 'http://161.35.24.106/'
 });
 
 // Add a request interceptor to include the token
