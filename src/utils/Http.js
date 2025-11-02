@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_LOCAL_BASE_URL
+  baseURL: process.env.REACT_APP_API_BASE_URL
 });
 
 // Add a request interceptor to include the token
