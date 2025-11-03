@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { getCourseFullStructure } from "../api/CoursesApi";
+import { getCoursepreviewStructure } from "../api/CoursesApi";
 import "../static/Courses.css";
 
 function Course() {
@@ -10,14 +10,16 @@ function Course() {
     const [error, setError] = useState("");
     const [expandedSections, setExpandedSections] = useState(new Set());
     const [expandedSubsections, setExpandedSubsections] = useState(new Set());
+    const [currentVideo, setCurrentVideo] = useState(null);
+    const [showVideoModal, setShowVideoModal] = useState(false);
 
     // Fetch course full structure from API
     useEffect(() => {
         const fetchCourseData = async () => {
             try {
                 setLoading(true);
-                const response = await getCourseFullStructure(courseId);
-                console.log('Course full structure:', response.data);
+                const response = await getCoursepreviewStructure(courseId);
+                console.log('Preview:', response.data);
                 setCourse(response.data);
             } catch (err) {
                 console.error('Error fetching course data:', err);
@@ -50,6 +52,37 @@ function Course() {
             newExpanded.add(subsectionId);
         }
         setExpandedSubsections(newExpanded);
+    };
+
+    // Play preview video
+    const playPreviewVideo = (lesson) => {
+        if (lesson.is_preview && lesson.video_url) {
+            setCurrentVideo(lesson);
+            setShowVideoModal(true);
+        }
+    };
+
+    // Close video modal
+    const closeVideoModal = () => {
+        setShowVideoModal(false);
+        setCurrentVideo(null);
+    };
+
+    // Extract YouTube video ID
+    const getYouTubeVideoId = (url) => {
+        if (!url) return null;
+        const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+        return match ? match[1] : null;
+    };
+
+    // Check if video is YouTube
+    const isYouTubeVideo = (url) => {
+        return url && (url.includes('youtube.com') || url.includes('youtu.be'));
+    };
+
+    // Check if video is local file
+    const isLocalVideo = (url) => {
+        return url && (url.includes('.mp4') || url.includes('.webm') || url.includes('.ogg'));
     };
 
     const formatLearningObjectives = (objectives) => {
@@ -154,6 +187,44 @@ function Course() {
 
     return (
         <div className="enterprise-course">
+            {/* Video Preview Modal */}
+            {showVideoModal && currentVideo && (
+                <div className="video-modal-overlay" onClick={closeVideoModal}>
+                    <div className="video-modal-content" onClick={(e) => e.stopPropagation()}>
+                        <div className="video-modal-header">
+                            <h3>{currentVideo.title}</h3>
+                            <button className="video-modal-close" onClick={closeVideoModal}>
+                                <i className="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div className="video-player-container">
+                            {isYouTubeVideo(currentVideo.video_url) ? (
+                                <iframe
+                                    src={`https://www.youtube.com/embed/${getYouTubeVideoId(currentVideo.video_url)}?autoplay=1`}
+                                    title={currentVideo.title}
+                                    frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                ></iframe>
+                            ) : isLocalVideo(currentVideo.video_url) ? (
+                                <video controls autoPlay style={{ width: '100%', height: '100%' }}>
+                                    <source src={currentVideo.video_url} type="video/mp4" />
+                                    Your browser does not support the video tag.
+                                </video>
+                            ) : (
+                                <div className="video-not-supported">
+                                    <i className="fas fa-exclamation-triangle"></i>
+                                    <p>Video format not supported</p>
+                                </div>
+                            )}
+                        </div>
+                        <div className="video-modal-footer">
+                            <p>Preview Content - Enroll to access all videos</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Course Hero Section */}
             <div className="course-hero">
                 <div className="hero-background"></div>
@@ -329,7 +400,7 @@ function Course() {
                                                             
                                                             return (
                                                                 <div key={subsection.id} className="subsection-enterprise">
-                                                                    {/* Subsection Header - Now Clickable */}
+                                                                    {/* Subsection Header */}
                                                                     <div 
                                                                         className={`subsection-header-enterprise ${isSubsectionExpanded ? 'expanded' : ''}`}
                                                                         onClick={() => toggleSubsection(subsection.id)}
@@ -348,25 +419,37 @@ function Course() {
                                                                         </div>
                                                                     </div>
 
-                                                                    {/* Lessons List - Now Collapsible */}
+                                                                    {/* Lessons List */}
                                                                     <div className={`lessons-list-enterprise ${isSubsectionExpanded ? 'expanded' : ''}`}>
                                                                         {subsection.lessons && subsection.lessons.length > 0 ? (
                                                                             subsection.lessons.map((lesson, lessonIndex) => (
-                                                                                <div key={lesson.id} className="lesson-item-enterprise">
+                                                                                <div 
+                                                                                    key={lesson.id} 
+                                                                                    className={`lesson-item-enterprise ${lesson.is_preview ? 'preview-available' : ''}`}
+                                                                                    onClick={() => lesson.is_preview && playPreviewVideo(lesson)}
+                                                                                >
                                                                                     <div className="lesson-icon" style={{ color: getLessonIconColor(lesson.lesson_type) }}>
                                                                                         <i className={getLessonIcon(lesson.lesson_type)}></i>
                                                                                     </div>
                                                                                     <div className="lesson-content">
                                                                                         <div className="lesson-main">
-                                                                                            <div className="lesson-type">{lesson.lesson_type}</div>
                                                                                             <div className="lesson-title">{lesson.title}</div>
-                                                                                            <div className="lesson-title">{lesson.video_duration > 0 && formatDuration(lesson.video_duration)}</div>
+                                                                                            <div className="lesson-meta">
+                                                                                                <span className="lesson-type">{lesson.lesson_type}</span>
+                                                                                                {lesson.video_duration > 0 && (
+                                                                                                    <span className="lesson-duration">{formatDuration(lesson.video_duration)}</span>
+                                                                                                )}
+                                                                                            </div>
                                                                                         </div>
                                                                                         <div className="lesson-actions">
-                                                                                            {lesson.is_preview && (
-                                                                                                <span className="preview-badge">
+                                                                                            {lesson.is_preview ? (
+                                                                                                <span className="preview-badge clickable">
                                                                                                     <i className="fas fa-eye"></i>
                                                                                                     Preview
+                                                                                                </span>
+                                                                                            ) : (
+                                                                                                <span className="locked-badge">
+                                                                                                    <i className="fas fa-lock"></i>
                                                                                                 </span>
                                                                                             )}
                                                                                         </div>
@@ -487,6 +570,7 @@ function Course() {
                                 </div>
                             </div>
                         </div>
+
                         {/* Additional Actions */}
                         <div className="sidebar-card">
                             <div className="action-buttons">

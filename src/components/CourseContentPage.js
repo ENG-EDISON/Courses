@@ -24,6 +24,7 @@ const CourseContentPage = () => {
     const [progressSummary, setProgressSummary] = useState(null);
     const [enrollmentId, setEnrollmentId] = useState(null);
     const [lastPlayed, setLastPlayed] = useState(null);
+    const [activeTab, setActiveTab] = useState('description');
 
     useEffect(() => {
         const fetchCourseContent = async () => {
@@ -113,185 +114,185 @@ const CourseContentPage = () => {
     }, [id]);
 
     // Video source detection function
-const getVideoSource = (videoUrl) => {
-    if (!videoUrl) return { type: 'none', source: '' };
-    
-    // Check if it's a YouTube URL
-    const youtubeMatch = videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
-    if (youtubeMatch) {
-        return {
-            type: 'youtube',
-            source: `https://www.youtube.com/embed/${youtubeMatch[1]}?rel=0&modestbranding=1`,
-            canTrack: false
-        };
-    }
-    
-    // Get base URL from environment and extract domain
-    const baseUrl = process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000/';
-    const baseDomain = new URL(baseUrl).hostname;
-    
-    // Check if it's a self-hosted video
-    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.m3u8'];
-    const isVideoFile = videoExtensions.some(ext => 
-        videoUrl.toLowerCase().includes(ext) || 
-        videoUrl.toLowerCase().includes('/media/') ||
-        videoUrl.toLowerCase().includes(baseDomain) || // Use environment domain
-        videoUrl.startsWith('/media/') || // Relative media URLs
-        videoUrl.startsWith(baseUrl + 'media/') // Full media URLs with base URL
-    );
-    
-    if (isVideoFile) {
-        // Handle relative URLs
-        let finalUrl = videoUrl;
-        if (videoUrl.startsWith('/media/')) {
-            finalUrl = `${baseUrl}${videoUrl.replace(/^\//, '')}`;
+    const getVideoSource = (videoUrl) => {
+        if (!videoUrl) return { type: 'none', source: '' };
+        
+        // Check if it's a YouTube URL
+        const youtubeMatch = videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+        if (youtubeMatch) {
+            return {
+                type: 'youtube',
+                source: `https://www.youtube.com/embed/${youtubeMatch[1]}?rel=0&modestbranding=1`,
+                canTrack: false
+            };
         }
         
+        // Get base URL from environment and extract domain
+        const baseUrl = process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000/';
+        const baseDomain = new URL(baseUrl).hostname;
+        
+        // Check if it's a self-hosted video
+        const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.m3u8'];
+        const isVideoFile = videoExtensions.some(ext => 
+            videoUrl.toLowerCase().includes(ext) || 
+            videoUrl.toLowerCase().includes('/media/') ||
+            videoUrl.toLowerCase().includes(baseDomain) || // Use environment domain
+            videoUrl.startsWith('/media/') || // Relative media URLs
+            videoUrl.startsWith(baseUrl + 'media/') // Full media URLs with base URL
+        );
+        
+        if (isVideoFile) {
+            // Handle relative URLs
+            let finalUrl = videoUrl;
+            if (videoUrl.startsWith('/media/')) {
+                finalUrl = `${baseUrl}${videoUrl.replace(/^\//, '')}`;
+            }
+            
+            return {
+                type: 'self-hosted',
+                source: finalUrl,
+                canTrack: true
+            };
+        }
+        
+        // Default case (could be other external services)
         return {
-            type: 'self-hosted',
-            source: finalUrl,
-            canTrack: true
+            type: 'external',
+            source: videoUrl,
+            canTrack: false
         };
-    }
-    
-    // Default case (could be other external services)
-    return {
-        type: 'external',
-        source: videoUrl,
-        canTrack: false
     };
-};
 
     // Enhanced Video Player Component
     const EnhancedVideoPlayer = ({ video, onProgressUpdate, onCompleted, isCompleted }) => {
-    const videoRef = useRef(null);
-    const [currentTime, setCurrentTime] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const videoSource = getVideoSource(video.video_url);
+        const videoRef = useRef(null);
+        const [currentTime, setCurrentTime] = useState(0);
+        const [duration, setDuration] = useState(0);
+        const videoSource = getVideoSource(video.video_url);
 
-    // Auto-resume from last position
-    useEffect(() => {
-        if (videoRef.current && video.lastPlayedTime && video.lastPlayedTime > 0) {
-            videoRef.current.currentTime = video.lastPlayedTime;
-            console.log("Resuming video from:", video.lastPlayedTime, "seconds");
-        }
-    }, [video.lastPlayedTime]);
-
-    const handleLoadedMetadata = () => {
-        if (videoRef.current) {
-            setDuration(videoRef.current.duration);
-            console.log("Video duration:", videoRef.current.duration);
-        }
-    };
-
-    const handleTimeUpdate = () => {
-        if (videoRef.current) {
-            const newTime = videoRef.current.currentTime;
-            setCurrentTime(newTime);
-            
-            // Update progress every 10 seconds for self-hosted videos
-            if (Math.floor(newTime) % 10 === 0 && videoSource.canTrack) {
-                onProgressUpdate(newTime, false);
+        // Auto-resume from last position
+        useEffect(() => {
+            if (videoRef.current && video.lastPlayedTime && video.lastPlayedTime > 0) {
+                videoRef.current.currentTime = video.lastPlayedTime;
+                console.log("Resuming video from:", video.lastPlayedTime, "seconds");
             }
-            
-            // Auto-complete at 95% watched (for self-hosted videos only)
-            if (duration > 0 && newTime / duration > 0.95 && !isCompleted && videoSource.canTrack) {
-                console.log("Auto-completing video at 95% watched");
+        }, [video.lastPlayedTime]);
+
+        const handleLoadedMetadata = () => {
+            if (videoRef.current) {
+                setDuration(videoRef.current.duration);
+                console.log("Video duration:", videoRef.current.duration);
+            }
+        };
+
+        const handleTimeUpdate = () => {
+            if (videoRef.current) {
+                const newTime = videoRef.current.currentTime;
+                setCurrentTime(newTime);
+                
+                // Update progress every 10 seconds for self-hosted videos
+                if (Math.floor(newTime) % 10 === 0 && videoSource.canTrack) {
+                    onProgressUpdate(newTime, false);
+                }
+                
+                // Auto-complete at 95% watched (for self-hosted videos only)
+                if (duration > 0 && newTime / duration > 0.95 && !isCompleted && videoSource.canTrack) {
+                    console.log("Auto-completing video at 95% watched");
+                    onProgressUpdate(duration, true);
+                    onCompleted();
+                }
+            }
+        };
+
+        const handleVideoEnd = () => {
+            if (videoSource.canTrack && !isCompleted) {
+                console.log("Video ended, marking as completed");
                 onProgressUpdate(duration, true);
                 onCompleted();
             }
+        };
+
+        const handleVideoPause = () => {
+            if (videoRef.current && videoSource.canTrack) {
+                onProgressUpdate(videoRef.current.currentTime, false);
+            }
+        };
+
+        // Helper function to format time
+        const formatTime = (seconds) => {
+            if (!seconds || isNaN(seconds)) return '0:00';
+            
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        };
+
+        // For YouTube videos - uses aspect ratio container
+        if (videoSource.type === 'youtube') {
+            return (
+                <div className="youtube-container">
+                    <iframe
+                        src={videoSource.source}
+                        title={video.title}
+                        className="video-player__iframe"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                    />
+                </div>
+            );
         }
-    };
 
-    const handleVideoEnd = () => {
-        if (videoSource.canTrack && !isCompleted) {
-            console.log("Video ended, marking as completed");
-            onProgressUpdate(duration, true);
-            onCompleted();
-        }
-    };
-
-    const handleVideoPause = () => {
-        if (videoRef.current && videoSource.canTrack) {
-            onProgressUpdate(videoRef.current.currentTime, false);
-        }
-    };
-
-    // Helper function to format time
-    const formatTime = (seconds) => {
-        if (!seconds || isNaN(seconds)) return '0:00';
-        
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
-    };
-
-    // For YouTube videos - uses aspect ratio container
-    if (videoSource.type === 'youtube') {
-        return (
-            <div className="youtube-container">
-                <iframe
-                    src={videoSource.source}
-                    title={video.title}
-                    className="video-player__iframe"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                />
-            </div>
-        );
-    }
-
-    // For self-hosted videos - uses fixed height container
-    if (videoSource.type === 'self-hosted') {
-        return (
-            <div className="self-hosted-container">
-                <div className="self-hosted-video">
-                    <video
-                        ref={videoRef}
-                        controls
-                        className="video-player__element"
-                        onTimeUpdate={handleTimeUpdate}
-                        onEnded={handleVideoEnd}
-                        onLoadedMetadata={handleLoadedMetadata}
-                        onPause={handleVideoPause}
-                    >
-                        <source src={videoSource.source} type="video/mp4" />
-                        Your browser does not support the video tag.
-                    </video>
-                    
-                    {/* Progress overlay for self-hosted videos */}
-                    <div className="video-progress-overlay">
-                        <div className="progress-bar">
-                            <div 
-                                className="progress-fill" 
-                                style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
-                            />
-                        </div>
-                        <div className="time-display">
-                            {formatTime(currentTime)} / {formatTime(duration)}
-                            {video.lastPlayedTime > 0 && (
-                                <span className="resume-indicator"> (Resumed)</span>
-                            )}
+        // For self-hosted videos - uses fixed height container
+        if (videoSource.type === 'self-hosted') {
+            return (
+                <div className="self-hosted-container">
+                    <div className="self-hosted-video">
+                        <video
+                            ref={videoRef}
+                            controls
+                            className="video-player__element"
+                            onTimeUpdate={handleTimeUpdate}
+                            onEnded={handleVideoEnd}
+                            onLoadedMetadata={handleLoadedMetadata}
+                            onPause={handleVideoPause}
+                        >
+                            <source src={videoSource.source} type="video/mp4" />
+                            Your browser does not support the video tag.
+                        </video>
+                        
+                        {/* Progress overlay for self-hosted videos */}
+                        <div className="video-progress-overlay">
+                            <div className="progress-bar">
+                                <div 
+                                    className="progress-fill" 
+                                    style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                                />
+                            </div>
+                            <div className="time-display">
+                                {formatTime(currentTime)} / {formatTime(duration)}
+                                {video.lastPlayedTime > 0 && (
+                                    <span className="resume-indicator"> (Resumed)</span>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
+            );
+        }
+
+        // For other external videos or unsupported formats
+        return (
+            <div className="self-hosted-container">
+                <div className="video-player__placeholder">
+                    <div className="placeholder-icon">🎬</div>
+                    <p>Video format not supported</p>
+                    <a href={videoSource.source} target="_blank" rel="noopener noreferrer" className="external-video-link">
+                        Open video in new tab
+                    </a>
+                </div>
             </div>
         );
-    }
-
-    // For other external videos or unsupported formats
-    return (
-        <div className="self-hosted-container">
-            <div className="video-player__placeholder">
-                <div className="placeholder-icon">🎬</div>
-                <p>Video format not supported</p>
-                <a href={videoSource.source} target="_blank" rel="noopener noreferrer" className="external-video-link">
-                    Open video in new tab
-                </a>
-            </div>
-        </div>
-    );
-};
+    };
 
     const findFirstVideo = (courseData) => {
         if (!courseData.sections) return null;
@@ -472,6 +473,172 @@ const getVideoSource = (videoUrl) => {
             return `${hours}h ${minutes}m`;
         }
         return `${minutes}m`;
+    };
+
+    // Tab content renderer
+    const renderTabContent = () => {
+        switch (activeTab) {
+            case 'description':
+                return (
+                    <div className="course-description">
+                        <h3>Course Overview</h3>
+                        <p>{course.description}</p>
+                        
+                        {/* Course Requirements */}
+                        {course.requirements && (
+                            <div className="requirements-section">
+                                <h4>Requirements</h4>
+                                <div className="requirements-list">
+                                    {course.requirements.split('\r\n').map((requirement, index) => (
+                                        requirement.trim() && (
+                                            <div key={index} className="requirement-item">
+                                                <span className="requirement-bullet">•</span>
+                                                <span>{requirement}</span>
+                                            </div>
+                                        )
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                );
+            
+            case 'objectives':
+                return (
+                    course.learning_objectives && course.learning_objectives.length > 0 && (
+                        <div className="learning-objectives">
+                            <h3>What You'll Learn</h3>
+                            <div className="objectives-grid">
+                                {course.learning_objectives.map((objective) => (
+                                    <div key={objective.id} className="objective-card">
+                                        <div className="objective-content">
+                                            <p>
+                                                {objective.icon && (
+                                                    <span className="icon">{objective.icon}</span>
+                                                )}
+                                                {objective.objective}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )
+                );
+            case 'resources':
+    // Helper function to get file type from URL
+    const getFileType = (url) => {
+        if (!url) return 'File';
+        const extension = url.split('.').pop().toLowerCase();
+        const fileTypes = {
+            'pdf': 'PDF',
+            'zip': 'ZIP',
+            'doc': 'DOC',
+            'docx': 'DOCX',
+            'ppt': 'PPT',
+            'pptx': 'PPTX',
+            'xls': 'XLS',
+            'xlsx': 'XLSX',
+            'txt': 'TXT',
+            'jpg': 'JPG',
+            'jpeg': 'JPEG',
+            'png': 'PNG',
+            'mp4': 'MP4',
+            'mov': 'MOV',
+            'avi': 'AVI'
+        };
+        return fileTypes[extension] || 'File';
+    };
+
+    // Helper function to get icon based on file type
+    const getResourceIcon = (url) => {
+        if (!url) return '📄';
+        const extension = url.split('.').pop().toLowerCase();
+        const iconMap = {
+            'pdf': '📕',
+            'zip': '📦',
+            'doc': '📄',
+            'docx': '📄',
+            'ppt': '📊',
+            'pptx': '📊',
+            'xls': '📈',
+            'xlsx': '📈',
+            'txt': '📝',
+            'jpg': '🖼️',
+            'jpeg': '🖼️',
+            'png': '🖼️',
+            'mp4': '🎬',
+            'mov': '🎬',
+            'avi': '🎬'
+        };
+        return iconMap[extension] || '📄';
+    };
+
+    // Collect all lesson resources
+    const lessonResources = [];
+    if (course.sections) {
+        course.sections.forEach(section => {
+            section.subsections.forEach(subsection => {
+                if (subsection.lessons) {
+                    subsection.lessons.forEach(lesson => {
+                        if (lesson.resources) {
+                            lessonResources.push({
+                                ...lesson,
+                                sectionTitle: section.title,
+                                subsectionTitle: subsection.title
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    return (
+        <div className="course-resources">
+            <h3>Course Resources</h3>
+            
+            {/* Lesson Resources */}
+            {lessonResources.length > 0 ? (
+                <div className="resources-section">
+                    <h4>Lesson Resources ({lessonResources.length})</h4>
+                    <div className="resources-grid">
+                        {lessonResources.map((lesson) => (
+                            <div key={lesson.id} className="resource-card">
+                                <div className="resource-icon">
+                                    {getResourceIcon(lesson.resources)}
+                                </div>
+                                <div className="resource-content">
+                                    <h5>{lesson.title}</h5>
+                                    <p>From: {lesson.sectionTitle} • {lesson.subsectionTitle}</p>
+                                    <a 
+                                        href={lesson.resources} 
+                                        className="resource-download-btn"
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        download
+                                    >
+                                        Download {getFileType(lesson.resources)}
+                                    </a>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ) : (
+                <div className="no-resources">
+                    <div className="no-resources-icon">📭</div>
+                    <h4>No Resources Available</h4>
+                    <p>This course doesn't have any downloadable resources yet.</p>
+                </div>
+            )}
+        </div>
+    );
+            
+            
+            default:
+                return null;
+        }
     };
 
     if (loading) {
@@ -657,30 +824,6 @@ const getVideoSource = (videoUrl) => {
                                             isCompleted={completionStatus[activeVideo.id]}
                                         />
                                     </div>
-                                    <div className="video-player__content">
-                                        <div className="content-section">
-                                            <h4>About this lesson</h4>
-                                            <p>{activeVideo.content || 'No additional content provided for this lesson.'}</p>
-                                        </div>
-                                        {activeVideo.resources && (
-                                            <div className="content-section">
-                                                <h5>Lesson Resources</h5>
-                                                <a 
-                                                    href={activeVideo.resources} 
-                                                    target="_blank" 
-                                                    rel="noopener noreferrer"
-                                                    className="resource-link"
-                                                >
-                                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                                        <path d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                        <path d="M4.66675 6.66666L8.00008 9.99999L11.3334 6.66666" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                        <path d="M8 10V2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                                    </svg>
-                                                    Download Resources
-                                                </a>
-                                            </div>
-                                        )}
-                                    </div>
                                 </>
                             ) : (
                                 <div className="video-player__empty">
@@ -694,35 +837,31 @@ const getVideoSource = (videoUrl) => {
                         </div>
                     </div>
 
-                    {/* Course Details Section */}
+                    {/* Course Details Section with Tabs */}
                     <div className="course-details-section">
                         <div className="details-tabs">
-                            <button className="tab-btn tab-btn--active">Description</button>
-                            <button className="tab-btn">Objectives</button>
-                            <button className="tab-btn">Resources</button>
+                            <button 
+                                className={`tab-btn ${activeTab === 'description' ? 'tab-btn--active' : ''}`}
+                                onClick={() => setActiveTab('description')}
+                            >
+                                Description
+                            </button>
+                            <button 
+                                className={`tab-btn ${activeTab === 'objectives' ? 'tab-btn--active' : ''}`}
+                                onClick={() => setActiveTab('objectives')}
+                            >
+                                Objectives
+                            </button>
+                            <button 
+                                className={`tab-btn ${activeTab === 'resources' ? 'tab-btn--active' : ''}`}
+                                onClick={() => setActiveTab('resources')}
+                            >
+                                Resources
+                            </button>
                         </div>
                         
                         <div className="tab-content">
-                            <div className="course-description">
-                                <h3>Course Overview</h3>
-                                <p>{course.description}</p>
-                            </div>
-                            
-                            {course.learning_objectives && course.learning_objectives.length > 0 && (
-                                <div className="learning-objectives">
-                                    <h3>What You'll Learn</h3>
-                                    <div className="objectives-grid">
-                                        {course.learning_objectives.map((objective) => (
-                                            <div key={objective.id} className="objective-card">
-                                                <div className="objective-icon">{objective.icon}</div>
-                                                <div className="objective-content">
-                                                    <p>{objective.objective}</p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
+                            {renderTabContent()}
                         </div>
                     </div>
                 </div>
