@@ -2,9 +2,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getCourseFullStructure } from '../api/CoursesApi';
-import { 
-    getCourseLessonProgress, 
-    updateBulkLessonProgress, 
+import {
+    getCourseLessonProgress,
+    updateBulkLessonProgress,
     getCourseProgressSummary,
     trackLessonProgress,
     getLastPlayedLesson,
@@ -30,7 +30,7 @@ const CourseContentPage = () => {
         const fetchCourseContent = async () => {
             try {
                 console.log("Fetching course content for course ID:", id);
-                
+
                 // Fetch all data in parallel
                 const [courseResponse, progressResponse, summaryResponse, lastPlayedResponse] = await Promise.all([
                     getCourseFullStructure(id),
@@ -50,7 +50,7 @@ const CourseContentPage = () => {
                 // Process progress data
                 const progressData = progressResponse.data;
                 const completedLessons = {};
-                
+
                 if (Array.isArray(progressData)) {
                     progressData.forEach(progress => {
                         const lessonId = progress.lesson || progress.lesson_id;
@@ -80,7 +80,7 @@ const CourseContentPage = () => {
 
                 // Set active video: last played OR first video
                 let activeVideoToSet = null;
-                
+
                 if (lastPlayedResponse.data && lastPlayedResponse.data.lesson_id) {
                     activeVideoToSet = findLessonInCourse(courseResponse.data, lastPlayedResponse.data.lesson_id);
                     if (activeVideoToSet) {
@@ -88,18 +88,18 @@ const CourseContentPage = () => {
                         activeVideoToSet.lastPlayedTime = lastPlayedResponse.data.current_time;
                     }
                 }
-                
+
                 if (!activeVideoToSet) {
                     activeVideoToSet = findFirstVideo(courseResponse.data);
                 }
-                
+
                 setActiveVideo(activeVideoToSet);
 
                 // Expand first section by default
                 if (courseResponse.data.sections && courseResponse.data.sections.length > 0) {
                     setExpandedSections(new Set([courseResponse.data.sections[0].id]));
                 }
-                
+
             } catch (err) {
                 console.error('Full error details:', err);
                 setError('Failed to load course content');
@@ -116,7 +116,7 @@ const CourseContentPage = () => {
     // Video source detection function
     const getVideoSource = (videoUrl) => {
         if (!videoUrl) return { type: 'none', source: '' };
-        
+
         // Check if it's a YouTube URL
         const youtubeMatch = videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
         if (youtubeMatch) {
@@ -126,35 +126,35 @@ const CourseContentPage = () => {
                 canTrack: false
             };
         }
-        
+
         // Get base URL from environment and extract domain
         const baseUrl = process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000/';
         const baseDomain = new URL(baseUrl).hostname;
-        
+
         // Check if it's a self-hosted video
         const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.m3u8'];
-        const isVideoFile = videoExtensions.some(ext => 
-            videoUrl.toLowerCase().includes(ext) || 
+        const isVideoFile = videoExtensions.some(ext =>
+            videoUrl.toLowerCase().includes(ext) ||
             videoUrl.toLowerCase().includes('/media/') ||
             videoUrl.toLowerCase().includes(baseDomain) || // Use environment domain
             videoUrl.startsWith('/media/') || // Relative media URLs
             videoUrl.startsWith(baseUrl + 'media/') // Full media URLs with base URL
         );
-        
+
         if (isVideoFile) {
             // Handle relative URLs
             let finalUrl = videoUrl;
             if (videoUrl.startsWith('/media/')) {
                 finalUrl = `${baseUrl}${videoUrl.replace(/^\//, '')}`;
             }
-            
+
             return {
                 type: 'self-hosted',
                 source: finalUrl,
                 canTrack: true
             };
         }
-        
+
         // Default case (could be other external services)
         return {
             type: 'external',
@@ -189,12 +189,12 @@ const CourseContentPage = () => {
             if (videoRef.current) {
                 const newTime = videoRef.current.currentTime;
                 setCurrentTime(newTime);
-                
+
                 // Update progress every 10 seconds for self-hosted videos
                 if (Math.floor(newTime) % 10 === 0 && videoSource.canTrack) {
                     onProgressUpdate(newTime, false);
                 }
-                
+
                 // Auto-complete at 95% watched (for self-hosted videos only)
                 if (duration > 0 && newTime / duration > 0.95 && !isCompleted && videoSource.canTrack) {
                     console.log("Auto-completing video at 95% watched");
@@ -221,7 +221,7 @@ const CourseContentPage = () => {
         // Helper function to format time
         const formatTime = (seconds) => {
             if (!seconds || isNaN(seconds)) return '0:00';
-            
+
             const mins = Math.floor(seconds / 60);
             const secs = Math.floor(seconds % 60);
             return `${mins}:${secs.toString().padStart(2, '0')}`;
@@ -259,12 +259,12 @@ const CourseContentPage = () => {
                             <source src={videoSource.source} type="video/mp4" />
                             Your browser does not support the video tag.
                         </video>
-                        
+
                         {/* Progress overlay for self-hosted videos */}
                         <div className="video-progress-overlay">
                             <div className="progress-bar">
-                                <div 
-                                    className="progress-fill" 
+                                <div
+                                    className="progress-fill"
                                     style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
                                 />
                             </div>
@@ -296,7 +296,7 @@ const CourseContentPage = () => {
 
     const findFirstVideo = (courseData) => {
         if (!courseData.sections) return null;
-        
+
         for (const section of courseData.sections) {
             for (const subsection of section.subsections) {
                 if (subsection.lessons && subsection.lessons.length > 0) {
@@ -314,7 +314,7 @@ const CourseContentPage = () => {
 
     const findLessonInCourse = (courseData, lessonId) => {
         if (!courseData.sections) return null;
-        
+
         for (const section of courseData.sections) {
             for (const subsection of section.subsections) {
                 if (subsection.lessons) {
@@ -350,9 +350,9 @@ const CourseContentPage = () => {
             subsectionTitle,
             lastPlayedTime: lastPlayed?.lesson_id === lesson.id ? lastPlayed.current_time : 0
         };
-        
+
         setActiveVideo(videoData);
-        
+
         // Track that user started watching this lesson
         await trackLessonPlay(lesson.id, 0, false);
     };
@@ -360,23 +360,23 @@ const CourseContentPage = () => {
     const trackLessonPlay = async (lessonId, currentTime = 0, completed = false) => {
         try {
             const videoSource = getVideoSource(activeVideo?.video_url);
-            
+
             // Only track time for self-hosted videos
             const trackedTime = videoSource.canTrack ? Math.floor(currentTime) : 0;
-            
+
             await trackLessonProgress(lessonId, {
                 current_time: trackedTime,
                 completed: completed,
                 total_duration: activeVideo?.video_duration || 0
             });
-            
-            console.log("Tracked lesson play:", { 
-                lessonId, 
-                currentTime: trackedTime, 
+
+            console.log("Tracked lesson play:", {
+                lessonId,
+                currentTime: trackedTime,
                 completed,
-                videoType: videoSource.type 
+                videoType: videoSource.type
             });
-            
+
             // Update local completion status if completed
             if (completed && !completionStatus[lessonId]) {
                 setCompletionStatus(prev => ({
@@ -384,7 +384,7 @@ const CourseContentPage = () => {
                     [lessonId]: true
                 }));
             }
-            
+
         } catch (error) {
             console.error('Error tracking lesson progress:', error);
         }
@@ -415,7 +415,7 @@ const CourseContentPage = () => {
                     watched_duration: activeVideo?.video_duration || 0
                 }
             ];
-            
+
             await updateBulkLessonProgress(id, bulkProgressData);
 
             // Refresh progress summary
@@ -427,7 +427,7 @@ const CourseContentPage = () => {
         } catch (error) {
             console.error('Error updating lesson progress:', error);
             console.error('Error details:', error.response?.data);
-            
+
             // Revert local state on error
             setCompletionStatus(prev => {
                 const newState = { ...prev };
@@ -448,8 +448,8 @@ const CourseContentPage = () => {
 
     const getTotalLessons = () => {
         if (!course?.sections) return 0;
-        return course.sections.reduce((total, section) => 
-            total + section.subsections.reduce((subTotal, subsection) => 
+        return course.sections.reduce((total, section) =>
+            total + section.subsections.reduce((subTotal, subsection) =>
                 subTotal + (subsection.lessons ? subsection.lessons.length : 0), 0
             ), 0
         );
@@ -468,7 +468,7 @@ const CourseContentPage = () => {
         if (!seconds) return '0m';
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
-        
+
         if (hours > 0) {
             return `${hours}h ${minutes}m`;
         }
@@ -483,7 +483,7 @@ const CourseContentPage = () => {
                     <div className="course-description">
                         <h3>Course Overview</h3>
                         <p>{course.description}</p>
-                        
+
                         {/* Course Requirements */}
                         {course.requirements && (
                             <div className="requirements-section">
@@ -502,7 +502,7 @@ const CourseContentPage = () => {
                         )}
                     </div>
                 );
-            
+
             case 'objectives':
                 return (
                     course.learning_objectives && course.learning_objectives.length > 0 && (
@@ -574,18 +574,23 @@ const CourseContentPage = () => {
         return iconMap[extension] || '📄';
     };
 
-    // Collect all lesson resources
-    const lessonResources = [];
+    // Collect all lesson resources from the course
+    const allResources = [];
     if (course.sections) {
         course.sections.forEach(section => {
             section.subsections.forEach(subsection => {
                 if (subsection.lessons) {
                     subsection.lessons.forEach(lesson => {
-                        if (lesson.resources) {
-                            lessonResources.push({
-                                ...lesson,
-                                sectionTitle: section.title,
-                                subsectionTitle: subsection.title
+                        // Check if lesson has resources array
+                        if (lesson.resources && Array.isArray(lesson.resources)) {
+                            lesson.resources.forEach(resource => {
+                                allResources.push({
+                                    ...resource,
+                                    lessonTitle: lesson.title,
+                                    sectionTitle: section.title,
+                                    subsectionTitle: subsection.title,
+                                    lessonId: lesson.id
+                                });
                             });
                         }
                     });
@@ -594,31 +599,108 @@ const CourseContentPage = () => {
         });
     }
 
+    // Group resources by type for better organization
+    const groupedResources = {
+        documents: allResources.filter(resource => {
+            const ext = resource.file ? resource.file.split('.').pop().toLowerCase() : '';
+            return ['pdf', 'doc', 'docx', 'txt'].includes(ext);
+        }),
+        presentations: allResources.filter(resource => {
+            const ext = resource.file ? resource.file.split('.').pop().toLowerCase() : '';
+            return ['ppt', 'pptx'].includes(ext);
+        }),
+        spreadsheets: allResources.filter(resource => {
+            const ext = resource.file ? resource.file.split('.').pop().toLowerCase() : '';
+            return ['xls', 'xlsx'].includes(ext);
+        }),
+        archives: allResources.filter(resource => {
+            const ext = resource.file ? resource.file.split('.').pop().toLowerCase() : '';
+            return ['zip', 'rar'].includes(ext);
+        }),
+        media: allResources.filter(resource => {
+            const ext = resource.file ? resource.file.split('.').pop().toLowerCase() : '';
+            return ['mp4', 'mov', 'avi', 'jpg', 'jpeg', 'png'].includes(ext);
+        }),
+        other: allResources.filter(resource => {
+            const ext = resource.file ? resource.file.split('.').pop().toLowerCase() : '';
+            return !['pdf', 'doc', 'docx', 'txt', 'ppt', 'pptx', 'xls', 'xlsx', 'zip', 'rar', 'mp4', 'mov', 'avi', 'jpg', 'jpeg', 'png'].includes(ext);
+        })
+    };
+
+    // Helper function to format file size
+    const formatFileSize = (bytes) => {
+        if (!bytes) return '';
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / 1048576).toFixed(1) + ' MB';
+    };
+
+    // Helper function to get full file URL
+    const getFileUrl = (filePath) => {
+        if (!filePath) return '';
+        if (filePath.startsWith('http')) return filePath;
+        const baseUrl = process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000';
+        return `${baseUrl}${filePath.startsWith('/') ? '' : '/'}${filePath}`;
+    };
+
     return (
         <div className="course-resources">
             <h3>Course Resources</h3>
             
-            {/* Lesson Resources */}
-            {lessonResources.length > 0 ? (
+            {/* Resource Summary */}
+            <div className="resources-summary">
+                <div className="summary-card">
+                    <div className="summary-icon">📚</div>
+                    <div className="summary-content">
+                        <h4>{allResources.length} Resources Available</h4>
+                        <p>Downloadable materials to enhance your learning experience</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* All Resources Grid */}
+            {allResources.length > 0 ? (
                 <div className="resources-section">
-                    <h4>Lesson Resources ({lessonResources.length})</h4>
+                    <h4>All Resources ({allResources.length})</h4>
                     <div className="resources-grid">
-                        {lessonResources.map((lesson) => (
-                            <div key={lesson.id} className="resource-card">
+                        {allResources.map((resource, index) => (
+                            <div key={resource.id || index} className="resource-card">
                                 <div className="resource-icon">
-                                    {getResourceIcon(lesson.resources)}
+                                    {getResourceIcon(resource.file)}
                                 </div>
                                 <div className="resource-content">
-                                    <h5>{lesson.title}</h5>
-                                    <p>From: {lesson.sectionTitle} • {lesson.subsectionTitle}</p>
+                                    <h5>{resource.title || 'Untitled Resource'}</h5>
+                                    <div className="resource-meta">
+                                        <span className="resource-source">
+                                            From: <strong>{resource.lessonTitle}</strong>
+                                        </span>
+                                        <span className="resource-section">
+                                            {resource.sectionTitle} • {resource.subsectionTitle}
+                                        </span>
+                                    </div>
+                                    <div className="resource-details">
+                                        <span className="resource-type">
+                                            {getFileType(resource.file)}
+                                        </span>
+                                        {resource.file_size && (
+                                            <span className="resource-size">
+                                                {formatFileSize(resource.file_size)}
+                                            </span>
+                                        )}
+                                    </div>
                                     <a 
-                                        href={lesson.resources} 
+                                        href={getFileUrl(resource.file)} 
                                         className="resource-download-btn"
                                         target="_blank" 
                                         rel="noopener noreferrer"
                                         download
                                     >
-                                        Download {getFileType(lesson.resources)}
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                            <path d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                            <path d="M4.66675 6.66667L8.00008 10L11.3334 6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                            <path d="M8 10V2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                        </svg>
+                                        Download {getFileType(resource.file)}
                                     </a>
                                 </div>
                             </div>
@@ -632,10 +714,12 @@ const CourseContentPage = () => {
                     <p>This course doesn't have any downloadable resources yet.</p>
                 </div>
             )}
+
+            
         </div>
     );
-            
-            
+
+
             default:
                 return null;
         }
@@ -658,8 +742,8 @@ const CourseContentPage = () => {
                 <div className="course-content__error">
                     <h2>Unable to load course</h2>
                     <p>{error || 'Course not found'}</p>
-                    <button 
-                        onClick={() => navigate('/enrolled-courses')} 
+                    <button
+                        onClick={() => navigate('/enrolled-courses')}
                         className="btn btn--primary"
                     >
                         Back to My Courses
@@ -676,14 +760,14 @@ const CourseContentPage = () => {
                 <div className="course-content__breadcrumb">
                     <Link to="/enrolled-courses" className="breadcrumb-link">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                         My Courses
                     </Link>
                     <span className="breadcrumb-separator">/</span>
                     <span className="breadcrumb-current">{course.title}</span>
                 </div>
-                
+
                 {/* Resume Banner */}
                 {lastPlayed && lastPlayed.lesson_id !== activeVideo?.id && (
                     <div className="resume-banner">
@@ -694,7 +778,7 @@ const CourseContentPage = () => {
                                 <span> ({(lastPlayed.current_time / 60).toFixed(0)}m watched)</span>
                             )}
                         </div>
-                        <button 
+                        <button
                             className="btn btn--primary btn--sm"
                             onClick={handleResumeLastPlayed}
                         >
@@ -702,12 +786,12 @@ const CourseContentPage = () => {
                         </button>
                     </div>
                 )}
-                
+
                 <div className="course-header__main">
                     <div className="course-header__info">
                         <h1 className="course-content__title">{course.title}</h1>
                         <p className="course-content__instructor">By {course.instructor_name}</p>
-                        
+
                         {/* Enhanced Meta Information */}
                         <div className="course-meta-grid">
                             <div className="meta-item">
@@ -742,7 +826,7 @@ const CourseContentPage = () => {
                             )}
                         </div>
                     </div>
-                    
+
                     {/* Progress Card */}
                     <div className="progress-card">
                         <div className="progress-card__header">
@@ -750,8 +834,8 @@ const CourseContentPage = () => {
                             <span className="progress-percentage">{getProgressPercentage()}%</span>
                         </div>
                         <div className="progress-bar">
-                            <div 
-                                className="progress-bar__fill" 
+                            <div
+                                className="progress-bar__fill"
                                 style={{ width: `${getProgressPercentage()}%` }}
                             ></div>
                         </div>
@@ -798,26 +882,26 @@ const CourseContentPage = () => {
                                         </div>
                                         <div className="video-actions">
                                             {!completionStatus[activeVideo.id] && (
-                                                <button 
+                                                <button
                                                     className="action-btn action-btn--complete"
                                                     onClick={() => markLessonAsCompleted(activeVideo.id)}
                                                 >
                                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                                        <path d="M13.3334 4L6.00008 11.3333L2.66675 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                        <path d="M13.3334 4L6.00008 11.3333L2.66675 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                                     </svg>
                                                     Mark Complete
                                                 </button>
                                             )}
                                             <button className="action-btn">
                                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                                    <path d="M8 2V14M2 8H14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                                    <path d="M8 2V14M2 8H14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                                                 </svg>
                                                 Notes
                                             </button>
                                         </div>
                                     </div>
                                     <div className="video-player__container">
-                                        <EnhancedVideoPlayer 
+                                        <EnhancedVideoPlayer
                                             video={activeVideo}
                                             onProgressUpdate={(currentTime, completed) => trackLessonPlay(activeVideo.id, currentTime, completed)}
                                             onCompleted={() => markLessonAsCompleted(activeVideo.id)}
@@ -840,26 +924,26 @@ const CourseContentPage = () => {
                     {/* Course Details Section with Tabs */}
                     <div className="course-details-section">
                         <div className="details-tabs">
-                            <button 
+                            <button
                                 className={`tab-btn ${activeTab === 'description' ? 'tab-btn--active' : ''}`}
                                 onClick={() => setActiveTab('description')}
                             >
                                 Description
                             </button>
-                            <button 
+                            <button
                                 className={`tab-btn ${activeTab === 'objectives' ? 'tab-btn--active' : ''}`}
                                 onClick={() => setActiveTab('objectives')}
                             >
                                 Objectives
                             </button>
-                            <button 
+                            <button
                                 className={`tab-btn ${activeTab === 'resources' ? 'tab-btn--active' : ''}`}
                                 onClick={() => setActiveTab('resources')}
                             >
                                 Resources
                             </button>
                         </div>
-                        
+
                         <div className="tab-content">
                             {renderTabContent()}
                         </div>
@@ -879,7 +963,7 @@ const CourseContentPage = () => {
                                 <span>{getProgressPercentage()}% complete</span>
                             </div>
                         </div>
-                        
+
                         <div className="curriculum-sections">
                             {course.sections && course.sections.map(section => (
                                 <SectionAccordion
@@ -903,11 +987,11 @@ const CourseContentPage = () => {
 
 // Enhanced Section Accordion Component
 const SectionAccordion = ({ section, isExpanded, onToggle, activeVideo, onVideoSelect, completionStatus, onMarkComplete }) => {
-    const totalLessons = section.subsections ? section.subsections.reduce((total, subsection) => 
+    const totalLessons = section.subsections ? section.subsections.reduce((total, subsection) =>
         total + (subsection.lessons ? subsection.lessons.length : 0), 0
     ) : 0;
 
-    const completedLessons = section.subsections ? section.subsections.reduce((total, subsection) => 
+    const completedLessons = section.subsections ? section.subsections.reduce((total, subsection) =>
         total + (subsection.lessons ? subsection.lessons.filter(lesson => completionStatus[lesson.id]).length : 0), 0
     ) : 0;
 
@@ -915,7 +999,7 @@ const SectionAccordion = ({ section, isExpanded, onToggle, activeVideo, onVideoS
 
     return (
         <div className="section-accordion">
-            <div 
+            <div
                 className={`section-accordion__header ${isExpanded ? 'section-accordion__header--expanded' : ''}`}
                 onClick={onToggle}
             >
@@ -933,31 +1017,31 @@ const SectionAccordion = ({ section, isExpanded, onToggle, activeVideo, onVideoS
                         </span>
                     </div>
                     <div className="section-progress-bar">
-                        <div 
-                            className="section-progress__fill" 
+                        <div
+                            className="section-progress__fill"
                             style={{ width: `${progressPercentage}%` }}
                         ></div>
                     </div>
                 </div>
                 <div className="section-accordion__icon">
-                    <svg 
-                        width="16" 
-                        height="16" 
-                        viewBox="0 0 16 16" 
-                        fill="none" 
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
                         xmlns="http://www.w3.org/2000/svg"
                     >
-                        <path 
-                            d={isExpanded ? "M4 10L8 6L12 10" : "M6 4L10 8L6 12"} 
-                            stroke="currentColor" 
-                            strokeWidth="2" 
-                            strokeLinecap="round" 
+                        <path
+                            d={isExpanded ? "M4 10L8 6L12 10" : "M6 4L10 8L6 12"}
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
                             strokeLinejoin="round"
                         />
                     </svg>
                 </div>
             </div>
-            
+
             {isExpanded && section.subsections && (
                 <div className="section-accordion__content">
                     {section.subsections.map(subsection => (
@@ -979,7 +1063,7 @@ const SectionAccordion = ({ section, isExpanded, onToggle, activeVideo, onVideoS
 
 // Enhanced Subsection Component
 const Subsection = ({ subsection, sectionTitle, activeVideo, onVideoSelect, completionStatus, onMarkComplete }) => {
-    const completedLessons = subsection.lessons ? 
+    const completedLessons = subsection.lessons ?
         subsection.lessons.filter(lesson => completionStatus[lesson.id]).length : 0;
 
     return (
@@ -995,7 +1079,7 @@ const Subsection = ({ subsection, sectionTitle, activeVideo, onVideoSelect, comp
                     <span className="subsection-progress">{completedLessons}/{subsection.lessons ? subsection.lessons.length : 0}</span>
                 </div>
             </div>
-            
+
             {subsection.lessons && (
                 <div className="subsection__lessons">
                     {subsection.lessons.map(lesson => (
@@ -1036,7 +1120,7 @@ const LessonItem = ({ lesson, sectionTitle, subsectionTitle, isActive, isComplet
     };
 
     return (
-        <div 
+        <div
             className={`lesson-item ${isActive ? 'lesson-item--active' : ''} ${isCompleted ? 'lesson-item--completed' : ''}`}
             onClick={handleLessonClick}
         >
@@ -1044,7 +1128,7 @@ const LessonItem = ({ lesson, sectionTitle, subsectionTitle, isActive, isComplet
                 {isCompleted ? (
                     <div className="status-completed">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path d="M13.3334 4L6.00008 11.3333L2.66675 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M13.3334 4L6.00008 11.3333L2.66675 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                     </div>
                 ) : (
@@ -1053,26 +1137,26 @@ const LessonItem = ({ lesson, sectionTitle, subsectionTitle, isActive, isComplet
                     </div>
                 )}
             </div>
-            
+
             <div className="lesson-item__icon">
                 {lesson.lesson_type === 'video' ? (
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path 
-                            d="M6 4L12 8L6 12V4Z" 
-                            fill="currentColor" 
+                        <path
+                            d="M6 4L12 8L6 12V4Z"
+                            fill="currentColor"
                         />
                     </svg>
                 ) : (
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path 
-                            d="M2 2H14V14H2V2Z" 
-                            stroke="currentColor" 
-                            strokeWidth="2" 
+                        <path
+                            d="M2 2H14V14H2V2Z"
+                            stroke="currentColor"
+                            strokeWidth="2"
                         />
                     </svg>
                 )}
             </div>
-            
+
             <div className="lesson-item__content">
                 <h6 className="lesson-item__title">{lesson.title}</h6>
                 <div className="lesson-item__meta">
@@ -1088,17 +1172,17 @@ const LessonItem = ({ lesson, sectionTitle, subsectionTitle, isActive, isComplet
             </div>
 
             {!isCompleted && (
-                <button 
+                <button
                     className="lesson-mark-complete"
                     onClick={handleMarkComplete}
                     title="Mark as completed"
                 >
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.5"/>
+                        <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.5" />
                     </svg>
                 </button>
             )}
-            
+
             {isActive && (
                 <div className="lesson-item__playing">
                     <div className="playing-indicator"></div>
