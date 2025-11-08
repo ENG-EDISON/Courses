@@ -1,8 +1,7 @@
 // components/LessonEditor.js
 import React, { useState, useEffect } from 'react';
 import { getLessons, updateLesson, createLesson, deleteLesson } from '../../api/LessonsApi';
-
-import {getCourseFullStructure} from "../../api/CoursesApi"
+import { getCourseFullStructure } from "../../api/CoursesApi";
 
 const LessonEditor = ({ course, onUpdate, onBack }) => {
   const [lessons, setLessons] = useState([]);
@@ -36,9 +35,7 @@ const LessonEditor = ({ course, onUpdate, onBack }) => {
       const sectionsData = response.data.sections || [];
       setSections(sectionsData);
       
-      // Check different possible field names
       const allSubsections = sectionsData.flatMap(section => {
-        // Try different possible field names
         const subsectionsArray = section.subsections || section.subsection || section.sub_sections || [];
         console.log(`Section "${section.title}" has subsections:`, subsectionsArray);
         
@@ -57,7 +54,6 @@ const LessonEditor = ({ course, onUpdate, onBack }) => {
 
   const handleEditLesson = (lesson) => {
     setEditingLesson(lesson);
-    // Set the selected section based on the lesson's subsection
     if (lesson.subsection) {
       const subsection = subsections.find(sub => sub.id === lesson.subsection);
       if (subsection) {
@@ -68,15 +64,37 @@ const LessonEditor = ({ course, onUpdate, onBack }) => {
 
   const handleSaveLesson = async (lessonData) => {
     try {
-      // Ensure we're using PATCH for updates to preserve subsection
-      if (editingLesson.id) {
-        await updateLesson(editingLesson.id, lessonData);
-      } else {
-        await createLesson({
-          ...lessonData,
-          course: course.id
+      // Handle file upload if video file exists
+      if (lessonData.video_file) {
+        const formData = new FormData();
+        
+        // Append all lesson data
+        Object.keys(lessonData).forEach(key => {
+          if (key === 'video_file' && lessonData[key]) {
+            formData.append('video_file', lessonData[key]);
+          } else if (key !== 'video_file') {
+            formData.append(key, lessonData[key]);
+          }
         });
+        
+        if (editingLesson.id) {
+          await updateLesson(editingLesson.id, formData);
+        } else {
+          formData.append('course', course.id);
+          await createLesson(formData);
+        }
+      } else {
+        // Regular JSON data
+        if (editingLesson.id) {
+          await updateLesson(editingLesson.id, lessonData);
+        } else {
+          await createLesson({
+            ...lessonData,
+            course: course.id
+          });
+        }
       }
+      
       setEditingLesson(null);
       setSelectedSection('');
       fetchLessons();
@@ -94,7 +112,8 @@ const LessonEditor = ({ course, onUpdate, onBack }) => {
       is_preview: false,
       content: '',
       video_url: '',
-      video_duration: 0
+      video_duration: 0,
+      video_file: null
     });
     setSelectedSection('');
   };
@@ -180,6 +199,7 @@ const LessonEditor = ({ course, onUpdate, onBack }) => {
                       {lesson.lesson_type}
                     </span>
                     {lesson.is_preview && <span className="preview-badge">Preview</span>}
+                    {lesson.video_file && <span className="upload-badge">Uploaded Video</span>}
                   </div>
                 </div>
                 
@@ -258,17 +278,31 @@ const LessonEditModal = ({
     video_duration: lesson.video_duration || 0,
     order: lesson.order || 0,
     is_preview: lesson.is_preview || false,
-    subsection: lesson.subsection || ''
+    subsection: lesson.subsection || '',
+    video_file: null
   });
 
+  const [videoSource, setVideoSource] = useState(lesson.video_file ? 'upload' : (lesson.video_url ? 'url' : 'upload'));
   const [errors, setErrors] = useState({});
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length === 0) {
-      onSave(formData);
+      // Clean up data based on video source
+      const submitData = { ...formData };
+      
+      if (videoSource === 'upload') {
+        // Remove video_url if uploading file
+        submitData.video_url = '';
+      } else if (videoSource === 'url') {
+        // Remove video_file if using URL
+        submitData.video_file = null;
+      }
+      
+      onSave(submitData);
     } else {
       setErrors(validationErrors);
     }
@@ -281,8 +315,12 @@ const LessonEditModal = ({
       errors.title = 'Title is required';
     }
     
-    if (formData.lesson_type === 'video' && !formData.video_url && !formData.video_file) {
-      errors.video_url = 'Video URL or file is required for video lessons';
+    if (formData.lesson_type === 'video') {
+      if (videoSource === 'url' && !formData.video_url) {
+        errors.video_url = 'Video URL is required';
+      } else if (videoSource === 'upload' && !formData.video_file && !lesson.video_file) {
+        errors.video_file = 'Please select a video file to upload';
+      }
     }
     
     if (formData.order < 0) {
@@ -310,6 +348,48 @@ const LessonEditModal = ({
       ...prev,
       video_duration: totalSeconds
     }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      const validVideoTypes = ['video/mp4', 'video/mov', 'video/avi', 'video/mkv', 'video/webm'];
+      if (!validVideoTypes.includes(file.type)) {
+        setErrors(prev => ({
+          ...prev,
+          video_file: 'Please select a valid video file (MP4, MOV, AVI, MKV, WebM)'
+        }));
+        return;
+      }
+
+      // Validate file size (max 500MB)
+      if (file.size > 500 * 1024 * 1024) {
+        setErrors(prev => ({
+          ...prev,
+          video_file: 'Video file size must be less than 500MB'
+        }));
+        return;
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        video_file: file
+      }));
+      
+      // Clear file error
+      setErrors(prev => ({ ...prev, video_file: '' }));
+      
+      // Simulate progress for better UX
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 10;
+        setUploadProgress(progress);
+        if (progress >= 90) {
+          clearInterval(interval);
+        }
+      }, 100);
+    }
   };
 
   const currentMinutes = Math.floor(formData.video_duration / 60);
@@ -399,16 +479,90 @@ const LessonEditModal = ({
           {formData.lesson_type === 'video' && (
             <div className="video-fields">
               <div className="form-group">
-                <label>Video URL</label>
-                <input
-                  type="url"
-                  value={formData.video_url}
-                  onChange={(e) => setFormData({...formData, video_url: e.target.value})}
-                  placeholder="https://youtube.com/embed/..."
-                  className={errors.video_url ? 'error' : ''}
-                />
-                {errors.video_url && <span className="error-text">{errors.video_url}</span>}
+                <label>Video Source</label>
+                <div className="video-source-toggle">
+                  <label className="toggle-option">
+                    <input
+                      type="radio"
+                      value="upload"
+                      checked={videoSource === 'upload'}
+                      onChange={(e) => setVideoSource(e.target.value)}
+                    />
+                    <span className="toggle-label">Upload Video File</span>
+                  </label>
+                  <label className="toggle-option">
+                    <input
+                      type="radio"
+                      value="url"
+                      checked={videoSource === 'url'}
+                      onChange={(e) => setVideoSource(e.target.value)}
+                    />
+                    <span className="toggle-label">Use Video URL</span>
+                  </label>
+                </div>
               </div>
+
+              {videoSource === 'upload' && (
+                <div className="file-upload-section">
+                  <div className="form-group">
+                    <label>Video File *</label>
+                    <div className="file-upload-area">
+                      <input
+                        type="file"
+                        accept="video/mp4,video/mov,video/avi,video/mkv,video/webm"
+                        onChange={handleFileChange}
+                        className="file-input"
+                      />
+                      <div className="upload-placeholder">
+                        {formData.video_file ? (
+                          <div className="file-selected">
+                            <span className="file-name">{formData.video_file.name}</span>
+                            <span className="file-size">
+                              ({(formData.video_file.size / (1024 * 1024)).toFixed(2)} MB)
+                            </span>
+                            {uploadProgress > 0 && uploadProgress < 100 && (
+                              <div className="upload-progress">
+                                <div 
+                                  className="progress-bar" 
+                                  style={{ width: `${uploadProgress}%` }}
+                                ></div>
+                                <span>{uploadProgress}%</span>
+                              </div>
+                            )}
+                          </div>
+                        ) : lesson.video_file ? (
+                          <div className="file-selected">
+                            <span className="file-name">✓ Video already uploaded</span>
+                          </div>
+                        ) : (
+                          <div className="upload-prompt">
+                            <span>Click to select video file</span>
+                            <small>Supported: MP4, MOV, AVI, MKV, WebM (Max: 500MB)</small>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {errors.video_file && <span className="error-text">{errors.video_file}</span>}
+                  </div>
+                </div>
+              )}
+
+              {videoSource === 'url' && (
+                <div className="form-group">
+                  <label>Video URL *</label>
+                  <input
+                    type="url"
+                    value={formData.video_url}
+                    onChange={(e) => setFormData({...formData, video_url: e.target.value})}
+                    placeholder="https://youtube.com/embed/... or direct video URL"
+                    className={errors.video_url ? 'error' : ''}
+                  />
+                  {errors.video_url && <span className="error-text">{errors.video_url}</span>}
+                  <small className="help-text">
+                    Supports YouTube embed URLs, Vimeo, or direct video links
+                  </small>
+                </div>
+              )}
 
               <div className="form-row">
                 <div className="form-group">

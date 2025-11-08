@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import LessonResource from './LessonResource';
 
 const Lesson = ({ 
@@ -14,6 +14,36 @@ const Lesson = ({
   onToggle
 }) => {
   const [isAddingResource, setIsAddingResource] = useState(false);
+  const [videoSource, setVideoSource] = useState(
+    lesson.video_file ? 'upload' : (lesson.video_url ? 'url' : 'upload')
+  );
+
+  const [previewUrl, setPreviewUrl] = useState(null);
+
+  // ✅ Generate preview dynamically when video changes
+  useEffect(() => {
+    if (lesson.video_file && typeof lesson.video_file !== 'string') {
+      const fileUrl = URL.createObjectURL(lesson.video_file);
+      setPreviewUrl(fileUrl);
+      return () => URL.revokeObjectURL(fileUrl);
+    } else if (lesson.video_file && typeof lesson.video_file === 'string') {
+      // If video_file is stored URL from backend
+      setPreviewUrl(lesson.video_file);
+    } else if (lesson.video_url) {
+       // eslint-disable-next-line
+      const youtubeMatch = lesson.video_url.match(/(?:youtube\.com\/.*v=|youtu\.be\/)([^"&?\/\s]{11})/);
+      if (youtubeMatch) {
+        setPreviewUrl(`https://www.youtube.com/embed/${youtubeMatch[1]}`);
+      } else if (lesson.video_url.includes('vimeo.com')) {
+        const vimeoId = lesson.video_url.split('/').pop();
+        setPreviewUrl(`https://player.vimeo.com/video/${vimeoId}`);
+      } else {
+        setPreviewUrl(lesson.video_url);
+      }
+    } else {
+      setPreviewUrl(null);
+    }
+  }, [lesson.video_file, lesson.video_url]);
 
   const updateLesson = useCallback((field, value) => {
     const updatedSections = sections.map((section, secIndex) => {
@@ -37,15 +67,11 @@ const Lesson = ({
 
   const deleteLesson = useCallback(() => {
     const lessonToDelete = sections[sectionIndex]?.subsections[subsectionIndex]?.lessons[lessonIndex];
-    
     if (lessonToDelete?.id) {
-      if (window.confirm('This lesson exists in the database. Do you want to delete it permanently?')) {
-        console.log('Should delete existing lesson from database:', lessonToDelete.id);
-      } else {
+      if (!window.confirm('This lesson exists in the database. Do you want to delete it permanently?')) {
         return;
       }
     }
-    
     const updatedSections = sections.map((section, secIndex) => {
       if (secIndex === sectionIndex) {
         const updatedSubsections = section.subsections.map((sub, subIdx) => {
@@ -65,7 +91,6 @@ const Lesson = ({
 
   const addResource = useCallback(() => {
     if (isAddingResource) return;
-
     setIsAddingResource(true);
     try {
       const updatedSections = sections.map((section, secIndex) => {
@@ -79,7 +104,6 @@ const Lesson = ({
                     file: null,
                     resource_type: 'document',
                     order: les.resources?.length || 0,
-                    lesson: lessonIndex,
                     isExisting: false
                   };
                   return { 
@@ -104,29 +128,53 @@ const Lesson = ({
     }
   }, [sectionIndex, subsectionIndex, lessonIndex, sections, setSections, onUpdate, isAddingResource]);
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const validVideoTypes = ['video/mp4', 'video/mov', 'video/avi', 'video/mkv', 'video/webm'];
+    if (!validVideoTypes.includes(file.type)) {
+      alert('Please select a valid video file (MP4, MOV, AVI, MKV, WebM)');
+      return;
+    }
+
+    if (file.size > 500 * 1024 * 1024) {
+      alert('Video file must be smaller than 500MB');
+      return;
+    }
+
+    updateLesson('video_file', file);
+    updateLesson('video_url', '');
+    setVideoSource('upload');
+  };
+
+  const handleVideoSourceChange = (source) => {
+    setVideoSource(source);
+    if (source === 'upload') {
+      updateLesson('video_url', '');
+    } else {
+      updateLesson('video_file', null);
+    }
+  };
+
+  const hasExistingVideoFile = !!lesson.video_file && typeof lesson.video_file === 'string';
+
   return (
     <div className={`lesson-card ${isExistingInDatabase(lesson) ? 'existing-lesson' : 'new-lesson'}`}>
-      {/* Lesson Header - Clickable for collapse/expand */}
       <div 
         className={`lesson-header ${isExpanded ? 'expanded' : ''}`}
         onClick={() => onToggle(sectionIndex, subsectionIndex, lessonIndex)}
       >
         <button 
           className={`lesson-toggle ${isExpanded ? 'expanded' : ''}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggle(sectionIndex, subsectionIndex, lessonIndex);
-          }}
-        >
-          ▶
-        </button>
+          onClick={(e) => { e.stopPropagation(); onToggle(sectionIndex, subsectionIndex, lessonIndex); }}
+        >▶</button>
 
-        {/* Order Input for Lesson */}
         <div className="order-input-group">
           <label>ORDER</label>
           <input
             type="number"
-            value={lesson.order !== undefined ? lesson.order : lessonIndex}
+            value={lesson.order ?? lessonIndex}
             onChange={(e) => updateLesson('order', parseInt(e.target.value) || 0)}
             className="order-input"
             min="0"
@@ -147,24 +195,19 @@ const Lesson = ({
           <span className={`status-badge ${isExistingInDatabase(lesson) ? 'existing' : 'new'}`}>
             {isExistingInDatabase(lesson) ? 'EXISTING' : 'NEW'}
           </span>
+          {hasExistingVideoFile && <span className="upload-badge">UPLOADED</span>}
         </div>
 
         <div className="lesson-actions">
           <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              addResource();
-            }} 
+            onClick={(e) => { e.stopPropagation(); addResource(); }}
             className="btn-secondary"
             disabled={isAddingResource}
           >
             + Add Resource
           </button>
           <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              deleteLesson();
-            }} 
+            onClick={(e) => { e.stopPropagation(); deleteLesson(); }}
             className="btn-danger"
           >
             Delete
@@ -172,91 +215,126 @@ const Lesson = ({
         </div>
       </div>
 
-      {/* Lesson Content - Only show when expanded */}
       {isExpanded && (
         <div className="lesson-content">
-          <div><label className="section-label">Lesson Content</label></div>
           <div className="lesson-content-section">
-
+            <label className="section-label">Lesson Content</label>
             <textarea
               value={lesson.content}
               onChange={(e) => updateLesson('content', e.target.value)}
-              placeholder="Enter lesson content (supports markdown)..."
+              placeholder="Enter lesson content..."
               rows={4}
               className="lesson-content-textarea"
             />
           </div>
 
           <div className="lesson-content-section">
-            <label className="section-label">Lesson Details</label>
-            <div className="lesson-meta-grid">
-              <div className="meta-field">
+            <label className="section-label">Video Settings</label>
+            <div className="video-source-toggle">
+              <label className="toggle-option">
+                <input
+                  type="radio"
+                  value="upload"
+                  checked={videoSource === 'upload'}
+                  onChange={(e) => handleVideoSourceChange(e.target.value)}
+                />
+                Upload Video
+              </label>
+              <label className="toggle-option">
+                <input
+                  type="radio"
+                  value="url"
+                  checked={videoSource === 'url'}
+                  onChange={(e) => handleVideoSourceChange(e.target.value)}
+                />
+                Use Video URL
+              </label>
+            </div>
+
+            {videoSource === 'upload' && (
+              <div className="file-upload-section">
+                <label>Video File</label>
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={handleFileChange}
+                />
+                {previewUrl && (
+                  <video controls width="100%" style={{ marginTop: '10px', borderRadius: '8px' }}>
+                    <source src={previewUrl} />
+                    Your browser does not support the video tag.
+                  </video>
+                )}
+              </div>
+            )}
+
+            {videoSource === 'url' && (
+              <div className="form-group">
                 <label>Video URL</label>
                 <input
                   type="url"
-                  value={lesson.video_url}
+                  value={lesson.video_url || ''}
                   onChange={(e) => updateLesson('video_url', e.target.value)}
-                  placeholder="https://example.com/video"
+                  placeholder="https://youtube.com/watch?v=..."
                   className="meta-input"
                 />
+                {previewUrl && (
+                  <div className="video-preview" style={{ marginTop: '10px' }}>
+                    {previewUrl.includes('youtube.com') || previewUrl.includes('vimeo.com') ? (
+                      <iframe
+                        src={previewUrl}
+                        width="100%"
+                        height="300"
+                        frameBorder="0"
+                        allowFullScreen
+                        title="Video Preview"
+                      ></iframe>
+                    ) : (
+                      <video controls width="100%">
+                        <source src={previewUrl} />
+                        Your browser does not support the video tag.
+                      </video>
+                    )}
+                  </div>
+                )}
               </div>
-              
+            )}
+
+            <div className="lesson-meta-grid">
               <div className="meta-field">
                 <label>Duration (minutes)</label>
                 <input
                   type="number"
-                  value={lesson.duration_minutes}
+                  value={lesson.duration_minutes || 0}
                   onChange={(e) => updateLesson('duration_minutes', parseInt(e.target.value) || 0)}
-                  placeholder="0"
                   min="0"
-                  className="meta-input"
                 />
               </div>
 
               <div className="meta-field checkbox-field">
-                <label className="checkbox-label">
+                <label>
                   <input
                     type="checkbox"
-                    checked={lesson.is_preview}
+                    checked={lesson.is_preview || false}
                     onChange={(e) => updateLesson('is_preview', e.target.checked)}
                   />
-                  <span className="checkmark"></span>
-                  Preview lesson (free to watch)
+                  Preview Lesson
                 </label>
               </div>
             </div>
           </div>
 
+          {/* Resources Section */}
           <div className="lesson-content-section">
             <div className="resources-header">
-              <div className="resources-title">
-                <h6>Lesson Resources</h6>
-                <span className="resource-count">
-                  {lesson.resources?.length || 0} resource(s)
-                </span>
-              </div>
-              <button 
-                onClick={addResource}
-                className="btn-primary btn-sm"
-                disabled={isAddingResource}
-              >
+              <h6>Lesson Resources ({lesson.resources?.length || 0})</h6>
+              <button onClick={addResource} className="btn-primary btn-sm" disabled={isAddingResource}>
                 {isAddingResource ? 'Adding...' : '+ Add Resource'}
               </button>
             </div>
 
             {(!lesson.resources || lesson.resources.length === 0) ? (
-              <div className="empty-resource-state">
-                <div className="empty-resource-icon">📎</div>
-                <p>No resources added yet</p>
-                <small>Add supplementary materials like documents, presentations, or links</small>
-                <button 
-                  onClick={addResource}
-                  className="btn-primary"
-                  disabled={isAddingResource}
-                >
-                  {isAddingResource ? 'Adding...' : 'Add First Resource'}
-                </button>
-              </div>
+              <p className="empty-resource">No resources yet</p>
             ) : (
               <div className="resources-grid">
                 {lesson.resources.map((resource, resourceIndex) => (

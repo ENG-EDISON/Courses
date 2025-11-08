@@ -23,27 +23,163 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
   const loadingRef = useRef(false);
   const courseId = course?.id;
 
-  useEffect(() => {
-    if (courseId && !loadingRef.current) {
-      loadingRef.current = true;
-      loadExistingStructure().finally(() => {
-        loadingRef.current = false;
-      });
-    } else {
-      setSections([]);
-      setExpandedSections(new Set());
-      setExpandedSubsections(new Set());
-      setExpandedLessons(new Set());
-    }
-  }, [courseId]);
+  // Expand/Collapse handlers
+  const expandAll = useCallback(() => {
+    const allSectionIndices = new Set(sections.map((_, index) => index));
+    setExpandedSections(allSectionIndices);
 
-  // Collapse/Expand handlers
+    const allSubsectionIndices = new Set();
+    const allLessonIndices = new Set();
+
+    sections.forEach((section, sectionIndex) => {
+      section.subsections.forEach((subsection, subsectionIndex) => {
+        const subsectionKey = `${sectionIndex}-${subsectionIndex}`;
+        allSubsectionIndices.add(subsectionKey);
+
+        subsection.lessons.forEach((_, lessonIndex) => {
+          const lessonKey = `${sectionIndex}-${subsectionIndex}-${lessonIndex}`;
+          allLessonIndices.add(lessonKey);
+        });
+      });
+    });
+
+    setExpandedSubsections(allSubsectionIndices);
+    setExpandedLessons(allLessonIndices);
+  }, [sections]);
+
+  const collapseAll = useCallback(() => {
+    setExpandedSections(new Set());
+    setExpandedSubsections(new Set());
+    setExpandedLessons(new Set());
+  }, []);
+
+  // Main useEffect
+  useEffect(() => {
+    const loadData = async () => {
+      if (!courseId || loadingRef.current) return;
+
+      loadingRef.current = true;
+      setIsLoading(true);
+      try {
+        console.log("=== DEBUG: Loading course structure ===");
+
+        // 1. Get all sections for this course
+        const sectionsResponse = await getCourseSections(courseId);
+        const sectionsData = sectionsResponse.data;
+        console.log("Sections loaded:", sectionsData);
+
+        if (sectionsData.length === 0) {
+          setSections([]);
+          setExpandedSections(new Set());
+          setExpandedSubsections(new Set());
+          setExpandedLessons(new Set());
+          return;
+        }
+
+        // 2. Get all subsections for the course (single API call)
+        const subsectionsResponse = await getSubsectionByCourseId(courseId);
+        const allSubsections = subsectionsResponse.data.map(sub => ({
+          ...sub,
+          isExisting: true
+        }));
+        console.log("All subsections loaded:", allSubsections);
+
+        // 3. Get all lessons for all subsections (single batch approach)
+        const allLessons = [];
+        const lessonPromises = allSubsections.map(async (subsection) => {
+          try {
+            console.log(`Loading lessons for subsection ${subsection.id}`);
+            const lessonsResponse = await getLessonBySubsectionId(subsection.id);
+
+            if (lessonsResponse && lessonsResponse.data) {
+              const subsectionLessons = lessonsResponse.data.map(lesson => ({
+                ...lesson,
+                isExisting: true,
+                duration_minutes: lesson.video_duration ? Math.round(lesson.video_duration / 60) : 0
+              }));
+              allLessons.push(...subsectionLessons);
+            }
+            console.log("lessonsResponse",lessonsResponse)
+          } catch (error) {
+            console.error(`Error loading lessons for subsection ${subsection.id}:`, error);
+          }
+        });
+
+        await Promise.all(lessonPromises);
+        console.log("All lessons loaded:", allLessons);
+
+        // 4. Build the nested structure
+        const loadedSections = sectionsData.map(section => {
+          const sectionSubsections = allSubsections.filter(sub => sub.section === section.id);
+
+          const subsectionsWithLessons = sectionSubsections.map(subsection => {
+            const subsectionLessons = allLessons.filter(lesson => lesson.subsection === subsection.id);
+
+            return {
+              ...subsection,
+              lessons: subsectionLessons,
+              isExisting: true
+            };
+          });
+
+          return {
+            ...section,
+            subsections: subsectionsWithLessons,
+            isExisting: true
+          };
+        });
+
+        console.log("Final structure built:", loadedSections);
+        setSections(loadedSections);
+
+        // Auto-expand all sections
+        setTimeout(() => {
+          const allSectionIndices = new Set(loadedSections.map((_, index) => index));
+          const allSubsectionIndices = new Set();
+          const allLessonIndices = new Set();
+
+          loadedSections.forEach((section, sectionIndex) => {
+            section.subsections.forEach((subsection, subsectionIndex) => {
+              const subsectionKey = `${sectionIndex}-${subsectionIndex}`;
+              allSubsectionIndices.add(subsectionKey);
+
+              subsection.lessons.forEach((_, lessonIndex) => {
+                const lessonKey = `${sectionIndex}-${subsectionIndex}-${lessonIndex}`;
+                allLessonIndices.add(lessonKey);
+              });
+            });
+          });
+
+          setExpandedSections(allSectionIndices);
+          setExpandedSubsections(allSubsectionIndices);
+          setExpandedLessons(allLessonIndices);
+        }, 100);
+
+        if (onUpdate) {
+          onUpdate(loadedSections);
+        }
+
+      } catch (error) {
+        console.error('Error loading course structure:', error);
+        setSections([]);
+        setExpandedSections(new Set());
+        setExpandedSubsections(new Set());
+        setExpandedLessons(new Set());
+      } finally {
+        setIsLoading(false);
+        loadingRef.current = false;
+      }
+    };
+
+    loadData();
+  }, [courseId, onUpdate]);
+
+  // Rest of your component remains the same...
   const toggleSection = useCallback((sectionIndex) => {
     setExpandedSections(prev => {
       const newSet = new Set(prev);
       if (newSet.has(sectionIndex)) {
         newSet.delete(sectionIndex);
-        // Also collapse all subsections and lessons within this section
         setExpandedSubsections(prevSubs => {
           const newSubsSet = new Set(prevSubs);
           sections[sectionIndex]?.subsections?.forEach((_, subIndex) => {
@@ -75,7 +211,6 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
       const newSet = new Set(prev);
       if (newSet.has(compositeKey)) {
         newSet.delete(compositeKey);
-        // Also collapse all lessons within this subsection
         setExpandedLessons(prevLessons => {
           const newLessonsSet = new Set(prevLessons);
           sections[sectionIndex]?.subsections[subsectionIndex]?.lessons?.forEach((_, lessonIndex) => {
@@ -104,35 +239,6 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
     });
   }, []);
 
-  const expandAll = useCallback(() => {
-    const allSectionIndices = new Set(sections.map((_, index) => index));
-    setExpandedSections(allSectionIndices);
-    
-    const allSubsectionIndices = new Set();
-    const allLessonIndices = new Set();
-    
-    sections.forEach((section, sectionIndex) => {
-      section.subsections.forEach((subsection, subsectionIndex) => {
-        const subsectionKey = `${sectionIndex}-${subsectionIndex}`;
-        allSubsectionIndices.add(subsectionKey);
-        
-        subsection.lessons.forEach((_, lessonIndex) => {
-          const lessonKey = `${sectionIndex}-${subsectionIndex}-${lessonIndex}`;
-          allLessonIndices.add(lessonKey);
-        });
-      });
-    });
-    
-    setExpandedSubsections(allSubsectionIndices);
-    setExpandedLessons(allLessonIndices);
-  }, [sections]);
-
-  const collapseAll = useCallback(() => {
-    setExpandedSections(new Set());
-    setExpandedSubsections(new Set());
-    setExpandedLessons(new Set());
-  }, []);
-
   const isSectionExpanded = useCallback((sectionIndex) => {
     return expandedSections.has(sectionIndex);
   }, [expandedSections]);
@@ -144,122 +250,6 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
   const isLessonExpanded = useCallback((sectionIndex, subsectionIndex, lessonIndex) => {
     return expandedLessons.has(`${sectionIndex}-${subsectionIndex}-${lessonIndex}`);
   }, [expandedLessons]);
-
-  const loadExistingStructure = async () => {
-    if (!courseId) return;
-    
-    setIsLoading(true);
-    try {
-      console.log("=== DEBUG: Loading course structure ===");
-      
-      // 1. Get all sections for this course
-      const sectionsResponse = await getCourseSections(courseId);
-      const sectionsData = sectionsResponse.data;
-      console.log("Sections loaded:", sectionsData);
-      
-      if (sectionsData.length === 0) {
-        setSections([]);
-        setExpandedSections(new Set());
-        setExpandedSubsections(new Set());
-        setExpandedLessons(new Set());
-        return;
-      }
-      
-      // 2. Get all subsections for each section
-      const allSubsections = [];
-      
-      for (const section of sectionsData) {
-        try {
-          const subsectionsResponse = await getSubsectionByCourseId(courseId);
-          // Filter subsections that belong to this specific section
-          const sectionSubsections = subsectionsResponse.data.filter(sub => sub.section === section.id);
-          console.log(`Section ${section.id} has ${sectionSubsections.length} subsections`);
-          
-          allSubsections.push(...sectionSubsections.map(sub => ({
-            ...sub,
-            isExisting: true
-          })));
-        } catch (error) {
-          console.error(`Error loading subsections for section ${section.id}:`, error);
-        }
-      }
-      console.log("All subsections loaded:", allSubsections);
-      
-      // 3. Get all lessons for each subsection
-      const allLessons = [];
-      
-      for (const subsection of allSubsections) {
-        try {
-          console.log(`Loading lessons for subsection ${subsection.id}`);
-          
-          const lessonsResponse = await getLessonBySubsectionId(subsection.id);
-          console.log(`API response for subsection ${subsection.id}:`, lessonsResponse);
-          
-          if (lessonsResponse && lessonsResponse.data) {
-            const subsectionLessons = lessonsResponse.data.map(lesson => ({
-              ...lesson,
-              isExisting: true,
-              duration_minutes: lesson.video_duration ? Math.round(lesson.video_duration / 60) : 0
-            }));
-            console.log(`Subsection ${subsection.id} has ${subsectionLessons.length} lessons:`, subsectionLessons);
-            allLessons.push(...subsectionLessons);
-          } else {
-            console.log(`No lessons data found for subsection ${subsection.id}`);
-          }
-        } catch (error) {
-          console.error(`Error loading lessons for subsection ${subsection.id}:`, error);
-          console.error('Error details:', error.response || error.message);
-        }
-      }
-      console.log("All lessons loaded:", allLessons);
-      
-      // 4. Build the nested structure correctly
-      const loadedSections = sectionsData.map(section => {
-        // Find subsections that belong to this section
-        const sectionSubsections = allSubsections.filter(sub => sub.section === section.id);
-        
-        const subsectionsWithLessons = sectionSubsections.map(subsection => {
-          // Find lessons that belong to this subsection
-          const subsectionLessons = allLessons.filter(lesson => lesson.subsection === subsection.id);
-          
-          console.log(`Building subsection ${subsection.id} with ${subsectionLessons.length} lessons`);
-          
-          return {
-            ...subsection,
-            lessons: subsectionLessons,
-            isExisting: true
-          };
-        });
-        
-        return {
-          ...section,
-          subsections: subsectionsWithLessons,
-          isExisting: true
-        };
-      });
-      
-      console.log("Final structure built:", loadedSections);
-      setSections(loadedSections);
-      
-      // Auto-expand all sections when loading existing structure
-      setTimeout(() => {
-        expandAll();
-      }, 100);
-      
-      if (onUpdate) {
-        onUpdate(loadedSections);
-      }
-      
-    } catch (error) {
-      console.error('Error loading course structure:', error);
-      setSections([]);
-      setExpandedSections(new Set());
-      setExpandedSubsections(new Set());
-      setExpandedLessons(new Set());
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const isExistingInDatabase = (item) => {
     return item.id && item.isExisting !== false;
@@ -332,21 +322,50 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
 
             if (!isExistingInDatabase(lesson)) {
               console.log(`\n=== DEBUG: Creating NEW Lesson ${lessonIndex + 1} for Subsection ${subsectionIndex + 1} ===`);
-              const lessonData = {
-                title: lesson.title,
-                content: lesson.content,
-                video_url: lesson.video_url,
-                video_duration: lesson.duration_minutes * 60,
-                lesson_type: 'video',
-                order: lessonIndex,
-                is_preview: lesson.is_preview || false,
-                subsection: subsectionId
-              };
+              
+              // Check if lesson has a video file to upload
+              if (lesson.video_file) {
+                console.log("📁 Lesson has video file, using FormData");
+                // Use FormData for file upload
+                const formData = new FormData();
+                formData.append('title', lesson.title);
+                formData.append('content', lesson.content || '');
+                formData.append('video_url', lesson.video_url || '');
+                formData.append('video_duration', (lesson.duration_minutes || 0) * 60);
+                formData.append('lesson_type', lesson.lesson_type || 'video');
+                formData.append('order', lessonIndex);
+                formData.append('is_preview', lesson.is_preview || false);
+                formData.append('subsection', subsectionId);
+                formData.append('video_file', lesson.video_file);
 
-              const lessonResponse = await createLesson(lessonData);
-              lessonId = lessonResponse.data.id;
-              createdLessons.push(lessonResponse.data);
-              console.log(`Created lesson with ID: ${lessonId}`);
+                console.log("FormData contents:");
+                for (let pair of formData.entries()) {
+                  console.log(pair[0] + ': ', pair[1]);
+                }
+
+                const lessonResponse = await createLesson(formData);
+                lessonId = lessonResponse.data.id;
+                createdLessons.push(lessonResponse.data);
+                console.log(`Created lesson with video file, ID: ${lessonId}`);
+              } else {
+                console.log("📝 Lesson has no video file, using JSON");
+                // Use regular JSON for lessons without files
+                const lessonData = {
+                  title: lesson.title,
+                  content: lesson.content || '',
+                  video_url: lesson.video_url || '',
+                  video_duration: (lesson.duration_minutes || 0) * 60,
+                  lesson_type: lesson.lesson_type || 'video',
+                  order: lessonIndex,
+                  is_preview: lesson.is_preview || false,
+                  subsection: subsectionId
+                };
+
+                const lessonResponse = await createLesson(lessonData);
+                lessonId = lessonResponse.data.id;
+                createdLessons.push(lessonResponse.data);
+                console.log(`Created lesson with ID: ${lessonId}`);
+              }
             } else {
               console.log(`\n=== DEBUG: Using EXISTING Lesson ${lessonIndex + 1} (ID: ${lessonId}) ===`);
             }
@@ -357,9 +376,9 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
                 console.log(`\n=== DEBUG: Using EXISTING Resource ${resourceIndex + 1} (ID: ${resource.id}) ===`);
                 continue;
               }
-              
+
               console.log(`\n=== DEBUG: Creating NEW Resource ${resourceIndex + 1} for Lesson ${lessonIndex + 1} ===`);
-              
+
               if (resource.file) {
                 console.log("Resource has file:", resource.file);
                 const formData = new FormData();
@@ -368,12 +387,7 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
                 formData.append('resource_type', resource.resource_type || 'document');
                 formData.append('order', resource.order !== undefined ? resource.order : resourceIndex);
                 formData.append('lesson', lessonId);
-                
-                console.log("FormData entries:");
-                for (let pair of formData.entries()) {
-                  console.log(pair[0] + ': ', pair[1]);
-                }
-                
+
                 try {
                   const resourceResponse = await createLessonResource(formData);
                   createdResources.push(resourceResponse.data);
@@ -383,13 +397,6 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
                   throw error;
                 }
               } else if (resource.title) {
-                console.log("Resource data (no file):", {
-                  title: resource.title,
-                  resource_type: resource.resource_type,
-                  order: resource.order !== undefined ? resource.order : resourceIndex,
-                  lesson: lessonId
-                });
-                
                 const resourceResponse = await createLessonResource({
                   title: resource.title,
                   resource_type: resource.resource_type || 'document',
@@ -398,8 +405,6 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
                 });
                 createdResources.push(resourceResponse.data);
                 console.log("Resource created successfully");
-              } else {
-                console.log("Skipping resource - no title provided");
               }
             }
           }
@@ -425,7 +430,8 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
 
       alert(`Course structure saved successfully!\n\nCreated:\n- ${createdSections.length} new sections\n- ${createdSubsections.length} new subsections\n- ${createdLessons.length} new lessons\n- ${createdResources.length} new resources`);
 
-      await loadExistingStructure();
+      // Reload data after successful submission
+      window.location.reload();
 
     } catch (error) {
       console.error('\n=== DEBUG: ERROR DETAILS ===');
@@ -446,20 +452,14 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
       e.stopPropagation();
     }
 
-    console.log('addSection called - checking conditions');
-
     if (!courseId) {
       alert('Please select a course first.');
       return;
     }
 
-    if (isAddingSection) {
-      console.log('Prevented - already adding section');
-      return;
-    }
+    if (isAddingSection) return;
 
     setIsAddingSection(true);
-
     try {
       const newSection = {
         title: `Section ${sections.length + 1}`,
@@ -470,22 +470,16 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
         isExisting: false
       };
 
-      console.log('Creating NEW section:', newSection);
-
       const updatedSections = [...sections, newSection];
       setSections(updatedSections);
-      
-      // Auto-expand the newly created section
+
       setExpandedSections(prev => new Set([...prev, sections.length]));
 
       if (onUpdate) {
         onUpdate(updatedSections);
       }
     } finally {
-      setTimeout(() => {
-        setIsAddingSection(false);
-        console.log('addSection completed');
-      }, 300);
+      setTimeout(() => setIsAddingSection(false), 300);
     }
   }, [courseId, sections, isAddingSection, onUpdate]);
 
@@ -501,23 +495,20 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
     const sectionToDelete = sections[sectionIndex];
 
     if (isExistingInDatabase(sectionToDelete)) {
-      if (window.confirm('This section exists in the database. Do you want to delete it permanently?')) {
-        console.log('Should delete existing section from database:', sectionToDelete.id);
-      } else {
+      if (!window.confirm('This section exists in the database. Do you want to delete it permanently?')) {
         return;
       }
     }
 
     const updatedSections = sections.filter((_, index) => index !== sectionIndex);
     setSections(updatedSections);
-    
-    // Remove from expanded sections
+
     setExpandedSections(prev => {
       const newSet = new Set(prev);
       newSet.delete(sectionIndex);
       return newSet;
     });
-    
+
     onUpdate(updatedSections);
   }, [sections, onUpdate]);
 
@@ -548,10 +539,10 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
       });
     });
 
-    return { 
-      existingSections, 
-      newSections, 
-      existingSubsections, 
+    return {
+      existingSections,
+      newSections,
+      existingSubsections,
       newSubsections,
       existingLessons,
       newLessons

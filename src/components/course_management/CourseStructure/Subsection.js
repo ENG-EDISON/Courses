@@ -282,11 +282,12 @@ const Subsection = ({
         <input
           type="text"
           value={subsection.title}
-          onChange={(e) => onUpdateSubsection('title', e.target.value)}
+          onChange={(e) => onUpdateSubsection(subsectionIndex, 'title', e.target.value)}
           className="subsection-title-input"
           placeholder="Subsection title"
           onClick={(e) => e.stopPropagation()}
         />
+
 
         <div className="subsection-status">
           <span className={`status-badge ${isExistingInDatabase(subsection) ? 'existing' : 'new'}`}>
@@ -320,13 +321,14 @@ const Subsection = ({
       {/* Subsection Content - Only show when expanded */}
       {isExpanded && (
         <div className="subsection-content">
-          <textarea
-            value={subsection.description}
-            onChange={(e) => onUpdateSubsection('description', e.target.value)}
-            className="subsection-description"
-            placeholder="Subsection description"
-            rows={2}
-          />
+        <textarea
+          value={subsection.description}
+          onChange={(e) => onUpdateSubsection(subsectionIndex, 'description', e.target.value)}
+          className="subsection-description"
+          placeholder="Subsection description"
+          rows={2}
+        />
+
 
           <div className="lessons">
             <div className="lesson-header-row">

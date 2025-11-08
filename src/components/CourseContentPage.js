@@ -8,6 +8,7 @@ import {
     getCourseProgressSummary,
     trackLessonProgress,
     getLastPlayedLesson,
+    // eslint-disable-next-line 
     getUserEnrollment
 } from '../api/LessonProgressApi';
 import "../static/CourseContentPage.css"
@@ -22,6 +23,7 @@ const CourseContentPage = () => {
     const [expandedSections, setExpandedSections] = useState(new Set());
     const [completionStatus, setCompletionStatus] = useState({});
     const [progressSummary, setProgressSummary] = useState(null);
+    // eslint-disable-next-line 
     const [enrollmentId, setEnrollmentId] = useState(null);
     const [lastPlayed, setLastPlayed] = useState(null);
     const [activeTab, setActiveTab] = useState('description');
@@ -113,11 +115,26 @@ const CourseContentPage = () => {
         }
     }, [id]);
 
-    // Video source detection function
-    const getVideoSource = (videoUrl) => {
-        if (!videoUrl) return { type: 'none', source: '' };
+    // UPDATED: Video source detection function to handle both video_url and video_file
+    const getVideoSource = (lesson) => {
+        if (!lesson) return { type: 'none', source: '', canTrack: false };
+
+        // Priority: Check for uploaded video file first
+        if (lesson.video_file) {
+            console.log("Found uploaded video file:", lesson.video_file);
+            return {
+                type: 'uploaded',
+                source: lesson.video_file,
+                canTrack: true
+            };
+        }
+
+        // Fallback: Check for video URL
+        const videoUrl = lesson.video_url;
+        if (!videoUrl) return { type: 'none', source: '', canTrack: false };
 
         // Check if it's a YouTube URL
+        // eslint-disable-next-line 
         const youtubeMatch = videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
         if (youtubeMatch) {
             return {
@@ -163,12 +180,20 @@ const CourseContentPage = () => {
         };
     };
 
-    // Enhanced Video Player Component
+    // UPDATED: Enhanced Video Player Component to handle both video sources
     const EnhancedVideoPlayer = ({ video, onProgressUpdate, onCompleted, isCompleted }) => {
         const videoRef = useRef(null);
         const [currentTime, setCurrentTime] = useState(0);
         const [duration, setDuration] = useState(0);
-        const videoSource = getVideoSource(video.video_url);
+        const videoSource = getVideoSource(video);
+
+        console.log("Video source for player:", {
+            videoId: video.id,
+            videoTitle: video.title,
+            source: videoSource,
+            hasVideoFile: !!video.video_file,
+            hasVideoUrl: !!video.video_url
+        });
 
         // Auto-resume from last position
         useEffect(() => {
@@ -190,12 +215,12 @@ const CourseContentPage = () => {
                 const newTime = videoRef.current.currentTime;
                 setCurrentTime(newTime);
 
-                // Update progress every 10 seconds for self-hosted videos
+                // Update progress every 10 seconds for trackable videos
                 if (Math.floor(newTime) % 10 === 0 && videoSource.canTrack) {
                     onProgressUpdate(newTime, false);
                 }
 
-                // Auto-complete at 95% watched (for self-hosted videos only)
+                // Auto-complete at 95% watched (for trackable videos only)
                 if (duration > 0 && newTime / duration > 0.95 && !isCompleted && videoSource.canTrack) {
                     console.log("Auto-completing video at 95% watched");
                     onProgressUpdate(duration, true);
@@ -227,10 +252,36 @@ const CourseContentPage = () => {
             return `${mins}:${secs.toString().padStart(2, '0')}`;
         };
 
+        // UPDATED: Get video source badge
+        const getVideoSourceBadge = () => {
+            const badges = {
+                uploaded: { text: 'Uploaded Video', icon: '📁', color: '#10b981' },
+                youtube: { text: 'YouTube', icon: '📺', color: '#ff0000' },
+                'self-hosted': { text: 'Hosted Video', icon: '🎬', color: '#3b82f6' },
+                external: { text: 'External Video', icon: '🔗', color: '#8b5cf6' },
+                none: { text: 'No Video', icon: '❌', color: '#6b7280' }
+            };
+
+            const badge = badges[videoSource.type] || badges.none;
+            return (
+                <span 
+                    className="video-source-badge" 
+                    style={{ 
+                        backgroundColor: badge.color + '20', 
+                        color: badge.color,
+                        border: `1px solid ${badge.color}40`
+                    }}
+                >
+                    {badge.icon} {badge.text}
+                </span>
+            );
+        };
+
         // For YouTube videos - uses aspect ratio container
         if (videoSource.type === 'youtube') {
             return (
                 <div className="youtube-container">
+                    {getVideoSourceBadge()}
                     <iframe
                         src={videoSource.source}
                         title={video.title}
@@ -242,10 +293,11 @@ const CourseContentPage = () => {
             );
         }
 
-        // For self-hosted videos - uses fixed height container
-        if (videoSource.type === 'self-hosted') {
+        // For uploaded and self-hosted videos - uses fixed height container
+        if (videoSource.type === 'uploaded' || videoSource.type === 'self-hosted') {
             return (
                 <div className="self-hosted-container">
+                    {getVideoSourceBadge()}
                     <div className="self-hosted-video">
                         <video
                             ref={videoRef}
@@ -257,38 +309,63 @@ const CourseContentPage = () => {
                             onPause={handleVideoPause}
                         >
                             <source src={videoSource.source} type="video/mp4" />
+                            <source src={videoSource.source} type="video/webm" />
+                            <source src={videoSource.source} type="video/ogg" />
                             Your browser does not support the video tag.
                         </video>
 
-                        {/* Progress overlay for self-hosted videos */}
-                        <div className="video-progress-overlay">
-                            <div className="progress-bar">
-                                <div
-                                    className="progress-fill"
-                                    style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
-                                />
+                        {/* Progress overlay for trackable videos */}
+                        {videoSource.canTrack && (
+                            <div className="video-progress-overlay">
+                                <div className="progress-bar">
+                                    <div
+                                        className="progress-fill"
+                                        style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                                    />
+                                </div>
+                                <div className="time-display">
+                                    {formatTime(currentTime)} / {formatTime(duration)}
+                                    {video.lastPlayedTime > 0 && (
+                                        <span className="resume-indicator"> (Resumed)</span>
+                                    )}
+                                </div>
                             </div>
-                            <div className="time-display">
-                                {formatTime(currentTime)} / {formatTime(duration)}
-                                {video.lastPlayedTime > 0 && (
-                                    <span className="resume-indicator"> (Resumed)</span>
-                                )}
-                            </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             );
         }
 
         // For other external videos or unsupported formats
+        if (videoSource.type === 'external') {
+            return (
+                <div className="self-hosted-container">
+                    {getVideoSourceBadge()}
+                    <div className="video-player__placeholder">
+                        <div className="placeholder-icon">🎬</div>
+                        <p>External video content</p>
+                        <a href={videoSource.source} target="_blank" rel="noopener noreferrer" className="external-video-link">
+                            Open video in new tab
+                        </a>
+                    </div>
+                </div>
+            );
+        }
+
+        // No video available
         return (
             <div className="self-hosted-container">
+                {getVideoSourceBadge()}
                 <div className="video-player__placeholder">
-                    <div className="placeholder-icon">🎬</div>
-                    <p>Video format not supported</p>
-                    <a href={videoSource.source} target="_blank" rel="noopener noreferrer" className="external-video-link">
-                        Open video in new tab
-                    </a>
+                    <div className="placeholder-icon">📝</div>
+                    <h4>No Video Content</h4>
+                    <p>This lesson doesn't have any video content.</p>
+                    {video.content && (
+                        <div className="lesson-content-preview">
+                            <h5>Lesson Content:</h5>
+                            <p>{video.content.substring(0, 200)}...</p>
+                        </div>
+                    )}
                 </div>
             </div>
         );
@@ -359,9 +436,9 @@ const CourseContentPage = () => {
 
     const trackLessonPlay = async (lessonId, currentTime = 0, completed = false) => {
         try {
-            const videoSource = getVideoSource(activeVideo?.video_url);
+            const videoSource = getVideoSource(activeVideo);
 
-            // Only track time for self-hosted videos
+            // Only track time for trackable videos (uploaded and self-hosted)
             const trackedTime = videoSource.canTrack ? Math.floor(currentTime) : 0;
 
             await trackLessonProgress(lessonId, {
@@ -374,7 +451,8 @@ const CourseContentPage = () => {
                 lessonId,
                 currentTime: trackedTime,
                 completed,
-                videoType: videoSource.type
+                videoType: videoSource.type,
+                canTrack: videoSource.canTrack
             });
 
             // Update local completion status if completed
@@ -475,6 +553,22 @@ const CourseContentPage = () => {
         return `${minutes}m`;
     };
 
+    // UPDATED: Get video source icon for lesson items
+    // eslint-disable-next-line
+    const getLessonVideoIcon = (lesson) => {
+        const videoSource = getVideoSource(lesson);
+        
+        const icons = {
+            uploaded: '📁',
+            youtube: '📺',
+            'self-hosted': '🎬',
+            external: '🔗',
+            none: '📝'
+        };
+
+        return icons[videoSource.type] || icons.none;
+    };
+
     // Tab content renderer
     const renderTabContent = () => {
         switch (activeTab) {
@@ -526,200 +620,169 @@ const CourseContentPage = () => {
                     )
                 );
             case 'resources':
-    // Helper function to get file type from URL
-    const getFileType = (url) => {
-        if (!url) return 'File';
-        const extension = url.split('.').pop().toLowerCase();
-        const fileTypes = {
-            'pdf': 'PDF',
-            'zip': 'ZIP',
-            'doc': 'DOC',
-            'docx': 'DOCX',
-            'ppt': 'PPT',
-            'pptx': 'PPTX',
-            'xls': 'XLS',
-            'xlsx': 'XLSX',
-            'txt': 'TXT',
-            'jpg': 'JPG',
-            'jpeg': 'JPEG',
-            'png': 'PNG',
-            'mp4': 'MP4',
-            'mov': 'MOV',
-            'avi': 'AVI'
-        };
-        return fileTypes[extension] || 'File';
-    };
+                // Helper function to get file type from URL
+                const getFileType = (url) => {
+                    if (!url) return 'File';
+                    const extension = url.split('.').pop().toLowerCase();
+                    const fileTypes = {
+                        'pdf': 'PDF',
+                        'zip': 'ZIP',
+                        'doc': 'DOC',
+                        'docx': 'DOCX',
+                        'ppt': 'PPT',
+                        'pptx': 'PPTX',
+                        'xls': 'XLS',
+                        'xlsx': 'XLSX',
+                        'txt': 'TXT',
+                        'jpg': 'JPG',
+                        'jpeg': 'JPEG',
+                        'png': 'PNG',
+                        'mp4': 'MP4',
+                        'mov': 'MOV',
+                        'avi': 'AVI'
+                    };
+                    return fileTypes[extension] || 'File';
+                };
 
-    // Helper function to get icon based on file type
-    const getResourceIcon = (url) => {
-        if (!url) return '📄';
-        const extension = url.split('.').pop().toLowerCase();
-        const iconMap = {
-            'pdf': '📕',
-            'zip': '📦',
-            'doc': '📄',
-            'docx': '📄',
-            'ppt': '📊',
-            'pptx': '📊',
-            'xls': '📈',
-            'xlsx': '📈',
-            'txt': '📝',
-            'jpg': '🖼️',
-            'jpeg': '🖼️',
-            'png': '🖼️',
-            'mp4': '🎬',
-            'mov': '🎬',
-            'avi': '🎬'
-        };
-        return iconMap[extension] || '📄';
-    };
+                // Helper function to get icon based on file type
+                const getResourceIcon = (url) => {
+                    if (!url) return '📄';
+                    const extension = url.split('.').pop().toLowerCase();
+                    const iconMap = {
+                        'pdf': '📕',
+                        'zip': '📦',
+                        'doc': '📄',
+                        'docx': '📄',
+                        'ppt': '📊',
+                        'pptx': '📊',
+                        'xls': '📈',
+                        'xlsx': '📈',
+                        'txt': '📝',
+                        'jpg': '🖼️',
+                        'jpeg': '🖼️',
+                        'png': '🖼️',
+                        'mp4': '🎬',
+                        'mov': '🎬',
+                        'avi': '🎬'
+                    };
+                    return iconMap[extension] || '📄';
+                };
 
-    // Collect all lesson resources from the course
-    const allResources = [];
-    if (course.sections) {
-        course.sections.forEach(section => {
-            section.subsections.forEach(subsection => {
-                if (subsection.lessons) {
-                    subsection.lessons.forEach(lesson => {
-                        // Check if lesson has resources array
-                        if (lesson.resources && Array.isArray(lesson.resources)) {
-                            lesson.resources.forEach(resource => {
-                                allResources.push({
-                                    ...resource,
-                                    lessonTitle: lesson.title,
-                                    sectionTitle: section.title,
-                                    subsectionTitle: subsection.title,
-                                    lessonId: lesson.id
+                // Collect all lesson resources from the course
+                const allResources = [];
+                if (course.sections) {
+                    course.sections.forEach(section => {
+                        section.subsections.forEach(subsection => {
+                            if (subsection.lessons) {
+                                subsection.lessons.forEach(lesson => {
+                                    // Check if lesson has resources array
+                                    if (lesson.resources && Array.isArray(lesson.resources)) {
+                                        lesson.resources.forEach(resource => {
+                                            allResources.push({
+                                                ...resource,
+                                                lessonTitle: lesson.title,
+                                                sectionTitle: section.title,
+                                                subsectionTitle: subsection.title,
+                                                lessonId: lesson.id
+                                            });
+                                        });
+                                    }
                                 });
-                            });
-                        }
+                            }
+                        });
                     });
                 }
-            });
-        });
-    }
 
-    // Group resources by type for better organization
-    const groupedResources = {
-        documents: allResources.filter(resource => {
-            const ext = resource.file ? resource.file.split('.').pop().toLowerCase() : '';
-            return ['pdf', 'doc', 'docx', 'txt'].includes(ext);
-        }),
-        presentations: allResources.filter(resource => {
-            const ext = resource.file ? resource.file.split('.').pop().toLowerCase() : '';
-            return ['ppt', 'pptx'].includes(ext);
-        }),
-        spreadsheets: allResources.filter(resource => {
-            const ext = resource.file ? resource.file.split('.').pop().toLowerCase() : '';
-            return ['xls', 'xlsx'].includes(ext);
-        }),
-        archives: allResources.filter(resource => {
-            const ext = resource.file ? resource.file.split('.').pop().toLowerCase() : '';
-            return ['zip', 'rar'].includes(ext);
-        }),
-        media: allResources.filter(resource => {
-            const ext = resource.file ? resource.file.split('.').pop().toLowerCase() : '';
-            return ['mp4', 'mov', 'avi', 'jpg', 'jpeg', 'png'].includes(ext);
-        }),
-        other: allResources.filter(resource => {
-            const ext = resource.file ? resource.file.split('.').pop().toLowerCase() : '';
-            return !['pdf', 'doc', 'docx', 'txt', 'ppt', 'pptx', 'xls', 'xlsx', 'zip', 'rar', 'mp4', 'mov', 'avi', 'jpg', 'jpeg', 'png'].includes(ext);
-        })
-    };
+                // Helper function to format file size
+                const formatFileSize = (bytes) => {
+                    if (!bytes) return '';
+                    if (bytes < 1024) return bytes + ' B';
+                    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+                    return (bytes / 1048576).toFixed(1) + ' MB';
+                };
 
-    // Helper function to format file size
-    const formatFileSize = (bytes) => {
-        if (!bytes) return '';
-        if (bytes < 1024) return bytes + ' B';
-        if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-        return (bytes / 1048576).toFixed(1) + ' MB';
-    };
+                // Helper function to get full file URL
+                const getFileUrl = (filePath) => {
+                    if (!filePath) return '';
+                    if (filePath.startsWith('http')) return filePath;
+                    const baseUrl = process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000';
+                    return `${baseUrl}${filePath.startsWith('/') ? '' : '/'}${filePath}`;
+                };
 
-    // Helper function to get full file URL
-    const getFileUrl = (filePath) => {
-        if (!filePath) return '';
-        if (filePath.startsWith('http')) return filePath;
-        const baseUrl = process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000';
-        return `${baseUrl}${filePath.startsWith('/') ? '' : '/'}${filePath}`;
-    };
-
-    return (
-        <div className="course-resources">
-            <h3>Course Resources</h3>
-            
-            {/* Resource Summary */}
-            <div className="resources-summary">
-                <div className="summary-card">
-                    <div className="summary-icon">📚</div>
-                    <div className="summary-content">
-                        <h4>{allResources.length} Resources Available</h4>
-                        <p>Downloadable materials to enhance your learning experience</p>
-                    </div>
-                </div>
-            </div>
-
-            {/* All Resources Grid */}
-            {allResources.length > 0 ? (
-                <div className="resources-section">
-                    <h4>All Resources ({allResources.length})</h4>
-                    <div className="resources-grid">
-                        {allResources.map((resource, index) => (
-                            <div key={resource.id || index} className="resource-card">
-                                <div className="resource-icon">
-                                    {getResourceIcon(resource.file)}
-                                </div>
-                                <div className="resource-content">
-                                    <h5>{resource.title || 'Untitled Resource'}</h5>
-                                    <div className="resource-meta">
-                                        <span className="resource-source">
-                                            From: <strong>{resource.lessonTitle}</strong>
-                                        </span>
-                                        <span className="resource-section">
-                                            {resource.sectionTitle} • {resource.subsectionTitle}
-                                        </span>
-                                    </div>
-                                    <div className="resource-details">
-                                        <span className="resource-type">
-                                            {getFileType(resource.file)}
-                                        </span>
-                                        {resource.file_size && (
-                                            <span className="resource-size">
-                                                {formatFileSize(resource.file_size)}
-                                            </span>
-                                        )}
-                                    </div>
-                                    <a 
-                                        href={getFileUrl(resource.file)} 
-                                        className="resource-download-btn"
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        download
-                                    >
-                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                            <path d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                            <path d="M4.66675 6.66667L8.00008 10L11.3334 6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                            <path d="M8 10V2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
-                                        Download {getFileType(resource.file)}
-                                    </a>
+                return (
+                    <div className="course-resources">
+                        <h3>Course Resources</h3>
+                        
+                        {/* Resource Summary */}
+                        <div className="resources-summary">
+                            <div className="summary-card">
+                                <div className="summary-icon">📚</div>
+                                <div className="summary-content">
+                                    <h4>{allResources.length} Resources Available</h4>
+                                    <p>Downloadable materials to enhance your learning experience</p>
                                 </div>
                             </div>
-                        ))}
+                        </div>
+
+                        {/* All Resources Grid */}
+                        {allResources.length > 0 ? (
+                            <div className="resources-section">
+                                <h4>All Resources ({allResources.length})</h4>
+                                <div className="resources-grid">
+                                    {allResources.map((resource, index) => (
+                                        <div key={resource.id || index} className="resource-card">
+                                            <div className="resource-icon">
+                                                {getResourceIcon(resource.file)}
+                                            </div>
+                                            <div className="resource-content">
+                                                <h5>{resource.title || 'Untitled Resource'}</h5>
+                                                <div className="resource-meta">
+                                                    <span className="resource-source">
+                                                        From: <strong>{resource.lessonTitle}</strong>
+                                                    </span>
+                                                    <span className="resource-section">
+                                                        {resource.sectionTitle} • {resource.subsectionTitle}
+                                                    </span>
+                                                </div>
+                                                <div className="resource-details">
+                                                    <span className="resource-type">
+                                                        {getFileType(resource.file)}
+                                                    </span>
+                                                    {resource.file_size && (
+                                                        <span className="resource-size">
+                                                            {formatFileSize(resource.file_size)}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <a 
+                                                    href={getFileUrl(resource.file)} 
+                                                    className="resource-download-btn"
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer"
+                                                    download
+                                                >
+                                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                        <path d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                        <path d="M4.66675 6.66667L8.00008 10L11.3334 6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                        <path d="M8 10V2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                    </svg>
+                                                    Download {getFileType(resource.file)}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="no-resources">
+                                <div className="no-resources-icon">📭</div>
+                                <h4>No Resources Available</h4>
+                                <p>This course doesn't have any downloadable resources yet.</p>
+                            </div>
+                        )}
                     </div>
-                </div>
-            ) : (
-                <div className="no-resources">
-                    <div className="no-resources-icon">📭</div>
-                    <h4>No Resources Available</h4>
-                    <p>This course doesn't have any downloadable resources yet.</p>
-                </div>
-            )}
+                );
 
-            
-        </div>
-    );
-
-// Added some code
             default:
                 return null;
         }
@@ -1100,11 +1163,36 @@ const Subsection = ({ subsection, sectionTitle, activeVideo, onVideoSelect, comp
     );
 };
 
-// Enhanced Lesson Item Component
+// UPDATED: Enhanced Lesson Item Component with video source icons
 const LessonItem = ({ lesson, sectionTitle, subsectionTitle, isActive, isCompleted, onSelect, onMarkComplete }) => {
     const formatDuration = (minutes) => {
         if (!minutes) return '';
         return `${minutes} min`;
+    };
+
+    // UPDATED: Get video source for this lesson
+    const getVideoSource = (lesson) => {
+        if (lesson.video_file) return { type: 'uploaded' };
+        if (lesson.video_url) {
+            if (lesson.video_url.includes('youtube.com') || lesson.video_url.includes('youtu.be')) {
+                return { type: 'youtube' };
+            }
+            return { type: 'self-hosted' };
+        }
+        return { type: 'none' };
+    };
+
+    const videoSource = getVideoSource(lesson);
+    
+    // UPDATED: Get video source icon
+    const getVideoIcon = () => {
+        const icons = {
+            uploaded: '📁',
+            youtube: '📺',
+            'self-hosted': '🎬',
+            none: '📝'
+        };
+        return icons[videoSource.type] || icons.none;
     };
 
     const handleLessonClick = (e) => {
@@ -1139,28 +1227,13 @@ const LessonItem = ({ lesson, sectionTitle, subsectionTitle, isActive, isComplet
             </div>
 
             <div className="lesson-item__icon">
-                {lesson.lesson_type === 'video' ? (
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path
-                            d="M6 4L12 8L6 12V4Z"
-                            fill="currentColor"
-                        />
-                    </svg>
-                ) : (
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path
-                            d="M2 2H14V14H2V2Z"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                        />
-                    </svg>
-                )}
+                <span className="video-source-icon">{getVideoIcon()}</span>
             </div>
 
             <div className="lesson-item__content">
                 <h6 className="lesson-item__title">{lesson.title}</h6>
                 <div className="lesson-item__meta">
-                    {lesson.lesson_type === 'video' && lesson.video_duration && (
+                    {lesson.video_duration && (
                         <span className="lesson-item__duration">
                             {formatDuration(lesson.video_duration)}
                         </span>
@@ -1168,6 +1241,13 @@ const LessonItem = ({ lesson, sectionTitle, subsectionTitle, isActive, isComplet
                     {lesson.is_preview && (
                         <span className="lesson-item__preview">Preview</span>
                     )}
+                    {/* UPDATED: Show video source type */}
+                    <span className="lesson-item__source">
+                        {videoSource.type === 'uploaded' && 'Uploaded'}
+                        {videoSource.type === 'youtube' && 'YouTube'}
+                        {videoSource.type === 'self-hosted' && 'Video'}
+                        {videoSource.type === 'none' && 'Content'}
+                    </span>
                 </div>
             </div>
 

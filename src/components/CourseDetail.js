@@ -54,9 +54,9 @@ function Course() {
         setExpandedSubsections(newExpanded);
     };
 
-    // Play preview video
+    // Play preview video - UPDATED to handle both video_url and video_file
     const playPreviewVideo = (lesson) => {
-        if (lesson.is_preview && lesson.video_url) {
+        if (lesson.is_preview && (lesson.video_url || lesson.video_file)) {
             setCurrentVideo(lesson);
             setShowVideoModal(true);
         }
@@ -71,6 +71,7 @@ function Course() {
     // Extract YouTube video ID
     const getYouTubeVideoId = (url) => {
         if (!url) return null;
+        // eslint-disable-next-line 
         const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
         return match ? match[1] : null;
     };
@@ -82,12 +83,50 @@ function Course() {
 
     // Check if video is local file
     const isLocalVideo = (url) => {
-        return url && (url.includes('.mp4') || url.includes('.webm') || url.includes('.ogg'));
+        return url && (url.includes('.mp4') || url.includes('.webm') || url.includes('.ogg') || url.includes('.mov') || url.includes('.avi'));
+    };
+
+    // UPDATED: Get video source for a lesson
+    const getVideoSource = (lesson) => {
+        // Priority: uploaded video file over URL
+        if (lesson.video_file) {
+            return {
+                type: 'uploaded',
+                src: lesson.video_file,
+                isExternal: false
+            };
+        } else if (lesson.video_url) {
+            if (isYouTubeVideo(lesson.video_url)) {
+                return {
+                    type: 'youtube',
+                    src: lesson.video_url,
+                    isExternal: true
+                };
+            } else if (isLocalVideo(lesson.video_url)) {
+                return {
+                    type: 'external',
+                    src: lesson.video_url,
+                    isExternal: false
+                };
+            } else {
+                return {
+                    type: 'unknown',
+                    src: lesson.video_url,
+                    isExternal: true
+                };
+            }
+        }
+        return null;
+    };
+
+    // UPDATED: Check if lesson has preview content
+    const hasPreviewContent = (lesson) => {
+        return lesson.is_preview && (lesson.video_url || lesson.video_file);
     };
 
     const formatLearningObjectives = (objectives) => {
         if (!objectives || !Array.isArray(objectives)) return null;
-        
+
         return (
             <div className="objectives-tight-grid">
                 {objectives.map((obj, index) => (
@@ -110,7 +149,7 @@ function Course() {
         if (!section.subsections) return 0;
         return section.subsections.reduce((total, subsection) => {
             if (!subsection.lessons) return total;
-            return total + subsection.lessons.reduce((subTotal, lesson) => 
+            return total + subsection.lessons.reduce((subTotal, lesson) =>
                 subTotal + (lesson.video_duration || 0), 0
             );
         }, 0);
@@ -118,7 +157,7 @@ function Course() {
 
     const getTotalSubsectionDuration = (subsection) => {
         if (!subsection.lessons) return 0;
-        return subsection.lessons.reduce((total, lesson) => 
+        return subsection.lessons.reduce((total, lesson) =>
             total + (lesson.video_duration || 0), 0
         );
     };
@@ -141,6 +180,21 @@ function Course() {
             assignment: "var(--accent-color)"
         };
         return colors[lessonType] || "var(--text-secondary)";
+    };
+
+    // UPDATED: Get video badge type
+    const getVideoBadgeType = (lesson) => {
+        const videoSource = getVideoSource(lesson);
+        if (!videoSource) return null;
+
+        const badges = {
+            uploaded: { text: 'Uploaded Video', icon: 'fas fa-video', color: 'var(--success-color)' },
+            youtube: { text: 'YouTube', icon: 'fab fa-youtube', color: 'var(--youtube-red)' },
+            external: { text: 'External Video', icon: 'fas fa-external-link-alt', color: 'var(--info-color)' },
+            unknown: { text: 'Video Link', icon: 'fas fa-link', color: 'var(--warning-color)' }
+        };
+
+        return badges[videoSource.type] || badges.unknown;
     };
 
     if (loading) {
@@ -187,36 +241,103 @@ function Course() {
 
     return (
         <div className="enterprise-course">
-            {/* Video Preview Modal */}
+            {/* Video Preview Modal - UPDATED to handle both video types */}
             {showVideoModal && currentVideo && (
                 <div className="video-modal-overlay" onClick={closeVideoModal}>
                     <div className="video-modal-content" onClick={(e) => e.stopPropagation()}>
                         <div className="video-modal-header">
-                            <h3>{currentVideo.title}</h3>
+                            <div className="video-title-section">
+                                <h3>{currentVideo.title}</h3>
+                                {getVideoBadgeType(currentVideo) && (
+                                    <span
+                                        className="video-source-badge"
+                                        style={{ color: getVideoBadgeType(currentVideo).color }}
+                                    >
+                                        <i className={getVideoBadgeType(currentVideo).icon}></i>
+                                        {getVideoBadgeType(currentVideo).text}
+                                    </span>
+                                )}
+                            </div>
                             <button className="video-modal-close" onClick={closeVideoModal}>
                                 <i className="fas fa-times"></i>
                             </button>
                         </div>
                         <div className="video-player-container">
-                            {isYouTubeVideo(currentVideo.video_url) ? (
-                                <iframe
-                                    src={`https://www.youtube.com/embed/${getYouTubeVideoId(currentVideo.video_url)}?autoplay=1`}
-                                    title={currentVideo.title}
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                ></iframe>
-                            ) : isLocalVideo(currentVideo.video_url) ? (
-                                <video controls autoPlay style={{ width: '100%', height: '100%' }}>
-                                    <source src={currentVideo.video_url} type="video/mp4" />
-                                    Your browser does not support the video tag.
-                                </video>
-                            ) : (
-                                <div className="video-not-supported">
-                                    <i className="fas fa-exclamation-triangle"></i>
-                                    <p>Video format not supported</p>
-                                </div>
-                            )}
+                            {(() => {
+                                const videoSource = getVideoSource(currentVideo);
+
+                                if (!videoSource) {
+                                    return (
+                                        <div className="video-not-supported">
+                                            <i className="fas fa-exclamation-triangle"></i>
+                                            <p>No video content available</p>
+                                        </div>
+                                    );
+                                }
+
+                                switch (videoSource.type) {
+                                    case 'youtube':
+                                        return (
+                                            <iframe
+                                                src={`https://www.youtube.com/embed/${getYouTubeVideoId(videoSource.src)}?autoplay=1`}
+                                                title={currentVideo.title}
+                                                frameBorder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                            ></iframe>
+                                        );
+
+                                    case 'uploaded':
+                                    case 'external':
+                                        return (
+                                            <video
+                                                controls
+                                                autoPlay
+                                                style={{ width: '100%', height: '100%' }}
+                                                key={videoSource.src} // Force re-render on source change
+                                            >
+                                                <source src={videoSource.src} type="video/mp4" />
+                                                <source src={videoSource.src} type="video/webm" />
+                                                <source src={videoSource.src} type="video/ogg" />
+                                                Your browser does not support the video tag.
+                                            </video>
+                                        );
+
+                                    case 'unknown':
+                                    default:
+                                        return videoSource.isExternal ? (
+                                            <div className="external-video-link">
+                                                <div className="external-video-icon">
+                                                    <i className="fas fa-external-link-alt"></i>
+                                                </div>
+                                                <h4>External Video Content</h4>
+                                                <p>This lesson contains video content from an external source.</p>
+                                                <a
+                                                    href={videoSource.src}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="external-link-btn"
+                                                >
+                                                    <i className="fas fa-external-link-alt"></i>
+                                                    Open Video in New Tab
+                                                </a>
+                                            </div>
+                                        ) : (
+                                            <div className="video-not-supported">
+                                                <i className="fas fa-exclamation-triangle"></i>
+                                                <p>Video format not supported</p>
+                                                <a
+                                                    href={videoSource.src}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="external-link-btn"
+                                                >
+                                                    Try opening directly
+                                                </a>
+                                            </div>
+                                        );
+                                }
+                            })()}
                         </div>
                         <div className="video-modal-footer">
                             <p>Preview Content - Enroll to access all videos</p>
@@ -236,12 +357,12 @@ function Course() {
                         <span className="breadcrumb-divider">/</span>
                         <span className="current-course">{course.title}</span>
                     </div>
-                    
+
                     <div className="hero-main">
                         <div className="hero-text">
                             <h1 className="course-title">{course.title}</h1>
                             <p className="course-subtitle">{course.short_description}</p>
-                            
+
                             <div className="hero-meta">
                                 <div className="meta-item">
                                     <i className="fas fa-chart-line"></i>
@@ -263,7 +384,7 @@ function Course() {
                                 )}
                             </div>
                         </div>
-                        
+
                         <div className="hero-actions">
                             <div className="pricing-card">
                                 <div className="price-display">
@@ -271,7 +392,7 @@ function Course() {
                                         const regularPrice = parseFloat(course.price);
                                         const discountPrice = parseFloat(course.discount_price);
                                         const hasValidDiscount = discountPrice && discountPrice < regularPrice;
-                                        
+
                                         return hasValidDiscount ? (
                                             <div className="discount-price-group">
                                                 <span className="original-price">${course.price}</span>
@@ -328,18 +449,18 @@ function Course() {
                             </section>
                         )}
 
-                        {/* Course Curriculum */}
+                        {/* Course Curriculum - UPDATED to show video source badges */}
                         <section className="content-section">
                             <div className="section-header">
                                 <i className="fas fa-book-open"></i>
                                 <h2>Course Curriculum</h2>
                                 <span className="section-count">
-                                    {course.sections?.length || 0} sections • 
-                                    {course.sections?.reduce((total, section) => 
+                                    {course.sections?.length || 0} sections •
+                                    {course.sections?.reduce((total, section) =>
                                         total + (section.subsections?.length || 0), 0
-                                    ) || 0} subsections • 
-                                    {course.sections?.reduce((total, section) => 
-                                        total + (section.subsections?.reduce((subTotal, subsection) => 
+                                    ) || 0} subsections •
+                                    {course.sections?.reduce((total, section) =>
+                                        total + (section.subsections?.reduce((subTotal, subsection) =>
                                             subTotal + (subsection.lessons?.length || 0), 0
                                         ) || 0), 0
                                     ) || 0} lessons
@@ -351,11 +472,11 @@ function Course() {
                                         {course.sections.map((section, sectionIndex) => {
                                             const sectionDuration = getTotalSectionDuration(section);
                                             const isSectionExpanded = expandedSections.has(section.id);
-                                            
+
                                             return (
                                                 <div key={section.id} className="curriculum-section">
                                                     {/* Section Header */}
-                                                    <div 
+                                                    <div
                                                         className={`section-header-enterprise ${isSectionExpanded ? 'expanded' : ''}`}
                                                         onClick={() => toggleSection(section.id)}
                                                     >
@@ -377,7 +498,7 @@ function Course() {
                                                                     </div>
                                                                     <div className="meta-item">
                                                                         <i className="fas fa-play-circle"></i>
-                                                                        {section.subsections?.reduce((total, sub) => 
+                                                                        {section.subsections?.reduce((total, sub) =>
                                                                             total + (sub.lessons?.length || 0), 0
                                                                         ) || 0} Lessons
                                                                     </div>
@@ -397,11 +518,11 @@ function Course() {
                                                         {section.subsections && section.subsections.map((subsection, subIndex) => {
                                                             const subsectionDuration = getTotalSubsectionDuration(subsection);
                                                             const isSubsectionExpanded = expandedSubsections.has(subsection.id);
-                                                            
+
                                                             return (
                                                                 <div key={subsection.id} className="subsection-enterprise">
                                                                     {/* Subsection Header */}
-                                                                    <div 
+                                                                    <div
                                                                         className={`subsection-header-enterprise ${isSubsectionExpanded ? 'expanded' : ''}`}
                                                                         onClick={() => toggleSubsection(subsection.id)}
                                                                     >
@@ -419,14 +540,14 @@ function Course() {
                                                                         </div>
                                                                     </div>
 
-                                                                    {/* Lessons List */}
+                                                                    {/* Lessons List - UPDATED to show video source badges */}
                                                                     <div className={`lessons-list-enterprise ${isSubsectionExpanded ? 'expanded' : ''}`}>
                                                                         {subsection.lessons && subsection.lessons.length > 0 ? (
                                                                             subsection.lessons.map((lesson, lessonIndex) => (
-                                                                                <div 
-                                                                                    key={lesson.id} 
-                                                                                    className={`lesson-item-enterprise ${lesson.is_preview ? 'preview-available' : ''}`}
-                                                                                    onClick={() => lesson.is_preview && playPreviewVideo(lesson)}
+                                                                                <div
+                                                                                    key={lesson.id}
+                                                                                    className={`lesson-item-enterprise ${hasPreviewContent(lesson) ? 'preview-available' : ''}`}
+                                                                                    onClick={() => hasPreviewContent(lesson) && playPreviewVideo(lesson)}
                                                                                 >
                                                                                     <div className="lesson-icon" style={{ color: getLessonIconColor(lesson.lesson_type) }}>
                                                                                         <i className={getLessonIcon(lesson.lesson_type)}></i>
@@ -439,10 +560,19 @@ function Course() {
                                                                                                 {lesson.video_duration > 0 && (
                                                                                                     <span className="lesson-duration">{formatDuration(lesson.video_duration)}</span>
                                                                                                 )}
+                                                                                                {/* Video Source Badge */}
+                                                                                                {getVideoBadgeType(lesson) && (
+                                                                                                    <span
+                                                                                                        className="video-source-mini-badge"
+                                                                                                        style={{ color: getVideoBadgeType(lesson).color }}
+                                                                                                    >
+                                                                                                        <i className={getVideoBadgeType(lesson).icon}></i>
+                                                                                                    </span>
+                                                                                                )}
                                                                                             </div>
                                                                                         </div>
                                                                                         <div className="lesson-actions">
-                                                                                            {lesson.is_preview ? (
+                                                                                            {hasPreviewContent(lesson) ? (
                                                                                                 <span className="preview-badge clickable">
                                                                                                     <i className="fas fa-eye"></i>
                                                                                                     Preview
