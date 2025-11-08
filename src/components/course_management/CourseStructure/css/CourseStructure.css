@@ -6,6 +6,7 @@
   max-width: 1200px;
   margin: 0 auto;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  box-sizing: border-box;
 }
 
 /* Header Section */
@@ -16,6 +17,7 @@
   margin-bottom: 30px;
   padding-bottom: 20px;
   border-bottom: 2px solid #e1e5e9;
+  box-sizing: border-box;
 }
 
 .structure-title h3 {
@@ -50,6 +52,7 @@
   align-items: center;
   width: 100%;
   margin-top: 15px;
+  box-sizing: border-box;
 }
 
 .controls-left {
@@ -99,6 +102,7 @@
   align-items: center;
   justify-content: center;
   min-height: 40px;
+  box-sizing: border-box;
 }
 
 .btn-primary {
@@ -167,6 +171,7 @@
   padding: 40px;
   color: #7f8c8d;
   font-size: 16px;
+  box-sizing: border-box;
 }
 
 .no-course-selected {
@@ -175,6 +180,7 @@
   background-color: #f8f9fa;
   border-radius: 8px;
   color: #7f8c8d;
+  box-sizing: border-box;
 }
 
 .submission-progress {
@@ -185,6 +191,7 @@
   border-radius: 6px;
   margin-bottom: 20px;
   text-align: center;
+  box-sizing: border-box;
 }
 
 /* Sections List */
@@ -192,6 +199,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  box-sizing: border-box;
 }
 
 /* Card Styles */
@@ -206,6 +214,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.2s ease;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .section-card:hover,
@@ -228,6 +237,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   margin: 0;
+  box-sizing: border-box;
 }
 
 .section-header:hover,
@@ -260,6 +270,7 @@
   justify-content: center;
   min-width: 24px;
   min-height: 24px;
+  flex-shrink: 0;
 }
 
 .section-toggle.expanded,
@@ -287,6 +298,8 @@
   font-weight: 500;
   transition: border-color 0.2s ease;
   background: white;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .section-title-input {
@@ -315,20 +328,26 @@
 .section-content {
   padding: 1.5rem;
   background: white;
+  box-sizing: border-box;
 }
 
 .subsection-content {
   padding: 1.25rem;
   background: #fafafa;
   border-top: 1px solid #e9ecef;
+  box-sizing: border-box;
 }
 
+/* Lesson Content - FIXED */
 .lesson-content {
-  padding: 1.5rem;
+  padding: 0;
   background: white;
   border-top: 1px solid #e9ecef;
-  background-color: red;
   display: flex;
+  flex-direction: column;
+  min-height: 200px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 /* Collapse Controls */
@@ -384,6 +403,7 @@
   gap: 0.5rem;
   align-items: center;
   margin-left: auto;
+  flex-shrink: 0;
 }
 
 /* Order Input Group */
@@ -392,6 +412,7 @@
   align-items: center;
   gap: 6px;
   min-width: 80px;
+  flex-shrink: 0;
 }
 
 .order-input-group label {
@@ -412,6 +433,7 @@
   text-align: center;
   background-color: #f8f9fa;
   transition: border-color 0.2s ease;
+  box-sizing: border-box;
 }
 
 .order-input:focus {
@@ -426,6 +448,7 @@
 .lesson-status,
 .resource-status {
   margin-left: auto;
+  flex-shrink: 0;
 }
 
 .status-badge {
@@ -435,6 +458,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .status-badge.existing {
@@ -462,6 +486,8 @@
   font-size: 14px;
   line-height: 1.5;
   transition: border-color 0.2s ease;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .section-description:focus,
@@ -471,13 +497,20 @@
   box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
 }
 
-/* Lesson Content Sections */
+/* Lesson Content Sections - UPDATED */
 .lesson-content-section {
-  margin-bottom: 2rem;
+  margin: 0;
   padding: 1.5rem;
   background: #fafbfc;
-  border: 1px solid #e1e5e9;
-  border-radius: 8px;
+  border: none;
+  border-bottom: 1px solid #e1e5e9;
+  border-radius: 0;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.lesson-content-section:last-child {
+  border-bottom: none;
 }
 
 .section-label {
@@ -502,6 +535,8 @@
   transition: all 0.2s ease;
   background: white;
   min-height: 120px;
+  max-height: 400px;
+  box-sizing: border-box;
 }
 
 .lesson-content-textarea:focus {
@@ -516,12 +551,14 @@
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
   align-items: start;
+  box-sizing: border-box;
 }
 
 .meta-field {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  box-sizing: border-box;
 }
 
 .meta-field label {
@@ -537,6 +574,8 @@
   font-size: 14px;
   transition: all 0.2s ease;
   background: white;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .meta-input:focus {
@@ -558,6 +597,7 @@
   color: #5c6b7a;
   cursor: pointer;
   padding: 0.5rem 0;
+  box-sizing: border-box;
 }
 
 .checkbox-label input[type="checkbox"] {
@@ -597,12 +637,15 @@
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid #e1e5e9;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .resources-title {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .resources-title h6 {
@@ -619,6 +662,7 @@
   border-radius: 12px;
   font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 /* Empty Resource State */
@@ -629,6 +673,8 @@
   border: 2px dashed #e1e5e9;
   border-radius: 8px;
   color: #7f8c8d;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .empty-resource-icon {
@@ -655,6 +701,8 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 /* Subsections Container */
@@ -662,6 +710,8 @@
   margin-top: 20px;
   padding-top: 20px;
   border-top: 1px solid #e1e5e9;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .subsection-header-row {
@@ -669,6 +719,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .subsection-header-row h4 {
@@ -683,6 +735,8 @@
   margin-top: 15px;
   padding-top: 15px;
   border-top: 1px solid #e1e5e9;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .lesson-header-row {
@@ -690,6 +744,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .lesson-header-row h5 {
@@ -709,6 +765,8 @@
 .resource-card {
   padding: 15px;
   margin-bottom: 10px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .resource-header {
@@ -717,6 +775,8 @@
   gap: 10px;
   margin-bottom: 10px;
   flex-wrap: wrap;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .resource-header input[type="text"] {
@@ -726,6 +786,8 @@
   border: 1px solid #dce1e6;
   border-radius: 4px;
   font-size: 14px;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .resource-header select {
@@ -735,12 +797,15 @@
   font-size: 14px;
   background-color: white;
   min-width: 120px;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .file-upload {
   width: 100%;
   padding: 8px 0;
   font-size: 14px;
+  box-sizing: border-box;
 }
 
 /* File Upload Styles */
@@ -748,6 +813,8 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .file-upload-input {
@@ -763,6 +830,7 @@
   text-align: center;
   font-size: 14px;
   transition: background-color 0.2s ease;
+  box-sizing: border-box;
 }
 
 .file-upload-label:hover {
@@ -774,12 +842,15 @@
   padding: 12px;
   border: 1px solid #dee2e6;
   border-radius: 4px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .file-name-display {
   margin-bottom: 8px;
   padding: 6px 0;
   font-size: 14px;
+  box-sizing: border-box;
 }
 
 .file-name-display strong {
@@ -791,6 +862,8 @@
   display: flex;
   gap: 12px;
   margin-bottom: 10px;
+  flex-wrap: wrap;
+  box-sizing: border-box;
 }
 
 .file-size, .file-type {
@@ -799,6 +872,7 @@
   border-radius: 4px;
   font-size: 12px;
   color: #495057;
+  box-sizing: border-box;
 }
 
 .resource-database-indicator {
@@ -813,6 +887,7 @@
   color: #2e7d32;
   font-size: 12px;
   font-weight: 500;
+  box-sizing: border-box;
 }
 
 .database-icon {
@@ -831,6 +906,8 @@
   border-radius: 6px;
   margin: 0.5rem 0;
   border: 1px dashed #dee2e6;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .empty-resource {
@@ -842,19 +919,24 @@
   border-radius: 4px;
   margin: 0.5rem 0;
   border: 1px dashed #dee2e6;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 /* Nested Components Spacing */
 .subsection-card {
   margin-bottom: 15px;
+  width: 100%;
 }
 
 .lesson-card {
   margin-bottom: 12px;
+  width: 100%;
 }
 
 .resource-card {
   margin-bottom: 8px;
+  width: 100%;
 }
 
 /* Smooth transitions for expand/collapse */
@@ -867,14 +949,17 @@
 /* Enhanced visual hierarchy */
 .section-card {
   margin-bottom: 1.5rem;
+  width: 100%;
 }
 
 .subsection-card {
   margin-bottom: 1rem;
+  width: 100%;
 }
 
 .lesson-card {
   margin-bottom: 0.75rem;
+  width: 100%;
 }
 
 /* Status indicator dots */
@@ -883,6 +968,7 @@
   height: 8px;
   border-radius: 50%;
   margin-right: 8px;
+  flex-shrink: 0;
 }
 
 .status-indicator.existing {
@@ -953,6 +1039,11 @@ select:focus-visible {
   background: #a8a8a8;
 }
 
+/* Global box-sizing fix */
+.course-structure * {
+  box-sizing: border-box;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .course-structure {
@@ -1017,6 +1108,7 @@ select:focus-visible {
   .subsection-title-input,
   .lesson-title-input {
     min-width: auto;
+    width: 100%;
   }
   
   .section-content {
@@ -1028,7 +1120,7 @@ select:focus-visible {
   }
   
   .lesson-content {
-    padding: 1rem;
+    padding: 0;
   }
   
   .lesson-meta-grid {
@@ -1048,7 +1140,7 @@ select:focus-visible {
   
   .lesson-content-section {
     padding: 1rem;
-    margin-bottom: 1.5rem;
+    margin: 0;
   }
   
   .empty-resource-state {
@@ -1064,6 +1156,7 @@ select:focus-visible {
   .resource-header input[type="text"],
   .resource-header select {
     min-width: auto;
+    width: 100%;
   }
   
   .collapse-controls {
@@ -1106,7 +1199,7 @@ select:focus-visible {
   }
   
   .lesson-content {
-    padding: 0.75rem;
+    padding: 0;
   }
   
   .resources-title {
@@ -1117,6 +1210,5 @@ select:focus-visible {
   
   .lesson-content-section {
     padding: 0.75rem;
-    margin-bottom: 1rem;
   }
 }
