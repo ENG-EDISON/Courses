@@ -2,13 +2,15 @@ import './App.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Homepage from './components/Homepage';
 import Profile from './components/Profile';
-import NavigationBar from './components/NavigationBar';
+import NavigationBar from './components/common/NavigationBar';
 import "./index.css"
-import EnterpriseLogin from './components/Login';
+import EnterpriseLogin from './components/user_management/Login';
 import Course from './components/CourseDetail';
 import AllCourses from './components/AllCoursesPage';
 import MyEnrolledCourses from './components/MyEnrolledCourses';
 import CourseContentPage from './components/CourseContentPage';
+import CourseEditor from './components/course_management/CourseEditor/CourseEditor'
+
 
 const router = createBrowserRouter([
 
@@ -72,6 +74,25 @@ const router = createBrowserRouter([
       </>
     )
 },
+{
+    path: '/course-editor/',  // Add :id parameter
+    element:(
+      <>
+      <NavigationBar/>
+      <CourseEditor/>
+      </>
+    )
+},
+  {
+    path: '/instructor',
+    element:
+      (
+        <>
+          <NavigationBar />
+        </>
+      ),
+    errorElement: <p>404 Not found</p>,
+  },
   {
     path:'/enrolled-courses',
     element:(

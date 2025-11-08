@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { getCoursepreviewStructure } from "../api/CoursesApi";
+import { getCoursePreviewStructure } from "../api/CoursesApi";
 import "../static/Courses.css";
 
 function Course() {
@@ -18,7 +18,7 @@ function Course() {
         const fetchCourseData = async () => {
             try {
                 setLoading(true);
-                const response = await getCoursepreviewStructure(courseId);
+                const response = await getCoursePreviewStructure(courseId);
                 console.log('Preview:', response.data);
                 setCourse(response.data);
             } catch (err) {

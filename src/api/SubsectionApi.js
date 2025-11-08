@@ -1,6 +1,7 @@
 import apiClient from "../utils/Http";
 
-export const getCourseSections = (courseId) => apiClient.get(`api/sections/?course=${courseId}`);
-export const getCourseSection = (sectionId) => apiClient.get(`api/sections/${sectionId}/`);
-export const getSubsections = (sectionId) => apiClient.get(`api/subsections/?section=${sectionId}`);
-export const getLessons = (subsectionId) => apiClient.get(`api/lessons/?subsection=${subsectionId}`);
+export const createSubSection = (data) =>apiClient.post('api/subsection/', data);
+export const getCourseSubSections = (courseId) => apiClient.get(`api/sections/?course=${courseId}`);
+export const getCourseSubSectionById= (sectionId) => apiClient.get(`api/sections/${sectionId}/`);
+export const getSubsectionByCourseId =(courseId) =>apiClient.get(`api/subsection/?course=${courseId}`);
+export const getSubsections = (sectionId) => apiClient.get(`api/subsection/?section=${sectionId}`);

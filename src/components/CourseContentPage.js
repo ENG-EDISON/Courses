@@ -719,7 +719,7 @@ const CourseContentPage = () => {
         </div>
     );
 
-
+// Added some code
             default:
                 return null;
         }

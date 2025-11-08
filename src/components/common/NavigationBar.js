@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
-import "../static/NavigationBar.css";
-import { getMyProfile } from "../api/ProfileApis";
+import "../../static/NavigationBar.css";
+import { getMyProfile } from "../../api/ProfileApis";
 
 function NavigationBar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -113,6 +113,9 @@ function NavigationBar() {
           <>
             <li className="nav-item">
               <Link to="/enrolled-courses">My Courses</Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/course-editor/">Instructor View</Link>
             </li>
             <li className="nav-item profile-dropdown-container" ref={dropdownRef}>
               <button 

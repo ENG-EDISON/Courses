@@ -1,0 +1,418 @@
+.learning-objectives-manager {
+  background: white;
+  border-radius: 8px;
+  padding: 0;
+  border: 1px solid #e2e8f0;
+}
+
+.objectives-header {
+  padding: 20px 25px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #fafbfc;
+  border-radius: 8px 8px 0 0;
+}
+
+.objectives-header h3 {
+  margin: 0 0 5px 0;
+  color: #2d3748;
+  font-size: 1.2rem;
+}
+
+.objectives-header p {
+  margin: 0;
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+.add-objective-section {
+  padding: 20px 25px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.input-group {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.objective-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.objective-input:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.btn-add {
+  background: #48bb78;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-add:hover:not(:disabled) {
+  background: #38a169;
+  transform: translateY(-1px);
+}
+
+.btn-add:disabled {
+  background: #a0aec0;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.objectives-list-section {
+  padding: 20px 25px;
+}
+
+.objectives-count {
+  color: #718096;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.objectives-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.objective-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 16px;
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.objective-item:hover {
+  border-color: #cbd5e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.objective-number {
+  background: #4299e1;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.objective-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  gap: 15px;
+}
+
+.objective-text {
+  flex: 1;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: #2d3748;
+}
+
+.objective-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-edit, .btn-delete {
+  background: none;
+  border: 1px solid #e2e8f0;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.btn-edit:hover {
+  background: #4299e1;
+  border-color: #4299e1;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #e53e3e;
+  border-color: #e53e3e;
+  color: white;
+}
+
+/* Edit Mode */
+.objective-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.edit-input {
+  padding: 10px 12px;
+  border: 2px solid #4299e1;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  background: white;
+}
+
+.edit-input:focus {
+  outline: none;
+  border-color: #4299e1;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.btn-save {
+  background: #48bb78;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-save:hover:not(:disabled) {
+  background: #38a169;
+}
+
+.btn-save:disabled {
+  background: #a0aec0;
+  cursor: not-allowed;
+}
+
+.btn-cancel {
+  background: #e2e8f0;
+  color: #4a5568;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-cancel:hover {
+  background: #cbd5e0;
+}
+
+/* No Objectives State */
+.no-objectives {
+  text-align: center;
+  padding: 40px 20px;
+  color: #718096;
+}
+
+.no-objectives-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.no-objectives h4 {
+  margin: 0 0 10px 0;
+  color: #4a5568;
+}
+
+.no-objectives p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Loading State */
+.loading-state {
+  text-align: center;
+  padding: 30px;
+  color: #718096;
+  font-style: italic;
+}
+
+/* No Course Selected */
+.no-course-selected {
+  text-align: center;
+  padding: 40px 20px;
+  color: #718096;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .input-group {
+    flex-direction: column;
+  }
+  
+  .objective-item {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .objective-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .objective-actions {
+    align-self: flex-end;
+  }
+  
+  .objective-edit {
+    width: 100%;
+  }
+}
+/* Add these new styles to your existing CSS */
+
+.objective-inputs {
+  display: flex;
+  gap: 15px;
+  flex: 1;
+}
+
+.icon-input-group,
+.objective-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.icon-input-group {
+  flex: 0 0 80px;
+}
+
+.objective-input-group {
+  flex: 1;
+}
+
+.icon-input-group label,
+.objective-input-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 0;
+}
+
+.icon-input {
+  padding: 10px 12px;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  text-align: center;
+  min-width: 60px;
+}
+
+.icon-input:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+}
+
+.icon-input-small {
+  padding: 6px 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-align: center;
+  min-width: 50px;
+  max-width: 60px;
+}
+
+.icon-input-small:focus {
+  outline: none;
+  border-color: #4299e1;
+}
+
+.icon-help {
+  margin-top: 8px;
+  text-align: center;
+}
+
+.edit-inputs {
+  display: flex;
+  gap: 15px;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.objective-main {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+}
+
+.objective-icon-display {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-size: 1.1rem;
+}
+
+.objective-text {
+  flex: 1;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: #2d3748;
+}
+
+.objective-icon-edit {
+  flex-shrink: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .objective-inputs {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .icon-input-group {
+    flex: 1;
+  }
+  
+  .edit-inputs {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .objective-main {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .objective-text {
+    min-width: 100%;
+    order: 3;
+  }
+}
