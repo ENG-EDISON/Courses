@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getAllCourses, searchCourses } from "../api/CoursesApi";
+import { getAllCoursesCardView, searchCourses } from "../api/CoursesApi";
 import "../static/AllCoursesPage.css";
 
 // StarRating Component (moved outside for better organization)
@@ -101,7 +101,7 @@ function AllCoursesPage() {
         const fetchCourses = async () => {
             try {
                 setLoading(true);
-                const response = await getAllCourses();
+                const response = await getAllCoursesCardView();
                 console.log('Courses data:', response.data);
                 setCourses(response.data);
                 groupCoursesByCategory(response.data);
@@ -116,15 +116,19 @@ function AllCoursesPage() {
         fetchCourses();
     }, []);
 
-    // Group courses by category
+    // Group courses by category - UPDATED for string category
     const groupCoursesByCategory = (coursesData) => {
         const grouped = {};
         
         coursesData.forEach(course => {
-            const categoryName = course.category?.name || 'Uncategorized';
+            // Use course.category directly since it's now a string
+            const categoryName = course.category || 'Uncategorized';
             if (!grouped[categoryName]) {
                 grouped[categoryName] = {
-                    category: course.category,
+                    category: {
+                        name: course.category,
+                        slug: course.category_slug
+                    },
                     courses: []
                 };
             }

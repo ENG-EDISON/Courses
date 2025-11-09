@@ -1,6 +1,7 @@
 import apiClient from "../utils/Http";
 
 export const getAllCourses = () => apiClient.get('/api/course/');
+export const getAllCoursesCardView=()=>apiClient.get('api/courses/card-view/');
 export const getMyCoursesAsInstructor=()=>apiClient.get('/courses/my-courses/');
 export const getCourseFullStructure = (id) => apiClient.get(`/api/courses/${id}/full-structure/`);
 export const getCoursePreviewStructure = (id) => apiClient.get(`/api/courses/${id}/preview/`);
