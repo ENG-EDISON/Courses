@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import Lesson from './Lesson';
+import Lesson from '../CourseStructure/lesson/LessonMain';
 
 const Subsection = ({ 
   subsection, 
