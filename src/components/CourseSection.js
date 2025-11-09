@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../static/CourseSection.css";
-import { getAllCourses } from "../api/CoursesApi"
+import {getAllCoursesCardView } from "../api/CoursesApi"
 
 function CoursesSection() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -15,7 +15,7 @@ function CoursesSection() {
     const fetchCourses = async () => {
       try {
         setLoading(true);
-        const response = await getAllCourses();
+        const response = await getAllCoursesCardView();
         console.log('Courses API response:', response.data); // Debug log
         setCourses(response.data);
       } catch (err) {

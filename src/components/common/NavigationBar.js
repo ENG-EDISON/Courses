@@ -204,9 +204,9 @@ function NavigationBar() {
             <li className="nav-item">
               <Link to="/login">Login</Link>
             </li>
-            <li className="nav-item signup">
+            {/* <li className="nav-item signup">
               <Link to="/signup">Sign Up</Link>
-            </li>
+            </li> */}
           </>
         )}
       </ul>
