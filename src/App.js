@@ -1,5 +1,6 @@
 import './App.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext'; // ✅ Import AuthProvider
 import Homepage from './components/Homepage';
 import Profile from './components/Profile';
 import NavigationBar from './components/common/NavigationBar';
@@ -9,31 +10,27 @@ import Course from './components/CourseDetail';
 import AllCourses from './components/AllCoursesPage';
 import MyEnrolledCourses from './components/MyEnrolledCourses';
 import CourseContentPage from './components/CourseContentPage';
-import CourseEditor from './components/course_management/CourseEditor/CourseEditor'
-
+import CourseEditor from './components/course_management/CourseEditor/CourseEditor';
 
 const router = createBrowserRouter([
-
   {
     path: '/',
-    element:
-      (
-        <>
-          <NavigationBar />
-          <Homepage />
-        </>
-      ),
+    element: (
+      <>
+        <NavigationBar />
+        <Homepage />
+      </>
+    ),
     errorElement: <p>404 Not found</p>,
   },
   {
     path: '/login',
-    element:
-      (
-        <>
-          <NavigationBar />
-          <EnterpriseLogin />
-        </>
-      ),
+    element: (
+      <>
+        <NavigationBar />
+        <EnterpriseLogin />
+      </>
+    ),
     errorElement: <p>404 Not found</p>,
   },
   {
@@ -44,69 +41,70 @@ const router = createBrowserRouter([
         <Profile />
       </>
     )
-  }
-  ,
+  },
   {
-    path: '/course/:courseId',  // This will capture the course.id
+    path: '/course/:courseId',
     element: (
       <>
         <NavigationBar />
-        <Course/>
+        <Course />
       </>
     )
   },
   {
-    path:'/all-courses',
-    element:(
+    path: '/all-courses',
+    element: (
       <>
-      <NavigationBar/>
-      <AllCourses/>
+        <NavigationBar />
+        <AllCourses />
       </>
     )
-
   },
-{
-    path: '/course-content/:id',  // Add :id parameter
-    element:(
+  {
+    path: '/course-content/:id',
+    element: (
       <>
-      <NavigationBar/>
-      <CourseContentPage/>
+        <NavigationBar />
+        <CourseContentPage />
       </>
     )
-},
-{
-    path: '/course-editor/',  // Add :id parameter
-    element:(
+  },
+  {
+    path: '/course-editor/',
+    element: (
       <>
-      <NavigationBar/>
-      <CourseEditor/>
+        <NavigationBar />
+        <CourseEditor />
       </>
     )
-},
+  },
   {
     path: '/instructor',
-    element:
-      (
-        <>
-          <NavigationBar />
-        </>
-      ),
+    element: (
+      <>
+        <NavigationBar />
+      </>
+    ),
     errorElement: <p>404 Not found</p>,
   },
   {
-    path:'/enrolled-courses',
-    element:(
+    path: '/enrolled-courses',
+    element: (
       <>
-      <NavigationBar/>
-      <MyEnrolledCourses/>
+        <NavigationBar />
+        <MyEnrolledCourses />
       </>
     )
   }
 ]);
+
 function App() {
   return (
     <div className="App">
-      <RouterProvider router={router} />
+      {/* ✅ Wrap RouterProvider with AuthProvider */}
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </div>
   );
 }

@@ -8,6 +8,7 @@ function NavigationBar() {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(null);
   const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
@@ -44,13 +45,16 @@ function NavigationBar() {
         if (isMounted) {
           if (response.status === 200) {
             setIsLoggedIn(true);
+            setUser(response.data); // ✅ Store user data
           } else {
             setIsLoggedIn(false);
+            setUser(null);
           }
         }
       } catch (error) {
         if (isMounted) {
           setIsLoggedIn(false);
+          setUser(null);
           if (error.response?.status === 401 || error.response?.status === 403) {
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
@@ -72,12 +76,16 @@ function NavigationBar() {
     };
   }, []);
 
+  // ✅ Check if user is an instructor
+  const isInstructor = user?.user_type === 'instructor';
+
   const handleLogout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     sessionStorage.removeItem('access_token');
     sessionStorage.removeItem('refresh_token');
     setIsLoggedIn(false);
+    setUser(null);
     setProfileDropdownOpen(false);
     window.location.href = '/';
   };
@@ -114,9 +122,6 @@ function NavigationBar() {
             <li className="nav-item">
               <Link to="/enrolled-courses">My Courses</Link>
             </li>
-            <li className="nav-item">
-              <Link to="/course-editor/">Instructor View</Link>
-            </li>
             <li className="nav-item profile-dropdown-container" ref={dropdownRef}>
               <button 
                 className="profile-dropdown-toggle"
@@ -134,9 +139,18 @@ function NavigationBar() {
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                   <circle cx="12" cy="7" r="4" />
                 </svg>
+                {/* ✅ Show instructor badge if user is instructor */}
+                {isInstructor && <span className="instructor-badge">Instructor</span>}
               </button>
               {profileDropdownOpen && (
                 <div className="profile-dropdown-menu">
+                  {/* ✅ Show user role in profile dropdown */}
+                  {isInstructor && (
+                    <div className="user-role-info">
+                      <span className="role-badge">Instructor</span>
+                    </div>
+                  )}
+                  
                   <Link 
                     to="/profile" 
                     className="dropdown-item"
@@ -147,18 +161,28 @@ function NavigationBar() {
                       <circle cx="12" cy="7" r="4" />
                     </svg>
                     Profile
+                    {isInstructor && <span className="role-indicator">👑</span>}
                   </Link>
-                  <Link 
-                    to="/settings" 
-                    className="dropdown-item"
-                    onClick={() => setProfileDropdownOpen(false)}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="3" />
-                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                    </svg>
-                    Settings
-                  </Link>
+                  {/* ✅ Show instructor-specific links in dropdown */}
+                  {isInstructor && (
+                    <>
+                      <div className="dropdown-divider"></div>
+                      <Link 
+                        to="/course-editor" 
+                        className="dropdown-item instructor-item"
+                        onClick={() => setProfileDropdownOpen(false)}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M12 19l7-7 3 3-7 7-3-3z" />
+                          <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+                          <path d="M2 2l7.586 7.586" />
+                          <circle cx="11" cy="11" r="2" />
+                        </svg>
+                        Course Editor
+                      </Link>
+                    </>
+                  )}
+                  
                   <div className="dropdown-divider"></div>
                   <button 
                     onClick={handleLogout}

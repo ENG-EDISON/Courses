@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './CourseEditor.css';
-// import CourseStructure from '../CourseStructure/CourseStructure';
 import CourseStructure from '../CourseStructure/course/CourseStructure';
-// import CourseDetailsEditForm from '../CourseDetailsEditForm/CourseDetailsEditForm';
-// import { getAllCourses, updateCourse } from '../../../api/CourseApi';
-import { getAllCourses,updateCourse } from '../../../api/CoursesApi';
+import { getAllCourses, updateCourse } from '../../../api/CoursesApi';
 import CourseDetailsEditForm from '../../CourseDetailsEditForm/CourseDetailsEditForm';
+import { getMyProfile } from '../../../api/ProfileApis';
+
+
 const CourseEditor = () => {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [courses, setCourses] = useState([]);
@@ -17,18 +17,26 @@ const CourseEditor = () => {
     loadCourses();
   }, []);
 
-  const loadCourses = async () => {
-    try {
-      setIsLoading(true);
-      const response = await getAllCourses();
-      setCourses(response.data);
-    } catch (error) {
-      console.error('Error loading courses:', error);
-      alert('Error loading courses: ' + error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+const loadCourses = async () => {
+  try {
+    setIsLoading(true);
+    
+    // Get user profile to get ID
+    const profileResponse = await getMyProfile();
+    const userId = profileResponse.data.id;
+    
+    // Get all courses and filter by instructor
+    const coursesResponse = await getAllCourses();
+    const myCourses = coursesResponse.data.filter(course => course.instructor === userId);
+    
+    setCourses(myCourses);
+  } catch (error) {
+    console.error('Error loading courses:', error);
+    alert('Error loading courses: ' + error.message);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleCourseSelect = (course) => {
     setSelectedCourse(course);
@@ -37,17 +45,17 @@ const CourseEditor = () => {
 
   const handleCourseUpdate = async (updatedCourseData) => {
     if (!selectedCourse) return;
-    
+
     setIsLoading(true);
     try {
       const response = await updateCourse(selectedCourse.id, updatedCourseData);
       setSelectedCourse(response.data);
-      
+
       // Update the courses list
-      setCourses(prev => prev.map(course => 
+      setCourses(prev => prev.map(course =>
         course.id === selectedCourse.id ? response.data : course
       ));
-      
+
       alert('Course updated successfully!');
     } catch (error) {
       console.error('Error updating course:', error);
@@ -70,8 +78,8 @@ const CourseEditor = () => {
       <div className="editor-header">
         <h1>Course Editor</h1>
         <div className="course-selector">
-          <select 
-            value={selectedCourse?.id || ''} 
+          <select
+            value={selectedCourse?.id || ''}
             onChange={(e) => {
               const courseId = e.target.value;
               const course = courses.find(c => c.id === parseInt(courseId));
@@ -94,13 +102,13 @@ const CourseEditor = () => {
       {selectedCourse && (
         <div className="editor-container">
           <div className="editor-tabs">
-            <button 
+            <button
               className={`tab-button ${activeTab === 'structure' ? 'active' : ''}`}
               onClick={() => setActiveTab('structure')}
             >
               📚 Course Structure
             </button>
-            <button 
+            <button
               className={`tab-button ${activeTab === 'details' ? 'active' : ''}`}
               onClick={() => setActiveTab('details')}
             >
