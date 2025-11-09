@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './CourseEditor.css';
-import CourseStructure from '../CourseStructure/CourseStructure';
+// import CourseStructure from '../CourseStructure/CourseStructure';
+import CourseStructure from '../CourseStructure/course/CourseStructure';
 // import CourseDetailsEditForm from '../CourseDetailsEditForm/CourseDetailsEditForm';
 // import { getAllCourses, updateCourse } from '../../../api/CourseApi';
 import { getAllCourses,updateCourse } from '../../../api/CoursesApi';
