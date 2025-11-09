@@ -122,6 +122,7 @@ const VideoUpload = ({ videoFile, onFileChange }) => {
     
     testPositions.forEach((position, index) => {
       const testTime = video.duration * position;
+      // eslint-disable-next-line
       const originalTime = video.currentTime;
       
       video.currentTime = testTime;
@@ -352,9 +353,8 @@ const VideoUrlInput = ({ videoUrl, onVideoUrlChange }) => {
 // Helper function
 const getYouTubeVideoId = (url) => {
     if (!url) return null;
-    const match = url.match(
-        /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
-    );
+    // eslint-disable-next-line
+    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
     return match ? match[1] : null;
 };
 

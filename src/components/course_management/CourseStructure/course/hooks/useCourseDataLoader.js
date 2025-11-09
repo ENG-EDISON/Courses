@@ -9,9 +9,17 @@ export const useCourseDataLoader = ({
   onUpdate,
   setSections,
   setIsLoading,
-  expandAll
+  expandAll,
 }) => {
   const loadingRef = useRef(false);
+
+  // ✅ Keep latest versions of callbacks in refs so they don't trigger rerenders
+  const expandAllRef = useRef(expandAll);
+  const onUpdateRef = useRef(onUpdate);
+  useEffect(() => {
+    expandAllRef.current = expandAll;
+    onUpdateRef.current = onUpdate;
+  }, [expandAll, onUpdate]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -19,43 +27,43 @@ export const useCourseDataLoader = ({
 
       loadingRef.current = true;
       setIsLoading(true);
+
       try {
         console.log("=== DEBUG: Loading course structure ===");
 
-        // 1. Get all sections for this course
+        // 1️⃣ Load all sections
         const sectionsResponse = await getCourseSections(courseId);
         const sectionsData = sectionsResponse.data;
         console.log("Sections loaded:", sectionsData);
 
-        if (sectionsData.length === 0) {
+        if (!sectionsData.length) {
           setSections([]);
           return;
         }
 
-        // 2. Get all subsections for the course (single API call)
+        // 2️⃣ Load all subsections
         const subsectionsResponse = await getSubsectionByCourseId(courseId);
         const allSubsections = subsectionsResponse.data.map(sub => ({
           ...sub,
-          isExisting: true
+          isExisting: true,
         }));
         console.log("All subsections loaded:", allSubsections);
 
-        // 3. Get all lessons for all subsections (single batch approach)
+        // 3️⃣ Load all lessons
         const allLessons = [];
         const lessonPromises = allSubsections.map(async (subsection) => {
           try {
-            console.log(`Loading lessons for subsection ${subsection.id}`);
             const lessonsResponse = await getLessonBySubsectionId(subsection.id);
-
-            if (lessonsResponse && lessonsResponse.data) {
+            if (lessonsResponse?.data) {
               const subsectionLessons = lessonsResponse.data.map(lesson => ({
                 ...lesson,
                 isExisting: true,
-                duration_minutes: lesson.video_duration ? Math.round(lesson.video_duration / 60) : 0
+                duration_minutes: lesson.video_duration
+                  ? Math.round(lesson.video_duration / 60)
+                  : 0,
               }));
               allLessons.push(...subsectionLessons);
             }
-            console.log("lessonsResponse", lessonsResponse);
           } catch (error) {
             console.error(`Error loading lessons for subsection ${subsection.id}:`, error);
           }
@@ -64,37 +72,40 @@ export const useCourseDataLoader = ({
         await Promise.all(lessonPromises);
         console.log("All lessons loaded:", allLessons);
 
-        // 4. Build the nested structure
+        // 4️⃣ Build structure
         const loadedSections = sectionsData.map(section => {
-          const sectionSubsections = allSubsections.filter(sub => sub.section === section.id);
+          const sectionSubsections = allSubsections.filter(
+            sub => sub.section === section.id
+          );
 
           const subsectionsWithLessons = sectionSubsections.map(subsection => {
-            const subsectionLessons = allLessons.filter(lesson => lesson.subsection === subsection.id);
-
+            const subsectionLessons = allLessons.filter(
+              lesson => lesson.subsection === subsection.id
+            );
             return {
               ...subsection,
               lessons: subsectionLessons,
-              isExisting: true
+              isExisting: true,
             };
           });
 
           return {
             ...section,
             subsections: subsectionsWithLessons,
-            isExisting: true
+            isExisting: true,
           };
         });
 
         console.log("Final structure built:", loadedSections);
         setSections(loadedSections);
 
-        // Auto-expand all sections
+        // ✅ Only expand once per load
         setTimeout(() => {
-          expandAll();
+          if (typeof expandAllRef.current === 'function') expandAllRef.current();
         }, 100);
 
-        if (onUpdate) {
-          onUpdate(loadedSections);
+        if (typeof onUpdateRef.current === 'function') {
+          onUpdateRef.current(loadedSections);
         }
 
       } catch (error) {
@@ -107,5 +118,5 @@ export const useCourseDataLoader = ({
     };
 
     loadData();
-  }, [courseId]); // Remove all other dependencies to prevent infinite loops
+  }, [courseId, setIsLoading, setSections]); // ✅ only trigger when courseId changes
 };

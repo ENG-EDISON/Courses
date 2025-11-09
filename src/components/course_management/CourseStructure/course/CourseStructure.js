@@ -1,14 +1,6 @@
 // CourseStructure.jsx
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState,useCallback } from 'react';
 import '../css/CourseStructure.css';
-// import {
-//   createsection,
-//   getCourseSections,
-// } from '../../../api/SectionApi';
-// import { getSubsectionByCourseId, createSubSection } from '../../../api/SubsectionApi';
-// import { getLessonBySubsectionId, createLesson } from '../../../api/LessonsApi';
-// import { createLessonResource } from '../../../api/LessonResourcesApis';
-
 import Section from '../Section';
 // import StructureHeader from './StructureHeader';
 import LoadingState from './LoadingState';
@@ -29,9 +21,6 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
 
   // Custom hooks for different concerns
   const {
-    expandedSections,
-    expandedSubsections,
-    expandedLessons,
     setExpandedSections, // Add this line
     toggleSection,
     toggleSubsection,
