@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { getMyProfile } from "../../api/ProfileApis";
+import ProfileUpdate from "./ProfileUpdate";
+import PasswordChange from "./PasswordChange";
 import "./Profile.css";
-
 function Profile() {
     const [profile, setProfile] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
+    const [isEditing, setIsEditing] = useState(false);
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -25,6 +28,42 @@ function Profile() {
 
         fetchProfile();
     }, []);
+
+    // Function to refresh profile data after update
+    const handleProfileUpdated = async () => {
+        try {
+            const response = await getMyProfile();
+            setProfile(response.data);
+            setIsEditing(false);
+        } catch (error) {
+            console.error('Error refreshing profile:', error);
+        }
+    };
+
+    // Function to handle edit button click
+    const handleEditProfile = () => {
+        setIsEditing(true);
+    };
+
+    // Function to handle cancel edit
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+    };
+
+    // Function to handle password change button click
+    const handlePasswordChange = () => {
+        setIsChangingPassword(true);
+    };
+
+    // Function to handle password change success
+    const handlePasswordChangeSuccess = () => {
+        setIsChangingPassword(false);
+    };
+
+    // Function to handle password change cancel
+    const handlePasswordChangeCancel = () => {
+        setIsChangingPassword(false);
+    };
 
     if (isLoading) {
         return (
@@ -48,6 +87,30 @@ function Profile() {
         );
     }
 
+    // Show ProfileUpdate component when in edit mode
+    if (isEditing) {
+        return (
+            <div className="profile-container">
+                <ProfileUpdate 
+                    onProfileUpdated={handleProfileUpdated}
+                    onCancel={handleCancelEdit}
+                />
+            </div>
+        );
+    }
+
+    // Show PasswordChange component when changing password
+    if (isChangingPassword) {
+        return (
+            <div className="profile-container">
+                <PasswordChange 
+                    onSuccess={handlePasswordChangeSuccess}
+                    onCancel={handlePasswordChangeCancel}
+                />
+            </div>
+        );
+    }
+
     return (
         <div className="profile-container">
             <div className="profile-header">
@@ -57,32 +120,32 @@ function Profile() {
 
             <div className="profile-content">
                 <div className="profile-card">
-                <div className="profile-avatar-section">
-                    <div className="profile-avatar">
-                        {profile.profile_picture ? (
-                            <img 
-                                src={profile.profile_picture} 
-                                alt={`${profile.username}'s profile`}
-                                onError={(e) => {
-                                    // Fallback if image fails to load
-                                    e.target.style.display = 'none';
-                                    e.target.nextSibling.style.display = 'flex';
-                                }}
-                            />
-                        ) : null}
-                        <div className={`avatar-placeholder ${profile.profile_picture ? 'hidden' : ''}`}>
-                            {profile.first_name ? profile.first_name.charAt(0).toUpperCase() : profile.username.charAt(0).toUpperCase()}
+                    <div className="profile-avatar-section">
+                        <div className="profile-avatar">
+                            {profile.profile_picture ? (
+                                <img 
+                                    src={profile.profile_picture} 
+                                    alt={`${profile.username}'s profile`}
+                                    onError={(e) => {
+                                        // Fallback if image fails to load
+                                        e.target.style.display = 'none';
+                                        e.target.nextSibling.style.display = 'flex';
+                                    }}
+                                />
+                            ) : null}
+                            <div className={`avatar-placeholder ${profile.profile_picture ? 'hidden' : ''}`}>
+                                {profile.first_name ? profile.first_name.charAt(0).toUpperCase() : profile.username.charAt(0).toUpperCase()}
+                            </div>
+                        </div>
+                        <div className="profile-badge">
+                            <span className={`badge ${profile.user_type}`}>
+                                {profile.user_type_display}
+                            </span>
+                            {profile.email_verified && (
+                                <span className="badge verified">Verified</span>
+                            )}
                         </div>
                     </div>
-                    <div className="profile-badge">
-                        <span className={`badge ${profile.user_type}`}>
-                            {profile.user_type_display}
-                        </span>
-                        {profile.email_verified && (
-                            <span className="badge verified">Verified</span>
-                        )}
-                    </div>
-                </div>
 
                     <div className="profile-info-grid">
                         <div className="info-section">
@@ -185,8 +248,12 @@ function Profile() {
                     </div>
 
                     <div className="profile-actions">
-                        <button className="btn-primary">Edit Profile</button>
-                        <button className="btn-secondary">Change Password</button>
+                        <button className="btn-primary" onClick={handleEditProfile}>
+                            Edit Profile
+                        </button>
+                        <button className="btn-secondary" onClick={handlePasswordChange}>
+                            Change Password
+                        </button>
                         <button className="btn-outline">Account Settings</button>
                     </div>
                 </div>

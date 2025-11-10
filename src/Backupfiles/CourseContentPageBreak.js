@@ -145,7 +145,7 @@ const CourseContentPage = () => {
         }
 
         // Get base URL from environment and extract domain
-        const baseUrl = process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000/';
+        const baseUrl = process.env.REACT_APP_API_BASE_URL ||  'http://127.0.0.1:8000/';
         const baseDomain = new URL(baseUrl).hostname;
 
         // Check if it's a self-hosted video
@@ -705,7 +705,8 @@ const CourseContentPage = () => {
                 const getFileUrl = (filePath) => {
                     if (!filePath) return '';
                     if (filePath.startsWith('http')) return filePath;
-                    const baseUrl = process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000';
+                    const baseUrl =process.env.REACT_APP_API_BASE_URL ||process.env.REACT_APP_API_PROD_URL ||'http://127.0.0.1:8000';
+
                     return `${baseUrl}${filePath.startsWith('/') ? '' : '/'}${filePath}`;
                 };
 
