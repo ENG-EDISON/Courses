@@ -69,6 +69,7 @@
   padding: var(--space-8) var(--space-6);
   max-width: 1200px;
   margin: 0 auto;
+
 }
 
 /* ===== HEADER STYLES ===== */
@@ -160,12 +161,12 @@
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--gray-200);
   transition: all var(--transition-normal);
-  height: 180px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: relative;
   overflow: hidden;
+  max-width: 400px;
 }
 
 .enrolled-courses__card::before {

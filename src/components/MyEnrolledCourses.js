@@ -275,36 +275,6 @@ function MyEnrolledCourses() {
                                                         )}
                                                     </div>
                                                 </div>
-
-                                                {/* Course Stats */}
-                                                <div className="enrolled-courses__stats">
-                                                    <div className="enrolled-courses__stat">
-                                                        <span className="enrolled-courses__stat-label">Lessons:</span>
-                                                        <span className="enrolled-courses__stat-value">
-                                                            {completedLessons}/{totalLessons}
-                                                        </span>
-                                                    </div>
-                                                    {course.duration_hours && (
-                                                        <div className="enrolled-courses__stat">
-                                                            <span className="enrolled-courses__stat-label">Duration:</span>
-                                                            <span className="enrolled-courses__stat-value">{course.duration_hours}h</span>
-                                                        </div>
-                                                    )}
-                                                    {course.level && (
-                                                        <div className="enrolled-courses__stat">
-                                                            <span className="enrolled-courses__stat-label">Level:</span>
-                                                            <span className="enrolled-courses__stat-value">{course.level}</span>
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                {/* Continue Learning Button */}
-                                                <div className="enrolled-courses__action">
-                                                    <button className={`enrolled-courses__continue-btn ${progressPercentage === 100 ? 'enrolled-courses__continue-btn--completed' : ''}`}>
-                                                        {progressPercentage === 100 ? 'Review Course' : 
-                                                         progressPercentage > 0 ? 'Continue Learning' : 'Start Learning'}
-                                                    </button>
-                                                </div>
                                             </div>
                                         </Link>
                                     );

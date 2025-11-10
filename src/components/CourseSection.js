@@ -1,14 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../static/CourseSection.css";
-import {getAllCoursesCardView } from "../api/CoursesApi"
+import { getAllCoursesCardView } from "../api/CoursesApi";
 
 function CoursesSection() {
   const [searchQuery, setSearchQuery] = useState("");
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [hoveredCourse, setHoveredCourse] = useState(null);
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const scrollRef = useRef(null);
+  const popupRef = useRef(null);
 
   // Fetch courses from API
   useEffect(() => {
@@ -28,6 +31,34 @@ function CoursesSection() {
 
     fetchCourses();
   }, []);
+
+  // Handle mouse move to update popup position
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (hoveredCourse && popupRef.current) {
+        const popup = popupRef.current;
+        const x = e.clientX + 15;
+        const y = e.clientY + 15;
+        
+        // Ensure popup stays within viewport
+        const maxX = window.innerWidth - popup.offsetWidth - 10;
+        const maxY = window.innerHeight - popup.offsetHeight - 10;
+        
+        setPopupPosition({
+          x: Math.min(x, maxX),
+          y: Math.min(y, maxY)
+        });
+      }
+    };
+
+    if (hoveredCourse) {
+      document.addEventListener('mousemove', handleMouseMove);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [hoveredCourse]);
 
   const filteredCourses = courses.filter(course =>
     course.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -56,6 +87,16 @@ function CoursesSection() {
       );
     }
     return <div className="course-price">${course.price}</div>;
+  };
+
+  // Handle mouse enter for course card
+  const handleMouseEnter = (course, e) => {
+    setHoveredCourse(course);
+  };
+
+  // Handle mouse leave for course card
+  const handleMouseLeave = () => {
+    setHoveredCourse(null);
   };
 
   if (loading) {
@@ -100,7 +141,12 @@ function CoursesSection() {
           <div className="course-cards" ref={scrollRef}>
             {filteredCourses.length > 0 ? (
               filteredCourses.map(course => (
-                <div key={course.id} className="course-card">
+                <div 
+                  key={course.id} 
+                  className="course-card"
+                  onMouseEnter={(e) => handleMouseEnter(course, e)}
+                  onMouseLeave={handleMouseLeave}
+                >
                   <Link to={`/course/${course.id}`}>
                     <img 
                       src={course.thumbnail || "/japan.png"} 
@@ -111,9 +157,6 @@ function CoursesSection() {
                     />
                     <div className="course-card-content">
                       <h3>{course.title}</h3>
-                      <p className="course-description">
-                        {course.short_description || course.description}
-                      </p>
                       <div className="course-meta">
                         <span className="course-level">{course.level}</span>
                         <span className="course-duration">{course.duration_hours}h</span>
@@ -138,6 +181,67 @@ function CoursesSection() {
           </div>
           <button className="scroll-btn right" onClick={() => scroll("right")}>&gt;</button>
         </div>
+
+        {/* Hover Popup */}
+        {hoveredCourse && (
+          <div 
+            ref={popupRef}
+            className="course-hover-popup"
+            style={{
+              position: 'fixed',
+              left: `${popupPosition.x}px`,
+              top: `${popupPosition.y}px`,
+              zIndex: 1000
+            }}
+          >
+            <div className="popup-content">
+              <h4>{hoveredCourse.title}</h4>
+              
+              {/* Description */}
+              <div className="popup-section">
+                <h5>Description</h5>
+                <p>{hoveredCourse.description || hoveredCourse.short_description || 'No description available.'}</p>
+              </div>
+
+              {/* Objectives - assuming you have this data in your course object */}
+              <div className="popup-section">
+                <h5>What You'll Learn</h5>
+                <ul className="objectives-list">
+                  {hoveredCourse.objectives ? (
+                    Array.isArray(hoveredCourse.objectives) ? (
+                      hoveredCourse.objectives.map((objective, index) => (
+                        <li key={index}>✓ {objective}</li>
+                      ))
+                    ) : (
+                      <li>✓ {hoveredCourse.objectives}</li>
+                    )
+                  ) : (
+                    <li>No learning objectives specified.</li>
+                  )}
+                </ul>
+              </div>
+
+              {/* Additional Info */}
+              <div className="popup-meta">
+                <span>Level: {hoveredCourse.level}</span>
+                <span>Duration: {hoveredCourse.duration_hours}h</span>
+                {hoveredCourse.certificate_available && <span>📜 Certificate</span>}
+              </div>
+
+              {/* Price */}
+              <div className="popup-price">
+                {hoveredCourse.discount_price && hoveredCourse.discount_price !== hoveredCourse.price ? (
+                  <>
+                    <span className="original-price">${hoveredCourse.price}</span>
+                    <span className="discount-price">${hoveredCourse.discount_price}</span>
+                  </>
+                ) : (
+                  <span>${hoveredCourse.price}</span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
