@@ -207,7 +207,7 @@ function CoursesSection() {
                     <>
                       {hoveredCourse.learning_objectives.slice(0, 5).map((objective) => (
                         <li key={objective.id}>
-                          <span className="check-icon">✓</span>
+                          <p className="check-icon">✓</p>
                           {objective.objective}
                         </li>
                       ))}
