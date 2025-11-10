@@ -2,7 +2,7 @@ import { useDebugValue, useEffect, useState } from "react"
 import { getMyEnrolledCourses } from "../api/ProfileApis"
 import { getCourseProgressSummary } from "../api/LessonProgressApi"
 import "../static/EnrolledCourses.css"
-import CourseSection from "./CourseSection"
+import CourseSection from "../components/CourseSection"
 import { Link } from "react-router-dom";
 
 function MyEnrolledCourses() {

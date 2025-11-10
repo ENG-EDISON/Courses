@@ -4,11 +4,11 @@ import './CourseStructure.css';
 import {
   createsection,
   getCourseSections,
-} from '../../../api/SectionApi';
-import { getSubsectionByCourseId, createSubSection, getSubsections, } from '../../../api/SubsectionApi';
-import { getLessons, createLesson, createLessonResource, } from '../../../api/LessonsApi';
+} from '../api/SectionApi';
+import { getSubsectionByCourseId, createSubSection, getSubsections, } from '../api/SubsectionApi';
+import { getLessons, createLesson, createLessonResource, } from '../api/LessonsApi';
 
-import apiClient from "../../../utils/Http";
+import apiClient from "../utils/Http";
 
 const CourseStructure = ({ course, onUpdate, onSave }) => {
   const [sections, setSections] = useState([]);

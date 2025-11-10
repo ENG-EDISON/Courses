@@ -1,15 +1,15 @@
 import './App.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext'; // ✅ Import AuthProvider
-import Homepage from './components/Homepage';
-import Profile from './components/Profile';
+import Homepage from './pages/Homepage';
+import Profile from './components/UserManagement/Profile';
 import NavigationBar from './components/common/NavigationBar';
 import "./index.css"
 import EnterpriseLogin from './components/user_management/Login';
-import Course from './components/CourseDetail';
-import AllCourses from './components/AllCoursesPage';
-import MyEnrolledCourses from './components/MyEnrolledCourses';
-import CourseContentPage from './components/CourseContentPage';
+import Course from './pages/CourseDetail';
+import AllCourses from './pages/AllCoursesPage';
+import MyEnrolledCourses from './pages/MyEnrolledCourses';
+import CourseContentPage from './components/CourseContentPage/CourseContentPage';
 import CourseEditor from './components/course_management/CourseEditor/CourseEditor';
 
 const router = createBrowserRouter([

@@ -1,16 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getCourseFullStructure } from '../api/CoursesApi';
+
+import {getCourseFullStructure} from '../../api/CoursesApi'
 import {
     getCourseLessonProgress,
+    updateBulkLessonProgress,
     getCourseProgressSummary,
+    trackLessonProgress,
     getLastPlayedLesson,
-} from '../api/LessonProgressApi';
+} from '../../api/LessonProgressApi';
+
 import CourseHeader from './components/CourseHeader';
 import CourseLayout from './components/CourseLayout';
 import LoadingState from './components/LoadingState';
 import ErrorState from './components/ErrorState';
-import "../static/CourseContentPage.css"
+import "../../static/CourseContentPage.css"
 
 const CourseContentPage = () => {
     const { id } = useParams();
@@ -23,6 +27,67 @@ const CourseContentPage = () => {
     const [completionStatus, setCompletionStatus] = useState({});
     const [progressSummary, setProgressSummary] = useState(null);
     const [lastPlayed, setLastPlayed] = useState(null);
+
+    // ADD THIS MISSING FUNCTION
+    const markLessonAsCompleted = async (lessonId) => {
+        try {
+            if (completionStatus[lessonId]) {
+                return;
+            }
+
+            console.log("Marking lesson as completed:", lessonId);
+
+            // Update local state immediately for better UX
+            setCompletionStatus(prev => ({
+                ...prev,
+                [lessonId]: true
+            }));
+
+            // Track as completed
+            await trackLessonPlay(lessonId, activeVideo?.video_duration || 0, true);
+
+            // Also update via bulk API for consistency
+            const bulkProgressData = [
+                {
+                    lesson_id: parseInt(lessonId),
+                    completed: true,
+                    watched_duration: activeVideo?.video_duration || 0
+                }
+            ];
+
+            await updateBulkLessonProgress(id, bulkProgressData);
+
+            // Refresh progress summary
+            const summaryResponse = await getCourseProgressSummary(id);
+            setProgressSummary(summaryResponse.data);
+
+            console.log("Successfully marked lesson as completed");
+
+        } catch (error) {
+            console.error('Error updating lesson progress:', error);
+            console.error('Error details:', error.response?.data);
+
+            // Revert local state on error
+            setCompletionStatus(prev => {
+                const newState = { ...prev };
+                delete newState[lessonId];
+                return newState;
+            });
+        }
+    };
+
+    const trackLessonPlay = async (lessonId, currentTime = 0, completed = false) => {
+        try {
+            // Simple tracking function
+            await trackLessonProgress(lessonId, {
+                current_time: Math.floor(currentTime),
+                completed: completed,
+                total_duration: activeVideo?.video_duration || 0
+            });
+        } catch (error) {
+            console.error('Error tracking lesson progress:', error);
+        }
+    };
 
     useEffect(() => {
         const fetchCourseContent = async () => {
@@ -172,7 +237,7 @@ const CourseContentPage = () => {
                 progressSummary={progressSummary}
                 onVideoSelect={handleVideoSelect}
                 onToggleSection={toggleSection}
-                onMarkComplete={markLessonAsCompleted}
+                onMarkComplete={markLessonAsCompleted} // Now this function exists
             />
         </div>
     );

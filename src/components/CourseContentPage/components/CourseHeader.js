@@ -1,6 +1,7 @@
 import Breadcrumb from './Breadcrumb';
 import ResumeBanner from './ResumeBanner';
 import ProgressCard from './ProgressCard';
+import CourseMeta from './CourseMeta';
 
 const CourseHeader = ({ 
     course, 

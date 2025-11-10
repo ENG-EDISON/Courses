@@ -3,13 +3,13 @@ import './css/CourseStructure.css';
 import {
   createsection,
   getCourseSections,
-} from '../../../api/SectionApi';
-import { getSubsectionByCourseId, createSubSection } from '../../../api/SubsectionApi';
-import { getLessonBySubsectionId, createLesson } from '../../../api/LessonsApi';
-import { createLessonResource } from '../../../api/LessonResourcesApis';
+} from '../api/SectionApi';
+import { getSubsectionByCourseId, createSubSection } from '../api/SubsectionApi';
+import { getLessonBySubsectionId, createLesson } from '../api/LessonsApi';
+import { createLessonResource } from '../api/LessonResourcesApis';
 
-import Section from './Section';
-import StructureHeader from './StructureHeader';
+import Section from '../components/course_management/CourseStructure/Section';
+import StructureHeader from '../components/course_management/CourseStructure/StructureHeader';
 
 const CourseStructure = ({ course, onUpdate, onSave }) => {
   const [sections, setSections] = useState([]);

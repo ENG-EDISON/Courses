@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import "../static/Homepage.css";
-import CoursesSection from "./CourseSection";
+import CoursesSection from "../components/CourseSection";
 
 function Homepage() {
   return (

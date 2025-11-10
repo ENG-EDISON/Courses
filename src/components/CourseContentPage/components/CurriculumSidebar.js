@@ -1,5 +1,4 @@
 import SectionAccordion from './SectionAccordion';
-
 const CurriculumSidebar = ({
     course,
     expandedSections,

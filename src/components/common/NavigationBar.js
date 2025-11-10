@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
-import "../../static/NavigationBar.css";
+import "./NavigationBar.css";
 import { getMyProfile } from "../../api/ProfileApis";
 
 function NavigationBar() {

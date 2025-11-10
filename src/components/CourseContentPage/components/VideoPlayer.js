@@ -1,6 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { getVideoSource } from '../utils/videoUtils';
-import { trackLessonProgress } from '../api/LessonProgressApi';
+import { trackLessonProgress } from '../../../api/LessonProgressApi';
+import YouTubePlayer from './YouTubePlayer';
+import SelfHostedVideoPlayer from './SelfHostedVideoPlayer';
+import ExternalVideoPlayer from './ExternalVideoPlayer';
+import NoVideoContent from './NoVideoContent';
 
 const EnhancedVideoPlayer = ({ video, isCompleted, onMarkComplete }) => {
     const videoRef = useRef(null);
@@ -90,7 +94,5 @@ const EnhancedVideoPlayer = ({ video, isCompleted, onMarkComplete }) => {
 
     return <NoVideoContent video={video} />;
 };
-
-// Additional video player components would be split similarly...
 
 export default EnhancedVideoPlayer;
