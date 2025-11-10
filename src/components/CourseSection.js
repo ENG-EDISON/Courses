@@ -19,7 +19,7 @@ function CoursesSection() {
       try {
         setLoading(true);
         const response = await getAllCoursesCardView();
-        console.log('Courses API response:', response.data); // Debug log
+        console.log('Courses API response:', response.data);
         setCourses(response.data);
       } catch (err) {
         console.error('Error fetching courses:', err);
@@ -182,11 +182,11 @@ function CoursesSection() {
           <button className="scroll-btn right" onClick={() => scroll("right")}>&gt;</button>
         </div>
 
-        {/* Hover Popup */}
+        {/* Udemy-style Hover Popup */}
         {hoveredCourse && (
           <div 
             ref={popupRef}
-            className="course-hover-popup"
+            className="udemy-popup"
             style={{
               position: 'fixed',
               left: `${popupPosition.x}px`,
@@ -194,50 +194,34 @@ function CoursesSection() {
               zIndex: 1000
             }}
           >
-            <div className="popup-content">
-              <h4>{hoveredCourse.title}</h4>
-              
-              {/* Description */}
-              <div className="popup-section">
-                <h5>Description</h5>
-                <p>{hoveredCourse.description || hoveredCourse.short_description || 'No description available.'}</p>
+            <div className="popup-body">
+              <h4 className="popup-title">{hoveredCourse.title}</h4>
+              <div className="popup-description">
+                {hoveredCourse.short_description || 'No description available.'}
               </div>
 
-              {/* Objectives - assuming you have this data in your course object */}
-              <div className="popup-section">
-                <h5>What You'll Learn</h5>
-                <ul className="objectives-list">
-                  {hoveredCourse.objectives ? (
-                    Array.isArray(hoveredCourse.objectives) ? (
-                      hoveredCourse.objectives.map((objective, index) => (
-                        <li key={index}>✓ {objective}</li>
-                      ))
-                    ) : (
-                      <li>✓ {hoveredCourse.objectives}</li>
-                    )
+              <div className="popup-objectives">
+                <strong>What you'll learn:</strong>
+                <ul>
+                  {hoveredCourse.learning_objectives && hoveredCourse.learning_objectives.length > 0 ? (
+                    <>
+                      {hoveredCourse.learning_objectives.slice(0, 5).map((objective) => (
+                        <li key={objective.id}>
+                          <span className="check-icon">✓</span>
+                          {objective.objective}
+                        </li>
+                      ))}
+                      {hoveredCourse.learning_objectives.length > 5 && (
+                        <li className="more-objectives">
+                          <span className="check-icon">⋯</span>
+                          +{hoveredCourse.learning_objectives.length - 5} more objectives
+                        </li>
+                      )}
+                    </>
                   ) : (
-                    <li>No learning objectives specified.</li>
+                    <li>No learning objectives specified</li>
                   )}
                 </ul>
-              </div>
-
-              {/* Additional Info */}
-              <div className="popup-meta">
-                <span>Level: {hoveredCourse.level}</span>
-                <span>Duration: {hoveredCourse.duration_hours}h</span>
-                {hoveredCourse.certificate_available && <span>📜 Certificate</span>}
-              </div>
-
-              {/* Price */}
-              <div className="popup-price">
-                {hoveredCourse.discount_price && hoveredCourse.discount_price !== hoveredCourse.price ? (
-                  <>
-                    <span className="original-price">${hoveredCourse.price}</span>
-                    <span className="discount-price">${hoveredCourse.discount_price}</span>
-                  </>
-                ) : (
-                  <span>${hoveredCourse.price}</span>
-                )}
               </div>
             </div>
           </div>
