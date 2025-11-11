@@ -1,8 +1,7 @@
 // CourseStructure.jsx
-import { useState,useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import '../css/CourseStructure.css';
 import Section from '../Section';
-// import StructureHeader from './StructureHeader';
 import LoadingState from './LoadingState';
 import SubmissionProgress from './SubmissionProgress';
 import NoCourseSelected from './NoCourseSelected';
@@ -16,12 +15,13 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isAddingSection, setIsAddingSection] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // ✅ Added refresh trigger
   
   const courseId = course?.id;
 
   // Custom hooks for different concerns
   const {
-    setExpandedSections, // Add this line
+    setExpandedSections,
     toggleSection,
     toggleSubsection,
     toggleLesson,
@@ -32,22 +32,24 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
     collapseAll
   } = useExpansionState(sections);
 
-  // Load course data
+  // Load course data - UPDATED with refreshTrigger
   useCourseDataLoader({
     courseId,
     onUpdate,
     setSections,
     setIsLoading,
-    expandAll
+    expandAll,
+    refreshTrigger // ✅ Added refresh trigger
   });
 
-  // Submission handler
+  // Submission handler - UPDATED with onSuccess callback
   const { submitCourseStructure } = useStructureSubmitter({
     courseId,
     sections,
     onSave,
     isSubmitting,
-    setIsSubmitting
+    setIsSubmitting,
+    onSuccess: () => setRefreshTrigger(prev => prev + 1) // ✅ Added onSuccess callback
   });
 
   // Section management
@@ -93,7 +95,9 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
       index === sectionIndex ? { ...section, [field]: value } : section
     );
     setSections(updatedSections);
-    onUpdate(updatedSections);
+    if (onUpdate) {
+      onUpdate(updatedSections);
+    }
   }, [sections, onUpdate]);
 
   const deleteSection = useCallback((sectionIndex) => {
@@ -114,7 +118,9 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
       return newSet;
     });
 
-    onUpdate(updatedSections);
+    if (onUpdate) {
+      onUpdate(updatedSections);
+    }
   }, [sections, onUpdate, setExpandedSections]);
 
   const isExistingInDatabase = (item) => {

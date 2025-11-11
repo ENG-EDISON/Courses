@@ -10,6 +10,7 @@ export const useCourseDataLoader = ({
   setSections,
   setIsLoading,
   expandAll,
+  refreshTrigger = 0 // ✅ Added this new parameter
 }) => {
   const loadingRef = useRef(false);
 
@@ -118,5 +119,5 @@ export const useCourseDataLoader = ({
     };
 
     loadData();
-  }, [courseId, setIsLoading, setSections]); // ✅ only trigger when courseId changes
+  }, [courseId, setIsLoading, setSections, refreshTrigger]); // ✅ Added refreshTrigger to dependencies
 };

@@ -1,11 +1,5 @@
 // hooks/useStructureSubmitter.js
 import { useCallback } from 'react';
-// import { createsection } from '../../../api/SectionApi';
-// import { createSubSection } from '../../../api/SubsectionApi';
-// import { createLesson } from '../../../api/LessonsApi';
-// import { createLessonResource } from '../../../api/LessonResourcesApis';
-
-
 import { createLessonResource } from '../../../../../api/LessonResourcesApis';
 import { createsection } from '../../../../../api/SectionApi';
 import { createSubSection } from '../../../../../api/SubsectionApi';
@@ -16,7 +10,8 @@ export const useStructureSubmitter = ({
   sections,
   onSave,
   isSubmitting,
-  setIsSubmitting
+  setIsSubmitting,
+  onSuccess // ✅ Added this new prop
 }) => {
   const isExistingInDatabase = (item) => {
     return item.id && item.isExisting !== false;
@@ -197,8 +192,12 @@ export const useStructureSubmitter = ({
 
       alert(`Course structure saved successfully!\n\nCreated:\n- ${createdSections.length} new sections\n- ${createdSubsections.length} new subsections\n- ${createdLessons.length} new lessons\n- ${createdResources.length} new resources`);
 
-      // Reload data after successful submission
-      window.location.reload();
+      // ✅ Call success callback instead of reloading the page
+      if (onSuccess) {
+        onSuccess();
+      }
+
+      // ❌ REMOVED: window.location.reload();
 
     } catch (error) {
       console.error('\n=== DEBUG: ERROR DETAILS ===');
@@ -211,7 +210,7 @@ export const useStructureSubmitter = ({
     } finally {
       setIsSubmitting(false);
     }
-  }, [courseId, sections, onSave, isSubmitting, setIsSubmitting]);
+  }, [courseId, sections, onSave, isSubmitting, setIsSubmitting, onSuccess]); // ✅ Added onSuccess to dependencies
 
   return { submitCourseStructure };
 };
