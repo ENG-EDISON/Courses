@@ -248,15 +248,6 @@ function Course() {
                         <div className="video-modal-header">
                             <div className="video-title-section">
                                 <h3>{currentVideo.title}</h3>
-                                {getVideoBadgeType(currentVideo) && (
-                                    <span
-                                        className="video-source-badge"
-                                        style={{ color: getVideoBadgeType(currentVideo).color }}
-                                    >
-                                        <i className={getVideoBadgeType(currentVideo).icon}></i>
-                                        {getVideoBadgeType(currentVideo).text}
-                                    </span>
-                                )}
                             </div>
                             <button className="video-modal-close" onClick={closeVideoModal}>
                                 <i className="fas fa-times"></i>
@@ -543,40 +534,50 @@ function Course() {
                                                                         </div>
                                                                     </div>
 
-                                                                    {/* Lessons List - UPDATED to show video source badges */}
+                                                                    {/* Lessons List - TRUE HORIZONTAL LAYOUT WITH ORDER NUMBER */}
                                                                     <div className={`lessons-list-enterprise ${isSubsectionExpanded ? 'expanded' : ''}`}>
                                                                         {subsection.lessons && subsection.lessons.length > 0 ? (
                                                                             subsection.lessons.map((lesson, lessonIndex) => (
                                                                                 <div
                                                                                     key={lesson.id}
                                                                                     className={`lesson-item-enterprise ${hasPreviewContent(lesson) ? 'preview-available' : ''}`}
-                                                                                    onClick={() => hasPreviewContent(lesson) && playPreviewVideo(lesson)}
                                                                                 >
                                                                                     <div className="lesson-icon" style={{ color: getLessonIconColor(lesson.lesson_type) }}>
                                                                                         <i className={getLessonIcon(lesson.lesson_type)}></i>
                                                                                     </div>
-                                                                                    <div className="lesson-content">
-                                                                                        <div className="lesson-main">
-                                                                                            <div className="lesson-title">{lesson.title}</div>
-                                                                                            <div className="lesson-meta">
-                                                                                                <span className="lesson-type">{lesson.lesson_type}</span>
-                                                                                                {lesson.video_duration > 0 && (
-                                                                                                    <span className="lesson-duration">{formatDuration(lesson.video_duration)}</span>
-                                                                                                )}
-                                                                                                {/* Video Source Badge */}
-                                                                                                {getVideoBadgeType(lesson) && (
-                                                                                                    <span
-                                                                                                        className="video-source-mini-badge"
-                                                                                                        style={{ color: getVideoBadgeType(lesson).color }}
-                                                                                                    >
-                                                                                                        <i className={getVideoBadgeType(lesson).icon}></i>
-                                                                                                    </span>
-                                                                                                )}
-                                                                                            </div>
+
+                                                                                    {/* TRUE HORIZONTAL LAYOUT - ALL IN ONE LINE WITH ORDER NUMBER */}
+                                                                                    <div className="lesson-content-horizontal">
+                                                                                        {/* ORDER NUMBER - ADDED HERE */}
+                                                                                        <div className="lesson-order">
+                                                                                            {lesson.order + 1}
+                                                                                        </div>
+
+                                                                                        <div className="lesson-title">{lesson.title}</div>
+                                                                                        <div className="lesson-meta-horizontal">
+                                                                                            <span className="lesson-type">{lesson.lesson_type}</span>
+                                                                                            {lesson.video_duration > 0 && (
+                                                                                                <span className="lesson-duration">{formatDuration(lesson.video_duration)}</span>
+                                                                                            )}
+                                                                                            {/* Video Source Badge */}
+                                                                                            {getVideoBadgeType(lesson) && (
+                                                                                                <span
+                                                                                                    className="video-source-mini-badge"
+                                                                                                    style={{ color: getVideoBadgeType(lesson).color }}
+                                                                                                >
+                                                                                                    <i className={getVideoBadgeType(lesson).icon}></i>
+                                                                                                </span>
+                                                                                            )}
                                                                                         </div>
                                                                                         <div className="lesson-actions">
                                                                                             {hasPreviewContent(lesson) ? (
-                                                                                                <span className="preview-badge clickable">
+                                                                                                <span
+                                                                                                    className="preview-badge clickable"
+                                                                                                    onClick={(e) => {
+                                                                                                        e.stopPropagation();
+                                                                                                        playPreviewVideo(lesson);
+                                                                                                    }}
+                                                                                                >
                                                                                                     <i className="fas fa-eye"></i>
                                                                                                     Preview
                                                                                                 </span>

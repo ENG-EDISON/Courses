@@ -10,34 +10,34 @@
     --success-color: #10b981;
     --error-color: #ef4444;
     --warning-color: #f59e0b;
-    
+
     /* Background Colors */
     --background-primary: #ffffff;
     --background-secondary: #f8fafc;
     --background-tertiary: #f1f5f9;
-    
+
     /* Text Colors */
     --text-primary: #1e293b;
     --text-secondary: #64748b;
     --text-tertiary: #94a3b8;
-    
+
     /* Border Colors */
     --border-light: #e2e8f0;
     --border-medium: #cbd5e1;
-    
+
     /* Shadow System */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    
+
     /* Border Radius System */
     --border-radius-sm: 6px;
     --border-radius-md: 8px;
     --border-radius-lg: 12px;
     --border-radius-xl: 16px;
     --border-radius-2xl: 20px;
-    
+
     /* Spacing System */
     --spacing-xs: 4px;
     --spacing-sm: 8px;
@@ -164,9 +164,9 @@
 
 /* ===== PRICING CARD ===== */
 .pricing-card {
-    background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.12) 0%, 
-        rgba(255, 255, 255, 0.08) 100%);
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.12) 0%,
+            rgba(255, 255, 255, 0.08) 100%);
     backdrop-filter: blur(40px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: var(--border-radius-2xl);
@@ -175,7 +175,7 @@
     text-align: center;
     position: relative;
     overflow: hidden;
-    box-shadow: 
+    box-shadow:
         var(--shadow-xl),
         0 20px 40px rgba(0, 0, 0, 0.1),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -189,10 +189,10 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, 
-        transparent 0%, 
-        rgba(255, 255, 255, 0.4) 50%, 
-        transparent 100%);
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.4) 50%,
+            transparent 100%);
 }
 
 .pricing-card::after {
@@ -202,18 +202,16 @@
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(
-        circle at center,
-        rgba(255, 255, 255, 0.1) 0%,
-        transparent 70%
-    );
+    background: radial-gradient(circle at center,
+            rgba(255, 255, 255, 0.1) 0%,
+            transparent 70%);
     opacity: 0;
     transition: opacity 0.4s ease;
 }
 
 .pricing-card:hover {
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 
+    box-shadow:
         var(--shadow-2xl),
         0 30px 60px rgba(0, 0, 0, 0.15),
         inset 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -302,9 +300,9 @@
 /* Enroll Button */
 .enroll-btn-primary {
     width: 100%;
-    background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.95) 0%,
-        rgba(255, 255, 255, 0.85) 100%);
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.95) 0%,
+            rgba(255, 255, 255, 0.85) 100%);
     color: var(--primary-dark);
     border: none;
     padding: var(--spacing-lg) var(--spacing-xl);
@@ -320,7 +318,7 @@
     margin-bottom: var(--spacing-lg);
     position: relative;
     overflow: hidden;
-    box-shadow: 
+    box-shadow:
         var(--shadow-lg),
         0 8px 20px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
@@ -334,21 +332,21 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, 
-        transparent, 
-        rgba(255, 255, 255, 0.6), 
-        transparent);
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.6),
+            transparent);
     transition: left 0.6s ease;
 }
 
 .enroll-btn-primary:hover {
     transform: translateY(-3px);
-    box-shadow: 
+    box-shadow:
         var(--shadow-2xl),
         0 15px 30px rgba(0, 0, 0, 0.15);
-    background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 1) 0%,
-        rgba(255, 255, 255, 0.9) 100%);
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(255, 255, 255, 0.9) 100%);
 }
 
 .enroll-btn-primary:hover::before {
@@ -775,7 +773,7 @@
     font-size: 0.75rem;
 }
 
-/* Lessons List */
+/* TRUE HORIZONTAL LAYOUT STYLES WITH ORDER NUMBER */
 .lessons-list-enterprise {
     max-height: 0;
     overflow: hidden;
@@ -791,12 +789,13 @@
 .lesson-item-enterprise {
     display: flex;
     align-items: center;
-    padding: var(--spacing-md-sub);
+    padding: 12px 16px;
     background: var(--background-secondary);
     border-radius: var(--border-radius-md);
     border: 1px solid var(--border-light);
     transition: all 0.3s ease;
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: 8px;
+    gap: 12px;
 }
 
 .lesson-item-enterprise:hover {
@@ -818,63 +817,147 @@
     flex-shrink: 0;
 }
 
-.lesson-content {
+/* ORDER NUMBER STYLES */
+.lesson-order {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--background-tertiary);
+    color: var(--text-secondary);
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+/* TRUE HORIZONTAL CONTENT - ALL ELEMENTS IN ONE LINE */
+.lesson-content-horizontal {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex: 1;
-    gap: var(--spacing-md);
+    gap: 16px;
 }
 
-.lesson-main {
-    display: flex;
-    justify-content: space-between;
+.lesson-content-horizontal .lesson-title {
     flex: 1;
-}
-
-.lesson-title {
-    margin: 0 0 var(--spacing-xs) 0;
+    margin: 0;
     font-size: 0.95rem;
     font-weight: 500;
     color: var(--text-primary);
+    min-width: 150px;
+    /* Adjusted for order number */
 }
 
-.lesson-meta {
+.lesson-meta-horizontal {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
-    font-size: 0.8rem;
+    gap: 12px;
+    flex-shrink: 0;
 }
 
 .lesson-type {
     text-transform: capitalize;
     color: var(--text-secondary);
     background: var(--background-tertiary);
-    padding: 2px 8px;
+    padding: 4px 8px;
     border-radius: 12px;
+    font-size: 0.75rem;
     font-weight: 500;
+    white-space: nowrap;
 }
 
 .lesson-duration {
     color: var(--text-tertiary);
     font-weight: 500;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.video-source-mini-badge {
+    display: flex;
+    align-items: center;
+    font-size: 0.8rem;
+    white-space: nowrap;
 }
 
 .lesson-actions {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .preview-badge {
     background: var(--accent-color);
     color: white;
-    padding: 4px 10px;
+    padding: 6px 12px;
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 600;
     display: flex;
     align-items: center;
     gap: 4px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.preview-badge:hover {
+    background: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+.locked-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    color: var(--text-tertiary);
+    background: var(--background-tertiary);
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+}
+
+.no-lessons-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+    background: var(--background-secondary);
+    border-radius: 8px;
+    border: 1px dashed var(--border-light);
+    color: var(--text-tertiary);
+    font-size: 0.9rem;
+}
+
+/* Responsive for smaller screens */
+@media (max-width: 768px) {
+    .lesson-content-horizontal {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .lesson-order {
+        order: 1;
+    }
+
+    .lesson-content-horizontal .lesson-title {
+        min-width: calc(100% - 40px);
+        order: 2;
+
+    }
+
+    .lesson-meta-horizontal {
+        order: 3;
+        flex: 1;
+    }
+
+    .lesson-actions {
+        order: 4;
+    }
 }
 
 /* No Lessons Message */
@@ -1187,7 +1270,8 @@
     position: relative;
     width: 100%;
     height: 0;
-    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    padding-bottom: 56.25%;
+    /* 16:9 aspect ratio */
     background: #000;
 }
 
@@ -1357,23 +1441,49 @@
 
 /* ===== ANIMATIONS ===== */
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes pulse {
-    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.7; }
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 0.7;
+    }
 }
 
 @keyframes pricePulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
 }
 
 @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
@@ -1382,11 +1492,11 @@
         grid-template-columns: 1fr;
         gap: var(--spacing-xl);
     }
-    
+
     .course-layout {
         grid-template-columns: 1fr;
     }
-    
+
     .course-sidebar {
         position: static;
     }
@@ -1396,113 +1506,113 @@
     .hero-content {
         padding: var(--spacing-xl) var(--spacing-lg);
     }
-    
+
     .course-title {
         font-size: 2rem;
     }
-    
+
     .hero-meta {
         gap: var(--spacing-md);
     }
-    
+
     .meta-item {
         flex: 1;
         min-width: 140px;
         justify-content: center;
     }
-    
+
     .pricing-card {
         min-width: auto;
         max-width: 400px;
         margin: 0 auto;
     }
-    
+
     .current-price {
         font-size: 3rem;
     }
-    
+
     .price-comparison {
         flex-direction: column;
         gap: var(--spacing-sm);
     }
-    
+
     .objectives-tight-grid {
         grid-template-columns: 1fr;
         gap: 4px;
     }
-    
+
     .objective-tight {
         padding: 5px 6px;
     }
-    
+
     .section-header-main {
         gap: var(--spacing-sm);
     }
-    
+
     .section-number {
         width: 40px;
         height: 40px;
         font-size: 1rem;
     }
-    
+
     .section-meta {
         gap: var(--spacing-md);
     }
-    
+
     .lessons-list-enterprise {
         margin-left: 0;
         padding-left: var(--spacing-md);
     }
-    
+
     .lesson-content {
         flex-direction: column;
         align-items: flex-start;
         gap: var(--spacing-sm);
     }
-    
+
     .lesson-actions {
         align-self: flex-end;
     }
-    
+
     .subsection-header-enterprise {
         gap: var(--spacing-sm);
         padding: var(--spacing-md);
     }
-    
+
     .subsection-number {
         width: 32px;
         height: 32px;
         font-size: 0.8rem;
     }
-    
+
     .subsection-toggle {
         font-size: 0.7rem;
     }
-    
+
     .no-lessons-message {
         margin-left: var(--spacing-md);
     }
-    
+
     .stats-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .instructor-stats {
         gap: var(--spacing-md);
     }
-    
+
     .video-modal-overlay {
         padding: var(--spacing-md);
     }
-    
+
     .video-modal-content {
         width: 95%;
     }
-    
+
     .video-modal-header {
         padding: var(--spacing-md);
     }
-    
+
     .video-modal-header h3 {
         font-size: 1.125rem;
     }
@@ -1512,69 +1622,69 @@
     .course-container {
         padding: var(--spacing-lg) var(--spacing-md);
     }
-    
+
     .pricing-card {
         padding: var(--spacing-xl);
     }
-    
+
     .current-price {
         font-size: 2.5rem;
     }
-    
+
     .enroll-btn-primary {
         padding: var(--spacing-md) var(--spacing-lg);
     }
-    
+
     .section-header {
         padding: var(--spacing-lg);
         flex-direction: column;
         align-items: flex-start;
         gap: var(--spacing-sm);
     }
-    
+
     .section-count {
         align-self: flex-start;
     }
-    
+
     .section-meta {
         flex-direction: column;
         gap: var(--spacing-sm);
     }
-    
+
     .subsection-header-enterprise {
         flex-direction: column;
         gap: var(--spacing-sm);
     }
-    
+
     .subsection-indicator {
         flex-direction: row;
         gap: var(--spacing-md);
     }
-    
+
     .subsection-toggle {
         margin-top: 0;
     }
-    
+
     .subsection-meta {
         flex-direction: column;
         gap: var(--spacing-sm);
     }
-    
+
     .lesson-meta {
         flex-direction: column;
         gap: var(--spacing-xs);
         align-items: flex-start;
     }
-    
+
     .no-lessons-message {
         margin-left: 0;
         margin-top: var(--spacing-sm);
     }
-    
+
     .video-modal-overlay {
         padding: var(--spacing-sm);
     }
-    
+
     .video-modal-content {
         width: 100%;
         border-radius: var(--border-radius-lg);
