@@ -1,12 +1,12 @@
 import './App.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext'; // ✅ Import AuthProvider
+import { AuthProvider } from './contexts/AuthContext';
 import Homepage from './pages/Homepage';
 import Profile from './components/UserManagement/Profile';
 import NavigationBar from './components/common/NavigationBar';
 import "./index.css"
 import EnterpriseLogin from './components/user_management/Login';
-import Course from './pages/CourseDetail';
+import CourseDetails from './pages/CourseDetailsPage/components/CourseDetails';
 import AllCourses from './pages/AllCoursesPage';
 import MyEnrolledCourses from './pages/MyEnrolledCourses';
 import CourseContentPage from './components/CourseContentPage/CourseContentPage';
@@ -47,7 +47,7 @@ const router = createBrowserRouter([
     element: (
       <>
         <NavigationBar />
-        <Course />
+        <CourseDetails /> {/* ✅ Updated component name */}
       </>
     )
   },
@@ -101,7 +101,6 @@ const router = createBrowserRouter([
 function App() {
   return (
     <div className="App">
-      {/* ✅ Wrap RouterProvider with AuthProvider */}
       <AuthProvider>
         <RouterProvider router={router} />
       </AuthProvider>
