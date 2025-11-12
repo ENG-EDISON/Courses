@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getAllCoursesCardView, searchCourses } from "../api/CoursesApi";
+import { getAllPublishedCardView, searchCourses } from "../api/CoursesApi";
 import "../static/AllCoursesPage.css";
 
 // StarRating Component (moved outside for better organization)
@@ -101,7 +101,7 @@ function AllCoursesPage() {
         const fetchCourses = async () => {
             try {
                 setLoading(true);
-                const response = await getAllCoursesCardView();
+                const response = await getAllPublishedCardView();
                 console.log('Courses data:', response.data);
                 setCourses(response.data);
                 groupCoursesByCategory(response.data);
@@ -231,6 +231,10 @@ function AllCoursesPage() {
         return colors[level] || '#64748b';
     };
 
+    // Check if there are no courses at all
+    const hasNoCourses = Object.keys(groupedCourses).length === 0 || 
+                         Object.values(groupedCourses).every(category => category.courses.length === 0);
+
     if (loading && courses.length === 0) {
         return (
             <div className="allcourses-loading">
@@ -354,9 +358,36 @@ function AllCoursesPage() {
                         )}
                     </div>
                 ) : (
-                    /* Categories View */
-                    <div className="allcourses-categories-section">
-                        {Object.entries(groupedCourses).map(([categoryName, categoryData]) => (
+                /* Categories View - UPDATED WITH NO COURSES HANDLING */
+                <div className="allcourses-categories-section">
+                    {hasNoCourses ? (
+                        // Show when there are no courses at all
+                        <div className="allcourses-no-courses">
+                            <div className="no-courses-content">
+                                <i className="fas fa-book-open no-courses-icon"></i>
+                                <h2 className="no-courses-title">Coming Soon</h2>
+                                <p className="no-courses-message">
+                                    We're currently working on adding amazing courses to our catalog. 
+                                    Check back soon for new learning opportunities!
+                                </p>
+                                <div className="no-courses-actions">
+                                    <button 
+                                        onClick={() => window.location.reload()} 
+                                        className="no-courses-retry-btn"
+                                    >
+                                        <i className="fas fa-redo"></i>
+                                        Check Again
+                                    </button>
+                                    <Link to="/" className="no-courses-home-btn">
+                                        <i className="fas fa-home"></i>
+                                        Back to Home
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        // Show categories when courses exist
+                        Object.entries(groupedCourses).map(([categoryName, categoryData]) => (
                             <div key={categoryName} className="allcourses-category-section">
                                 <div className="allcourses-category-header">
                                     <h2 className="allcourses-category-title">{categoryName}</h2>
@@ -364,30 +395,45 @@ function AllCoursesPage() {
                                         <span className="allcourses-course-count">
                                             {categoryData.courses.length} course{categoryData.courses.length !== 1 ? 's' : ''}
                                         </span>
-                                        <div className="allcourses-category-actions">
-                                            <button className="allcourses-view-all-btn">
-                                                View All
-                                                <i className="fas fa-arrow-right"></i>
-                                            </button>
-                                        </div>
+                                        {categoryData.courses.length > 0 && (
+                                            <div className="allcourses-category-actions">
+                                                <button className="allcourses-view-all-btn">
+                                                    View All
+                                                    <i className="fas fa-arrow-right"></i>
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 
                                 <div className="allcourses-scroll-container">
-                                    <div className="allcourses-scroll">
-                                        {categoryData.courses.map(course => (
-                                            <AllCoursesCard 
-                                              key={course.id} 
-                                              course={course} 
-                                              formatPrice={formatPrice} 
-                                              getLevelColor={getLevelColor} 
-                                            />
-                                        ))}
-                                    </div>
+                                    {categoryData.courses.length > 0 ? (
+                                        <div className="allcourses-scroll">
+                                            {categoryData.courses.map(course => (
+                                                <AllCoursesCard 
+                                                key={course.id} 
+                                                course={course} 
+                                                formatPrice={formatPrice} 
+                                                getLevelColor={getLevelColor} 
+                                                />
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="allcourses-coming-soon">
+                                            <div className="coming-soon-content">
+                                                <i className="fas fa-clock coming-soon-icon"></i>
+                                                <h3 className="coming-soon-title">Coming Soon</h3>
+                                                <p className="coming-soon-message">
+                                                    New courses in this category are on their way!
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                        ))}
-                    </div>
+                        ))
+                    )}
+                </div>
                 )}
             </div>
         </div>

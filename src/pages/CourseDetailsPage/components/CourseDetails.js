@@ -1,7 +1,6 @@
 // Course.js
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-// import { getCoursePreviewStructure } from "../api/CoursesApi";
 import { getCoursePreviewStructure } from "../../../api/CoursesApi";
 import "../../../static/Courses.css";
 
