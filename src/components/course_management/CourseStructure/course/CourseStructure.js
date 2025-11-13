@@ -9,13 +9,13 @@ import StructureHeader from '../StructureHeader';
 import { useExpansionState } from './hooks/useExpansionState';
 import { useCourseDataLoader } from './hooks/useCourseDataLoader';
 import { useStructureSubmitter } from './hooks/useStructureSubmitter';
-
+import { deleteSection as deleteSectionApi} from '../../../../api/SectionApi';
 const CourseStructure = ({ course, onUpdate, onSave }) => {
   const [sections, setSections] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isAddingSection, setIsAddingSection] = useState(false);
-  const [refreshTrigger, setRefreshTrigger] = useState(0); // ✅ Added refresh trigger
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   const courseId = course?.id;
 
@@ -32,25 +32,137 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
     collapseAll
   } = useExpansionState(sections);
 
-  // Load course data - UPDATED with refreshTrigger
+  // ✅ MOVE isExistingInDatabase BEFORE useCallback hooks that use it
+  const isExistingInDatabase = useCallback((item) => {
+    return item.id && item.isExisting !== false;
+  }, []);
+
+  // Load course data
   useCourseDataLoader({
     courseId,
     onUpdate,
     setSections,
     setIsLoading,
     expandAll,
-    refreshTrigger // ✅ Added refresh trigger
+    refreshTrigger
   });
 
-  // Submission handler - UPDATED with onSuccess callback
+  // Submission handler
   const { submitCourseStructure } = useStructureSubmitter({
     courseId,
     sections,
     onSave,
     isSubmitting,
     setIsSubmitting,
-    onSuccess: () => setRefreshTrigger(prev => prev + 1) // ✅ Added onSuccess callback
+    onSuccess: () => setRefreshTrigger(prev => prev + 1)
   });
+
+  // SECTION API CALLBACKS
+  const handleSectionCreate = useCallback((newSectionData, sectionIndex) => {
+    const updatedSections = sections.map((section, index) => {
+      if (index === sectionIndex) {
+        return { 
+          ...newSectionData, 
+          isExisting: true,
+          subsections: section.subsections || []
+        };
+      }
+      return section;
+    });
+    
+    setSections(updatedSections);
+    if (onUpdate) {
+      onUpdate(updatedSections);
+    }
+  }, [sections, onUpdate]);
+
+  const handleSectionUpdate = useCallback((sectionId, updatedData) => {
+    const updatedSections = sections.map(section => 
+      section.id === sectionId ? { 
+        ...updatedData, 
+        isExisting: true,
+        subsections: section.subsections || []
+      } : section
+    );
+    
+    setSections(updatedSections);
+    if (onUpdate) {
+      onUpdate(updatedSections);
+    }
+  }, [sections, onUpdate]);
+
+  const handleSectionDelete = useCallback((sectionId, sectionIndex) => {
+    const updatedSections = sections.filter((_, index) => index !== sectionIndex);
+    setSections(updatedSections);
+    
+    setExpandedSections(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(sectionIndex);
+      return newSet;
+    });
+
+    if (onUpdate) {
+      onUpdate(updatedSections);
+    }
+  }, [sections, onUpdate, setExpandedSections]);
+
+  // SUBSECTION API CALLBACKS
+  const handleSubsectionCreate = useCallback((newSubsectionData, sectionIndex, subsectionIndex) => {
+    const updatedSections = sections.map((section, secIndex) => {
+      if (secIndex === sectionIndex) {
+        const updatedSubsections = section.subsections.map((subsection, subIndex) => {
+          if (subIndex === subsectionIndex) {
+            return { 
+              ...newSubsectionData, 
+              isExisting: true,
+              lessons: subsection.lessons || []
+            };
+          }
+          return subsection;
+        });
+        return { ...section, subsections: updatedSubsections };
+      }
+      return section;
+    });
+    
+    setSections(updatedSections);
+    if (onUpdate) {
+      onUpdate(updatedSections);
+    }
+  }, [sections, onUpdate]);
+
+  const handleSubsectionUpdate = useCallback((subsectionId, updatedData) => {
+    const updatedSections = sections.map(section => ({
+      ...section,
+      subsections: section.subsections.map(subsection => 
+        subsection.id === subsectionId ? { 
+          ...updatedData, 
+          isExisting: true,
+          lessons: subsection.lessons || []
+        } : subsection
+      )
+    }));
+    
+    setSections(updatedSections);
+    if (onUpdate) {
+      onUpdate(updatedSections);
+    }
+  }, [sections, onUpdate]);
+
+  const handleSubsectionDelete = useCallback((subsectionId, sectionIndex, subsectionIndex) => {
+    const updatedSections = sections.map((section, secIndex) => {
+      if (secIndex === sectionIndex) {
+        const updatedSubsections = section.subsections.filter((_, subIndex) => subIndex !== subsectionIndex);
+        return { ...section, subsections: updatedSubsections };
+      }
+      return section;
+    });
+    
+    setSections(updatedSections);
+    if (onUpdate) {
+      onUpdate(updatedSections);
+    }
+  }, [sections, onUpdate]);
 
   // Section management
   const addSection = useCallback((e) => {
@@ -100,32 +212,39 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
     }
   }, [sections, onUpdate]);
 
-  const deleteSection = useCallback((sectionIndex) => {
+  // ✅ FIXED: Now isExistingInDatabase is defined before this useCallback
+  const deleteSection = useCallback(async (sectionIndex) => {
     const sectionToDelete = sections[sectionIndex];
 
     if (isExistingInDatabase(sectionToDelete)) {
-      if (!window.confirm('This section exists in the database. Do you want to delete it permanently?')) {
+      if (!window.confirm('This section exists in the database. Do you want to delete it permanently? This will also delete all subsections and lessons within it.')) {
         return;
       }
+
+      try {
+        setIsSubmitting(true);
+        await deleteSectionApi(sectionToDelete.id);
+        
+        // Remove from local state after successful API deletion
+        handleSectionDelete(sectionToDelete.id, sectionIndex);
+        
+        alert('Section deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting section:', error);
+        alert('Error deleting section. Please try again.');
+      } finally {
+        setIsSubmitting(false);
+      }
+    } else {
+      // Local deletion for new sections
+      handleSectionDelete(null, sectionIndex);
     }
+  }, [sections, isExistingInDatabase, handleSectionDelete, setIsSubmitting]);
 
-    const updatedSections = sections.filter((_, index) => index !== sectionIndex);
-    setSections(updatedSections);
-
-    setExpandedSections(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(sectionIndex);
-      return newSet;
-    });
-
-    if (onUpdate) {
-      onUpdate(updatedSections);
-    }
-  }, [sections, onUpdate, setExpandedSections]);
-
-  const isExistingInDatabase = (item) => {
-    return item.id && item.isExisting !== false;
-  };
+  // Get section ID from section object
+  const getSectionId = useCallback((section) => {
+    return section?.id || null;
+  }, []);
 
   const getSectionCounts = () => {
     const existingSections = sections.filter(s => isExistingInDatabase(s)).length;
@@ -210,6 +329,13 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
               onToggleLesson={toggleLesson}
               isLessonExpanded={isLessonExpanded}
               course={course}
+              sectionId={getSectionId(section)}
+              onSectionCreate={handleSectionCreate}
+              onSectionUpdate={handleSectionUpdate}
+              onSectionDelete={handleSectionDelete}
+              onSubsectionCreate={handleSubsectionCreate}
+              onSubsectionUpdate={handleSubsectionUpdate}
+              onSubsectionDelete={handleSubsectionDelete}
             />
           ))}
         </div>

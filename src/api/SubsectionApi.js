@@ -5,3 +5,4 @@ export const getCourseSubSections = (courseId) => apiClient.get(`api/sections/?c
 export const getCourseSubSectionById= (sectionId) => apiClient.get(`api/sections/${sectionId}/`);
 export const getSubsectionByCourseId =(courseId) =>apiClient.get(`api/subsection/?course=${courseId}`);
 export const getSubsections = (sectionId) => apiClient.get(`api/subsection/?section=${sectionId}`);
+export const deleteSubsection=(sectionId)=>apiClient.delete(`api/subsection/?section=${sectionId}`);

@@ -1,7 +1,7 @@
 // hooks/useStructureSubmitter.js
 import { useCallback } from 'react';
 import { createLessonResource } from '../../../../../api/LessonResourcesApis';
-import { createsection } from '../../../../../api/SectionApi';
+import { createSection } from '../../../../../api/SectionApi';
 import { createSubSection } from '../../../../../api/SubsectionApi';
 import { createLesson } from '../../../../../api/LessonsApi';
 
@@ -51,7 +51,7 @@ export const useStructureSubmitter = ({
             course: courseId
           };
 
-          const sectionResponse = await createsection(sectionData);
+          const sectionResponse = await createSection(sectionData);
           sectionId = sectionResponse.data.id;
           createdSections.push(sectionResponse.data);
           console.log(`Created section with ID: ${sectionId}`);
