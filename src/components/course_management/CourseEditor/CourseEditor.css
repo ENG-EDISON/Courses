@@ -475,3 +475,134 @@
     flex-direction: column;
   }
 }
+/* Buttons container at top */
+.buttons-divs {
+  margin-bottom: 12px;
+}
+
+.course-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-course-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  flex: 1;
+  transition: all 0.2s ease;
+}
+
+.edit-course-btn:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.delete-course-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  flex: 1;
+  transition: all 0.2s ease;
+}
+
+.delete-course-btn:hover:not(:disabled) {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+.delete-course-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Course card styling adjustments */
+.course-card {
+  position: relative;
+  padding: 16px;
+  border: 1px solid #e1e5e9;
+  border-radius: 12px;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.course-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.course-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.course-card-header h4 {
+  margin: 0;
+  flex: 1;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.course-card-header h4:hover {
+  color: #007bff;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.draft {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.published {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.course-description {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.4;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.course-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+
+.course-meta span {
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #f8f9fa;
+  color: #495057;
+}
+
+.course-meta .featured {
+  background: #fff3cd;
+  color: #856404;
+}

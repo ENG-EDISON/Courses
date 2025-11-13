@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../static/CourseSection.css";
 import { getAllPublishedCardView } from "../api/CoursesApi";
+import UdemyStylePopup from "./common/UdemyStylePopup";
 
 function CoursesSection() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -10,8 +11,9 @@ function CoursesSection() {
   const [error, setError] = useState("");
   const [hoveredCourse, setHoveredCourse] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
   const scrollRef = useRef(null);
-  const popupRef = useRef(null);
+  const hoverTimerRef = useRef(null);
 
   // Fetch courses from API
   useEffect(() => {
@@ -32,33 +34,30 @@ function CoursesSection() {
     fetchCourses();
   }, []);
 
-  // Handle mouse move to update popup position
+  // Hide popup on scroll
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (hoveredCourse && popupRef.current) {
-        const popup = popupRef.current;
-        const x = e.clientX + 15;
-        const y = e.clientY + 15;
-        
-        // Ensure popup stays within viewport
-        const maxX = window.innerWidth - popup.offsetWidth - 10;
-        const maxY = window.innerHeight - popup.offsetHeight - 10;
-        
-        setPopupPosition({
-          x: Math.min(x, maxX),
-          y: Math.min(y, maxY)
-        });
+    const handleScroll = () => {
+      if (isPopupVisible) {
+        setIsPopupVisible(false);
+        setHoveredCourse(null);
       }
     };
 
-    if (hoveredCourse) {
-      document.addEventListener('mousemove', handleMouseMove);
-    }
-
+    window.addEventListener('scroll', handleScroll, true);
+    
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', handleScroll, true);
     };
-  }, [hoveredCourse]);
+  }, [isPopupVisible]);
+
+  // Clear timer on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimerRef.current) {
+        clearTimeout(hoverTimerRef.current);
+      }
+    };
+  }, []);
 
   const filteredCourses = courses.filter(course =>
     course.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -91,11 +90,45 @@ function CoursesSection() {
 
   // Handle mouse enter for course card
   const handleMouseEnter = (course, e) => {
+    // Clear any existing timer
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+    }
+
+    // Get the card position and dimensions
+    const cardRect = e.currentTarget.getBoundingClientRect();
+    
+    // Position popup above the card (centered horizontally)
+    setPopupPosition({
+      x: cardRect.left + (cardRect.width / 2) - 160,
+      y: cardRect.top - 20
+    });
+
     setHoveredCourse(course);
+    setIsPopupVisible(true);
   };
 
   // Handle mouse leave for course card
   const handleMouseLeave = () => {
+    // Add a small delay before hiding to allow moving to popup
+    hoverTimerRef.current = setTimeout(() => {
+      setIsPopupVisible(false);
+      setHoveredCourse(null);
+    }, 100);
+  };
+
+  // Handle popup mouse enter
+  const handlePopupMouseEnter = () => {
+    // Clear the hide timer when mouse enters popup
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+    }
+    setIsPopupVisible(true);
+  };
+
+  // Handle popup mouse leave
+  const handlePopupMouseLeave = () => {
+    setIsPopupVisible(false);
     setHoveredCourse(null);
   };
 
@@ -182,50 +215,14 @@ function CoursesSection() {
           <button className="scroll-btn right" onClick={() => scroll("right")}>&gt;</button>
         </div>
 
-        {/* Udemy-style Hover Popup */}
-        {hoveredCourse && (
-          <div 
-            ref={popupRef}
-            className="udemy-popup"
-            style={{
-              position: 'fixed',
-              left: `${popupPosition.x}px`,
-              top: `${popupPosition.y}px`,
-              zIndex: 1000
-            }}
-          >
-            <div className="popup-body">
-              <h4 className="popup-title">{hoveredCourse.title}</h4>
-              <div className="popup-description">
-                {hoveredCourse.short_description || 'No description available.'}
-              </div>
-
-              <div className="popup-objectives">
-                <strong>What you'll learn:</strong>
-                <ul>
-                  {hoveredCourse.learning_objectives && hoveredCourse.learning_objectives.length > 0 ? (
-                    <>
-                      {hoveredCourse.learning_objectives.slice(0, 5).map((objective) => (
-                        <li key={objective.id}>
-                          <p className="check-icon">✓</p>
-                          {objective.objective}
-                        </li>
-                      ))}
-                      {hoveredCourse.learning_objectives.length > 5 && (
-                        <li className="more-objectives">
-                          <span className="check-icon">⋯</span>
-                          +{hoveredCourse.learning_objectives.length - 5} more objectives
-                        </li>
-                      )}
-                    </>
-                  ) : (
-                    <li>No learning objectives specified</li>
-                  )}
-                </ul>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Reusable Udemy-style Popup */}
+        <UdemyStylePopup
+          course={hoveredCourse}
+          isVisible={isPopupVisible && !!hoveredCourse}
+          position={popupPosition}
+          onMouseEnter={handlePopupMouseEnter}
+          onMouseLeave={handlePopupMouseLeave}
+        />
       </div>
     </section>
   );

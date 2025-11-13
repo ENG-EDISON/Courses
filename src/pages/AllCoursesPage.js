@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { getAllPublishedCardView, searchCourses } from "../api/CoursesApi";
 import "../static/AllCoursesPage.css";
+import UdemyStylePopup from "../components/common/UdemyStylePopup";
 
-// StarRating Component (moved outside for better organization)
+// StarRating Component
 const StarRating = ({ rating, maxStars = 5 }) => {
   const numericRating = parseFloat(rating) || 0;
   const fullStars = Math.floor(numericRating);
@@ -19,9 +20,13 @@ const StarRating = ({ rating, maxStars = 5 }) => {
   );
 };
 
-// Course Card Component (moved outside for better organization)
-const AllCoursesCard = ({ course, formatPrice, getLevelColor }) => (
-  <div className="allcourses-course-card">
+// Course Card Component
+const AllCoursesCard = ({ course, formatPrice, getLevelColor, onMouseEnter, onMouseLeave }) => (
+  <div 
+    className="allcourses-course-card"
+    onMouseEnter={onMouseEnter}
+    onMouseLeave={onMouseLeave}
+  >
     <Link to={`/course/${course.id}`} className="allcourses-course-link">
       <div className="allcourses-course-image-container">
         {course.thumbnail ? (
@@ -95,6 +100,10 @@ function AllCoursesPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState(null);
     const [searchLoading, setSearchLoading] = useState(false);
+    const [hoveredCourse, setHoveredCourse] = useState(null);
+    const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+    const [isPopupVisible, setIsPopupVisible] = useState(false);
+    const hoverTimerRef = useRef(null);
 
     // Fetch all courses
     useEffect(() => {
@@ -116,12 +125,36 @@ function AllCoursesPage() {
         fetchCourses();
     }, []);
 
-    // Group courses by category - UPDATED for string category
+    // Hide popup on scroll
+    useEffect(() => {
+        const handleScroll = () => {
+            if (isPopupVisible) {
+                setIsPopupVisible(false);
+                setHoveredCourse(null);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll, true);
+        
+        return () => {
+            window.removeEventListener('scroll', handleScroll, true);
+        };
+    }, [isPopupVisible]);
+
+    // Clear timer on unmount
+    useEffect(() => {
+        return () => {
+            if (hoverTimerRef.current) {
+                clearTimeout(hoverTimerRef.current);
+            }
+        };
+    }, []);
+
+    // Group courses by category
     const groupCoursesByCategory = (coursesData) => {
         const grouped = {};
         
         coursesData.forEach(course => {
-            // Use course.category directly since it's now a string
             const categoryName = course.category || 'Uncategorized';
             if (!grouped[categoryName]) {
                 grouped[categoryName] = {
@@ -229,6 +262,49 @@ function AllCoursesPage() {
             advanced: '#ef4444'
         };
         return colors[level] || '#64748b';
+    };
+
+    // Mouse handlers for course cards
+    const handleCardMouseEnter = (course, e) => {
+        // Clear any existing timer
+        if (hoverTimerRef.current) {
+            clearTimeout(hoverTimerRef.current);
+        }
+
+        // Get the card position and dimensions
+        const cardRect = e.currentTarget.getBoundingClientRect();
+        
+        // Position popup above the card (centered horizontally)
+        setPopupPosition({
+            x: cardRect.left + (cardRect.width / 2) - 160,
+            y: cardRect.top - 20
+        });
+
+        setHoveredCourse(course);
+        setIsPopupVisible(true);
+    };
+
+    const handleCardMouseLeave = () => {
+        // Add a small delay before hiding to allow moving to popup
+        hoverTimerRef.current = setTimeout(() => {
+            setIsPopupVisible(false);
+            setHoveredCourse(null);
+        }, 100);
+    };
+
+    // Handle popup mouse enter
+    const handlePopupMouseEnter = () => {
+        // Clear the hide timer when mouse enters popup
+        if (hoverTimerRef.current) {
+            clearTimeout(hoverTimerRef.current);
+        }
+        setIsPopupVisible(true);
+    };
+
+    // Handle popup mouse leave
+    const handlePopupMouseLeave = () => {
+        setIsPopupVisible(false);
+        setHoveredCourse(null);
     };
 
     // Check if there are no courses at all
@@ -340,7 +416,9 @@ function AllCoursesPage() {
                                           key={course.id} 
                                           course={course} 
                                           formatPrice={formatPrice} 
-                                          getLevelColor={getLevelColor} 
+                                          getLevelColor={getLevelColor}
+                                          onMouseEnter={(e) => handleCardMouseEnter(course, e)}
+                                          onMouseLeave={handleCardMouseLeave}
                                         />
                                     ))}
                                 </div>
@@ -358,7 +436,7 @@ function AllCoursesPage() {
                         )}
                     </div>
                 ) : (
-                /* Categories View - UPDATED WITH NO COURSES HANDLING */
+                /* Categories View */
                 <div className="allcourses-categories-section">
                     {hasNoCourses ? (
                         // Show when there are no courses at all
@@ -411,10 +489,12 @@ function AllCoursesPage() {
                                         <div className="allcourses-scroll">
                                             {categoryData.courses.map(course => (
                                                 <AllCoursesCard 
-                                                key={course.id} 
-                                                course={course} 
-                                                formatPrice={formatPrice} 
-                                                getLevelColor={getLevelColor} 
+                                                  key={course.id} 
+                                                  course={course} 
+                                                  formatPrice={formatPrice} 
+                                                  getLevelColor={getLevelColor}
+                                                  onMouseEnter={(e) => handleCardMouseEnter(course, e)}
+                                                  onMouseLeave={handleCardMouseLeave}
                                                 />
                                             ))}
                                         </div>
@@ -436,6 +516,15 @@ function AllCoursesPage() {
                 </div>
                 )}
             </div>
+
+            {/* Reusable Udemy-style Popup */}
+            <UdemyStylePopup
+              course={hoveredCourse}
+              isVisible={isPopupVisible && !!hoveredCourse}
+              position={popupPosition}
+              onMouseEnter={handlePopupMouseEnter}
+              onMouseLeave={handlePopupMouseLeave}
+            />
         </div>
     );
 }

@@ -3,15 +3,20 @@ import './CourseEditor.css';
 import CourseStructure from '../CourseStructure/course/CourseStructure';
 import CourseDetailsEditForm from '../../CourseDetailsEditForm/CourseDetailsEditForm';
 import { getMyProfile } from '../../../api/ProfileApis';
-import { getAllCourses, updateCourse } from '../../../api/CoursesApi';
+import { getAllCourses, updateCourse, deleteCourse } from '../../../api/CoursesApi';
 import CourseCreator from '../categorymanagement/CourseCreator';
 import CategoryManager from '../categorymanagement/CategoryManager';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
 
 const CourseEditor = () => {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [courses, setCourses] = useState([]);
   const [activeTab, setActiveTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(false);
+  const [deleteModal, setDeleteModal] = useState({ 
+    isOpen: false, 
+    course: null 
+  });
 
   // Load courses from API
   useEffect(() => {
@@ -64,6 +69,55 @@ const CourseEditor = () => {
     setActiveTab('structure');
   };
 
+  // Open delete confirmation modal
+  const handleDeleteClick = (course) => {
+    setDeleteModal({
+      isOpen: true,
+      course: course
+    });
+  };
+
+  // Close delete confirmation modal
+  const handleCloseModal = () => {
+    setDeleteModal({
+      isOpen: false,
+      course: null
+    });
+  };
+
+  // Confirm and execute deletion
+  const handleConfirmDelete = async () => {
+    if (!deleteModal.course) return;
+
+    const courseId = deleteModal.course.id;
+    const courseTitle = deleteModal.course.title;
+
+    try {
+      setIsLoading(true);
+      await deleteCourse(courseId);
+      
+      // Remove course from state
+      setCourses(prev => prev.filter(course => course.id !== courseId));
+      
+      // If the deleted course was currently selected, clear selection
+      if (selectedCourse && selectedCourse.id === courseId) {
+        setSelectedCourse(null);
+        setActiveTab('overview');
+      }
+      
+      // Close modal
+      handleCloseModal();
+      
+      alert(`Course "${courseTitle}" deleted successfully!`);
+      
+    } catch (error) {
+      console.error('Error deleting course:', error);
+      alert('Error deleting course: ' + (error.response?.data?.message || error.message));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleStructureUpdate = (sections) => {
     console.log('Course structure updated:', sections);
   };
@@ -88,6 +142,16 @@ const CourseEditor = () => {
 
   return (
     <div className="course-editor">
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirmDelete}
+        itemName={deleteModal.course?.title}
+        itemType="course"
+        isLoading={isLoading}
+      />
+
       {/* Header */}
       <div className="editor-header">
         <div className="header-main">
@@ -221,13 +285,31 @@ const CourseEditor = () => {
               ) : (
                 <div className="courses-grid">
                   {courses.map(course => (
-                    <div 
-                      key={course.id} 
-                      className="course-card"
-                      onClick={() => handleCourseSelect(course)}
-                    >
+                    <div key={course.id} className="course-card">
+                      {/* Buttons at the top */}
+                      <div className="buttons-divs">
+                        <div className="course-card-actions">
+                          <button
+                            className="edit-course-btn"
+                            onClick={() => handleCourseSelect(course)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="delete-course-btn"
+                            onClick={() => handleDeleteClick(course)}
+                            disabled={isLoading}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                      
+                      {/* Course content below buttons */}
                       <div className="course-card-header">
-                        <h4>{course.title}</h4>
+                        <h4 onClick={() => handleCourseSelect(course)} style={{cursor: 'pointer'}}>
+                          {course.title}
+                        </h4>
                         <span className={`status-badge ${course.status}`}>
                           {course.status}
                         </span>
