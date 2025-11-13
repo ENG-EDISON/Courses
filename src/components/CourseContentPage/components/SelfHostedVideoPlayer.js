@@ -11,12 +11,12 @@ const SelfHostedVideoPlayer = forwardRef(({
     onEnded,
     onLoadedMetadata,
     onPause,
-    onSeek // ✅ ADDED: onSeek prop
+    onSeek // Keep for potential future use, but won't trigger progress updates
 }, ref) => {
     
-    // ✅ ADDED: Handle seek events
+    // ✅ MODIFIED: Handle seek events without triggering progress updates
     const handleSeeked = () => {
-        console.log('🎯 Video seeked, triggering onSeek callback');
+        console.log('🎯 Video seeked (progress tracking disabled during seeking)');
         onSeek && onSeek();
     };
 
@@ -27,34 +27,17 @@ const SelfHostedVideoPlayer = forwardRef(({
                     ref={ref}
                     controls
                     className="video-player__element"
-                    onTimeUpdate={onTimeUpdate}
-                    onEnded={onEnded}
+                    onTimeUpdate={onTimeUpdate} // Keep for UI updates only
+                    onEnded={onEnded} // ✅ ONLY this will trigger progress tracking
                     onLoadedMetadata={onLoadedMetadata}
                     onPause={onPause}
-                    onSeeked={handleSeeked} // ✅ ADDED: onSeeked event handler
+                    onSeeked={handleSeeked}
                 >
                     <source src={source} type="video/mp4" />
                     <source src={source} type="video/webm" />
                     <source src={source} type="video/ogg" />
                     Your browser does not support the video tag.
                 </video>
-            </div>
-            
-            {/* ✅ ADDED: Debug info for testing */}
-            <div style={{
-                fontSize: '12px',
-                color: '#666',
-                marginTop: '10px',
-                padding: '8px',
-                backgroundColor: '#f5f5f5',
-                borderRadius: '4px'
-            }}>
-                <strong>Video Debug Info:</strong><br/>
-                Current Time: {Math.round(currentTime)}s<br/>
-                Duration: {Math.round(duration)}s<br/>
-                Last Played: {lastPlayedTime}s<br/>
-                Can Track: {canTrack ? 'Yes' : 'No'}<br/>
-                Source: {source ? 'Loaded' : 'Missing'}
             </div>
         </div>
     );
