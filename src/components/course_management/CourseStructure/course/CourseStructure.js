@@ -209,6 +209,7 @@ const CourseStructure = ({ course, onUpdate, onSave }) => {
               isSubsectionExpanded={isSubsectionExpanded}
               onToggleLesson={toggleLesson}
               isLessonExpanded={isLessonExpanded}
+              course={course}
             />
           ))}
         </div>

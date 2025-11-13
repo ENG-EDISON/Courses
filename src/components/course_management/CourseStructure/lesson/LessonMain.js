@@ -15,12 +15,24 @@ const Lesson = ({
   onUpdate,
   isExistingInDatabase,
   isExpanded,
-  onToggle
+  onToggle,
+  course // Add course prop to get course ID
 }) => {
   const [isAddingResource, setIsAddingResource] = useState(false);
   const [videoSource, setVideoSource] = useState(
     lesson.video_file ? 'upload' : (lesson.video_url ? 'url' : 'upload')
   );
+
+  // Get course ID from course prop
+  const getCourseId = useCallback(() => {
+    return course?.id || null;
+  }, [course]);
+
+  // Get subsection ID from the current subsection
+  const getSubsectionId = useCallback(() => {
+    const currentSubsection = sections[sectionIndex]?.subsections?.[subsectionIndex];
+    return currentSubsection?.id || null;
+  }, [sectionIndex, subsectionIndex, sections]);
 
   const updateLesson = useCallback((field, value) => {
     const updatedSections = sections.map((section, secIndex) => {
@@ -42,12 +54,86 @@ const Lesson = ({
     onUpdate(updatedSections);
   }, [sectionIndex, subsectionIndex, lessonIndex, sections, setSections, onUpdate]);
 
+  // Handle lesson creation from API
+  const handleLessonCreate = useCallback((newLessonData, sectionIndex, subsectionIndex, lessonIndex) => {
+    const updatedSections = sections.map((section, secIndex) => {
+      if (secIndex === sectionIndex) {
+        const updatedSubsections = section.subsections.map((subsection, subIndex) => {
+          if (subIndex === subsectionIndex) {
+            const updatedLessons = subsection.lessons.map((lesson, lesIndex) => {
+              if (lesIndex === lessonIndex) {
+                // Replace the local lesson with the one from API (with ID)
+                return { 
+                  ...newLessonData, 
+                  isExisting: true,
+                  // Preserve local state that might not be in API response
+                  resources: lesson.resources || []
+                };
+              }
+              return lesson;
+            });
+            return { ...subsection, lessons: updatedLessons };
+          }
+          return subsection;
+        });
+        return { ...section, subsections: updatedSubsections };
+      }
+      return section;
+    });
+    
+    setSections(updatedSections);
+    onUpdate(updatedSections);
+  }, [sections, setSections, onUpdate]);
+
+  // Handle lesson update from API
+  const handleLessonUpdate = useCallback((lessonId, updatedData) => {
+    const updatedSections = sections.map(section => ({
+      ...section,
+      subsections: section.subsections.map(subsection => ({
+        ...subsection,
+        lessons: subsection.lessons.map(lesson => 
+          lesson.id === lessonId ? { 
+            ...updatedData, 
+            isExisting: true,
+            // Preserve local state
+            resources: lesson.resources || []
+          } : lesson
+        )
+      }))
+    }));
+    
+    setSections(updatedSections);
+    onUpdate(updatedSections);
+  }, [sections, setSections, onUpdate]);
+
+  // Handle lesson deletion from API
+  const handleLessonDelete = useCallback((lessonId, sectionIndex, subsectionIndex, lessonIndex) => {
+    const updatedSections = sections.map((section, secIndex) => {
+      if (secIndex === sectionIndex) {
+        const updatedSubsections = section.subsections.map((subsection, subIndex) => {
+          if (subIndex === subsectionIndex) {
+            const updatedLessons = subsection.lessons.filter((_, lesIndex) => lesIndex !== lessonIndex);
+            return { ...subsection, lessons: updatedLessons };
+          }
+          return subsection;
+        });
+        return { ...section, subsections: updatedSubsections };
+      }
+      return section;
+    });
+    
+    setSections(updatedSections);
+    onUpdate(updatedSections);
+  }, [sections, setSections, onUpdate]);
+
   const deleteLesson = useCallback(() => {
     const lessonToDelete = sections[sectionIndex]?.subsections[subsectionIndex]?.lessons[lessonIndex];
 
     if (lessonToDelete?.id) {
       if (window.confirm('This lesson exists in the database. Do you want to delete it permanently?')) {
         console.log('Should delete existing lesson from database:', lessonToDelete.id);
+        // This will now be handled by the API delete in LessonHeader
+        return;
       } else {
         return;
       }
@@ -155,9 +241,16 @@ const Lesson = ({
         onTitleChange={(e) => updateLesson('title', e.target.value)}
         onAddResource={addResource}
         onDelete={deleteLesson}
+        // New API integration props
+        onLessonCreate={handleLessonCreate}
+        onLessonUpdate={handleLessonUpdate}
+        onLessonDelete={handleLessonDelete}
+        courseId={getCourseId()}
+        subsectionId={getSubsectionId()}
         sectionIndex={sectionIndex}
         subsectionIndex={subsectionIndex}
         lessonIndex={lessonIndex}
+        course={course}
       />
 
       {isExpanded && (

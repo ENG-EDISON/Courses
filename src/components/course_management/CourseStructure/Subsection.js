@@ -13,8 +13,9 @@ const Subsection = ({
   onDeleteSubsection,
   isExpanded,
   onToggle,
-  onToggleLesson,  // Add this prop
-  isLessonExpanded  // Add this prop
+  onToggleLesson,
+  isLessonExpanded,
+  course // Add course prop here
 }) => {
   const [isAddingLesson, setIsAddingLesson] = useState(false);
 
@@ -33,7 +34,7 @@ const Subsection = ({
         subsection: subsectionIndex,
         isExisting: false
       };
-
+      console.log("course................................",course)
       const updatedSections = sections.map((section, secIndex) => {
         if (secIndex === sectionIndex) {
           const updatedSubsections = section.subsections.map((sub, subIdx) => {
@@ -54,7 +55,7 @@ const Subsection = ({
     } finally {
       setTimeout(() => setIsAddingLesson(false), 300);
     }
-  }, [sectionIndex, subsectionIndex, sections, setSections, onUpdate, subsection, isAddingLesson]);
+  }, [sectionIndex, subsectionIndex, sections, setSections, onUpdate, subsection, isAddingLesson,course]);
 
   const updateLesson = useCallback((lessonIndex, field, value) => {
     const updatedSections = sections.map((section, secIndex) => {
@@ -263,7 +264,7 @@ const Subsection = ({
             onToggle(sectionIndex, subsectionIndex);
           }}
         >
-          ▶
+          {isExpanded ? '▼' : '▶'}
         </button>
 
         {/* Order Input for Subsection */}
@@ -288,7 +289,6 @@ const Subsection = ({
           onClick={(e) => e.stopPropagation()}
         />
 
-
         <div className="subsection-status">
           <span className={`status-badge ${isExistingInDatabase(subsection) ? 'existing' : 'new'}`}>
             {isExistingInDatabase(subsection) ? 'EXISTING' : 'NEW'}
@@ -304,7 +304,7 @@ const Subsection = ({
             className="btn-secondary"
             disabled={isAddingLesson}
           >
-            + Add Lesson
+            {isAddingLesson ? 'Adding...' : '+ Add Lesson'}
           </button>
           <button 
             onClick={(e) => {
@@ -321,14 +321,13 @@ const Subsection = ({
       {/* Subsection Content - Only show when expanded */}
       {isExpanded && (
         <div className="subsection-content">
-        <textarea
-          value={subsection.description}
-          onChange={(e) => onUpdateSubsection(subsectionIndex, 'description', e.target.value)}
-          className="subsection-description"
-          placeholder="Subsection description"
-          rows={2}
-        />
-
+          <textarea
+            value={subsection.description}
+            onChange={(e) => onUpdateSubsection(subsectionIndex, 'description', e.target.value)}
+            className="subsection-description"
+            placeholder="Subsection description"
+            rows={2}
+          />
 
           <div className="lessons">
             <div className="lesson-header-row">
@@ -360,8 +359,9 @@ const Subsection = ({
                   onUpdateResource={updateResource}
                   onDeleteResource={deleteResource}
                   onFileUpload={handleFileUpload}
-                  isExpanded={isLessonExpanded(sectionIndex, subsectionIndex, lessonIndex)}  // Use the prop
-                  onToggle={() => onToggleLesson(sectionIndex, subsectionIndex, lessonIndex)}  // Use the prop
+                  isExpanded={isLessonExpanded(sectionIndex, subsectionIndex, lessonIndex)}
+                  onToggle={() => onToggleLesson(sectionIndex, subsectionIndex, lessonIndex)}
+                  course={course} // Pass course to Lesson component
                 />
               ))
             )}

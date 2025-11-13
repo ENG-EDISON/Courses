@@ -15,7 +15,8 @@ const Section = ({
   onToggleSubsection,
   isSubsectionExpanded,
   onToggleLesson,  // Add this prop
-  isLessonExpanded  // Add this prop
+  isLessonExpanded,  // Add this prop
+  course
 }) => {
   const addSubsection = useCallback(() => {
     const sectionData = sections[sectionIndex];
@@ -188,6 +189,7 @@ const Section = ({
                   onToggle={() => onToggleSubsection(sectionIndex, subIndex)}
                   onToggleLesson={onToggleLesson}  // Pass down
                   isLessonExpanded={isLessonExpanded}  // Pass down
+                  course={course}
                 />
               ))
             )}
