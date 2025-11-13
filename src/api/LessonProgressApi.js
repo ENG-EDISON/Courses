@@ -16,8 +16,11 @@ export const getCourseProgressSummary = (courseId) => apiClient.get(`/api/course
 export const trackLessonProgress = (lessonId, data) => {
   const payload = {
     lesson_id: lessonId,
-    ...data
+    tracked_time: data.current_time, // ✅ Change from current_time to tracked_time
+    completed: data.completed,
+    progress_percentage: data.progress_percentage // Add this if needed
   };
+  console.log('📡 Sending progress payload:', payload);
   return apiClient.post(`/api/lesson-progress/track/`, payload);
 };
 

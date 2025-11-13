@@ -10,14 +10,14 @@ const SelfHostedVideoPlayer = forwardRef(({
     onTimeUpdate,
     onEnded,
     onLoadedMetadata,
-    onPause
+    onPause,
+    onSeek // ✅ ADDED: onSeek prop
 }, ref) => {
     
-    const formatTime = (seconds) => {
-        if (!seconds || isNaN(seconds)) return '0:00';
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    // ✅ ADDED: Handle seek events
+    const handleSeeked = () => {
+        console.log('🎯 Video seeked, triggering onSeek callback');
+        onSeek && onSeek();
     };
 
     return (
@@ -31,30 +31,30 @@ const SelfHostedVideoPlayer = forwardRef(({
                     onEnded={onEnded}
                     onLoadedMetadata={onLoadedMetadata}
                     onPause={onPause}
+                    onSeeked={handleSeeked} // ✅ ADDED: onSeeked event handler
                 >
                     <source src={source} type="video/mp4" />
                     <source src={source} type="video/webm" />
                     <source src={source} type="video/ogg" />
                     Your browser does not support the video tag.
                 </video>
-
-                {/* Progress overlay for trackable videos */}
-                {canTrack && (
-                    <div className="video-progress-overlay">
-                        <div className="progress-bar">
-                            <div
-                                className="progress-fill"
-                                style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
-                            />
-                        </div>
-                        <div className="time-display">
-                            {formatTime(currentTime)} / {formatTime(duration)}
-                            {lastPlayedTime > 0 && (
-                                <span className="resume-indicator"> (Resumed)</span>
-                            )}
-                        </div>
-                    </div>
-                )}
+            </div>
+            
+            {/* ✅ ADDED: Debug info for testing */}
+            <div style={{
+                fontSize: '12px',
+                color: '#666',
+                marginTop: '10px',
+                padding: '8px',
+                backgroundColor: '#f5f5f5',
+                borderRadius: '4px'
+            }}>
+                <strong>Video Debug Info:</strong><br/>
+                Current Time: {Math.round(currentTime)}s<br/>
+                Duration: {Math.round(duration)}s<br/>
+                Last Played: {lastPlayedTime}s<br/>
+                Can Track: {canTrack ? 'Yes' : 'No'}<br/>
+                Source: {source ? 'Loaded' : 'Missing'}
             </div>
         </div>
     );
