@@ -39,6 +39,12 @@ const Lesson =({
     return lesson.id || !isExistingInDatabase(lesson);
   }, [lesson, isExistingInDatabase]);
 
+  // ✅ ADDED: Video duration handler
+  const handleVideoDurationChange = (duration) => {
+    console.log('🎬 Video duration received in Lesson component:', duration);
+    updateLesson('video_duration', duration);
+  };
+
   // ✅ ADD MISSING RESOURCE API CALLBACKS
   const handleResourceCreate = useCallback((newResourceData, sectionIndex, subsectionIndex, lessonIndex, resourceIndex) => {
     console.log('🔄 Creating resource in state:', { newResourceData, sectionIndex, subsectionIndex, lessonIndex, resourceIndex });
@@ -336,9 +342,10 @@ const Lesson =({
     console.log('📝 Lesson component updated:', { 
       lessonId: lesson.id, 
       hasResources: lesson.resources?.length || 0,
-      canAddResources: canAddResources() 
+      canAddResources: canAddResources(),
+      videoDuration: lesson.video_duration // Log video duration
     });
-  }, [lesson.id, lesson.resources, canAddResources]);
+  }, [lesson.id, lesson.resources, lesson.video_duration, canAddResources]);
 
   return (
     <div className={`lesson-card ${isExistingInDatabase(lesson) ? 'existing-lesson' : 'new-lesson'}`}>
@@ -381,6 +388,7 @@ const Lesson =({
             onVideoSourceChange={handleVideoSourceChange}
             onFileChange={handleFileChange}
             onVideoUrlChange={(e) => updateLesson('video_url', e.target.value)}
+            onVideoDurationChange={handleVideoDurationChange} // ✅ ADDED: Pass the duration handler
           />
 
           <LessonMeta
