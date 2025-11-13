@@ -71,16 +71,16 @@ function UdemyStylePopup({ course, isVisible, position, onMouseEnter, onMouseLea
             <ul>
               {course.learning_objectives && course.learning_objectives.length > 0 ? (
                 <>
-                  {course.learning_objectives.slice(0, 5).map((objective, index) => (
+                  {course.learning_objectives.slice(0, 3).map((objective, index) => (
                     <li key={objective.id || index}>
                       <span className="check-icon">✓</span>
                       {objective.objective}
                     </li>
                   ))}
-                  {course.learning_objectives.length > 5 && (
+                  {course.learning_objectives.length > 3 && (
                     <li className="more-objectives">
                       <span className="check-icon">⋯</span>
-                      +{course.learning_objectives.length - 5} more objectives
+                      +{course.learning_objectives.length - 3} more objectives
                     </li>
                   )}
                 </>

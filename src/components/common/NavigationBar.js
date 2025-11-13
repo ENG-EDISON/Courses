@@ -10,18 +10,42 @@ function NavigationBar() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState(null);
   const dropdownRef = useRef(null);
+  const mobileMenuRef = useRef(null);
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Close profile dropdown
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setProfileDropdownOpen(false);
+      }
+      
+      // Close mobile menu when clicking outside
+      if (mobileMenuRef.current && 
+          !mobileMenuRef.current.contains(event.target) &&
+          !event.target.closest('.mobile-menu')) {
+        setMenuOpen(false);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    const handleRouteChange = () => {
+      setMenuOpen(false);
+      setProfileDropdownOpen(false);
+    };
+
+    // Listen for route changes
+    window.addEventListener('popstate', handleRouteChange);
+    
+    return () => {
+      window.removeEventListener('popstate', handleRouteChange);
     };
   }, []);
 
@@ -45,7 +69,7 @@ function NavigationBar() {
         if (isMounted) {
           if (response.status === 200) {
             setIsLoggedIn(true);
-            setUser(response.data); // ✅ Store user data
+            setUser(response.data);
           } else {
             setIsLoggedIn(false);
             setUser(null);
@@ -87,11 +111,21 @@ function NavigationBar() {
     setIsLoggedIn(false);
     setUser(null);
     setProfileDropdownOpen(false);
+    setMenuOpen(false);
     window.location.href = '/';
   };
 
   const toggleProfileDropdown = () => {
     setProfileDropdownOpen(!profileDropdownOpen);
+  };
+
+  const toggleMobileMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+
+  const handleNavLinkClick = () => {
+    setMenuOpen(false);
+    setProfileDropdownOpen(false);
   };
 
   if (isLoading) {
@@ -113,109 +147,119 @@ function NavigationBar() {
         <Link to="/" className="company-name">Hayducate</Link>
       </div>
 
-      <ul className={`nav-list ${menuOpen ? "active" : ""}`}>
-        <li className="nav-item">
-          <Link to="/all-courses">Courses</Link>
-        </li>
-        {isLoggedIn ? (
-          <>
-            <li className="nav-item">
-              <Link to="/enrolled-courses">My Courses</Link>
-            </li>
-            <li className="nav-item profile-dropdown-container" ref={dropdownRef}>
-              <button 
-                className="profile-dropdown-toggle"
-                onClick={toggleProfileDropdown}
-                aria-expanded={profileDropdownOpen}
-              >
-                <svg 
-                  width="24" 
-                  height="24" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth="2"
-                >
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
-                {/* ✅ Show instructor badge if user is instructor */}
-                {isInstructor && <span className="instructor-badge">Instructor</span>}
-              </button>
-              {profileDropdownOpen && (
-                <div className="profile-dropdown-menu">
-                  {/* ✅ Show user role in profile dropdown */}
-                  {isInstructor && (
-                    <div className="user-role-info">
-                      <span className="role-badge">Instructor</span>
-                    </div>
-                  )}
-                  
-                  <Link 
-                    to="/profile" 
-                    className="dropdown-item"
-                    onClick={() => setProfileDropdownOpen(false)}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                      <circle cx="12" cy="7" r="4" />
-                    </svg>
-                    Profile
-                    {isInstructor && <span className="role-indicator">👑</span>}
-                  </Link>
-                  {/* ✅ Show instructor-specific links in dropdown */}
-                  {isInstructor && (
-                    <>
-                      <div className="dropdown-divider"></div>
-                      <Link 
-                        to="/course-editor" 
-                        className="dropdown-item instructor-item"
-                        onClick={() => setProfileDropdownOpen(false)}
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M12 19l7-7 3 3-7 7-3-3z" />
-                          <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
-                          <path d="M2 2l7.586 7.586" />
-                          <circle cx="11" cy="11" r="2" />
-                        </svg>
-                        Course Editor
-                      </Link>
-                    </>
-                  )}
-                  
-                  <div className="dropdown-divider"></div>
-                  <button 
-                    onClick={handleLogout}
-                    className="dropdown-item logout-item"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                      <polyline points="16,17 21,12 16,7" />
-                      <line x1="21" y1="12" x2="9" y2="12" />
-                    </svg>
-                    Logout
-                  </button>
-                </div>
-              )}
-            </li>
-          </>
-        ) : (
-          <>
-            <li className="nav-item">
-              <Link to="/login">Login</Link>
-            </li>
-            {/* <li className="nav-item signup">
-              <Link to="/signup">Sign Up</Link>
-            </li> */}
-          </>
-        )}
-      </ul>
-
       {/* Mobile menu button */}
-      <div className="mobile-menu" onClick={() => setMenuOpen(!menuOpen)}>
+      <div 
+        className={`mobile-menu ${menuOpen ? "active" : ""}`} 
+        onClick={toggleMobileMenu}
+        aria-label="Toggle menu"
+      >
         <div className="bar"></div>
         <div className="bar"></div>
         <div className="bar"></div>
+      </div>
+
+      {/* Navigation links */}
+      <div 
+        ref={mobileMenuRef}
+        className={`nav-menu-container ${menuOpen ? "active" : ""}`}
+      >
+        <ul className={`nav-list ${menuOpen ? "active" : ""}`}>
+          <li className="nav-item">
+            <Link to="/all-courses" onClick={handleNavLinkClick}>Courses</Link>
+          </li>
+          {isLoggedIn ? (
+            <>
+              <li className="nav-item">
+                <Link to="/enrolled-courses" onClick={handleNavLinkClick}>My Courses</Link>
+              </li>
+              <li className="nav-item profile-dropdown-container" ref={dropdownRef}>
+                <button 
+                  className="profile-dropdown-toggle"
+                  onClick={toggleProfileDropdown}
+                  aria-expanded={profileDropdownOpen}
+                >
+                  <svg 
+                    width="24" 
+                    height="24" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  {/* ✅ Show instructor badge if user is instructor */}
+                  {isInstructor && <span className="instructor-badge">Instructor</span>}
+                </button>
+                {profileDropdownOpen && (
+                  <div className="profile-dropdown-menu">
+                    {/* ✅ Show user role in profile dropdown */}
+                    {isInstructor && (
+                      <div className="user-role-info">
+                        <span className="role-badge">Instructor</span>
+                      </div>
+                    )}
+                    
+                    <Link 
+                      to="/profile" 
+                      className="dropdown-item"
+                      onClick={handleNavLinkClick}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                      </svg>
+                      Profile
+                      {isInstructor && <span className="role-indicator">👑</span>}
+                    </Link>
+                    {/* ✅ Show instructor-specific links in dropdown */}
+                    {isInstructor && (
+                      <>
+                        <div className="dropdown-divider"></div>
+                        <Link 
+                          to="/course-editor" 
+                          className="dropdown-item instructor-item"
+                          onClick={handleNavLinkClick}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M12 19l7-7 3 3-7 7-3-3z" />
+                            <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+                            <path d="M2 2l7.586 7.586" />
+                            <circle cx="11" cy="11" r="2" />
+                          </svg>
+                          Course Editor
+                        </Link>
+                      </>
+                    )}
+                    
+                    <div className="dropdown-divider"></div>
+                    <button 
+                      onClick={handleLogout}
+                      className="dropdown-item logout-item"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16,17 21,12 16,7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                      </svg>
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </li>
+            </>
+          ) : (
+            <>
+              <li className="nav-item">
+                <Link to="/login" onClick={handleNavLinkClick}>Login</Link>
+              </li>
+              {/* <li className="nav-item signup">
+                <Link to="/signup" onClick={handleNavLinkClick}>Sign Up</Link>
+              </li> */}
+            </>
+          )}
+        </ul>
       </div>
     </nav>
   );

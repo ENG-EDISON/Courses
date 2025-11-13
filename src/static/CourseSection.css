@@ -195,24 +195,6 @@
   border-color: #3b82f6;
 }
 
-.error-message {
-  color: #dc2626;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  padding: 10px 14px;
-  border-radius: 6px;
-  text-align: center;
-  max-width: 400px;
-  margin: 0 auto;
-  font-size: 0.9rem;
-}
-
-.loading-spinner {
-  padding: 30px;
-  color: #666;
-  font-size: 0.9rem;
-}
-
 .no-courses {
   padding: 30px;
   color: #666;
@@ -301,8 +283,6 @@
     margin: 6px 0;
   }
   
-  .error-message,
-  .loading-spinner,
   .no-courses {
     padding: 20px;
     font-size: 0.85rem;

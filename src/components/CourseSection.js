@@ -7,11 +7,10 @@ import UdemyStylePopup from "./common/UdemyStylePopup";
 function CoursesSection() {
   const [searchQuery, setSearchQuery] = useState("");
   const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [hoveredCourse, setHoveredCourse] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const scrollRef = useRef(null);
   const hoverTimerRef = useRef(null);
 
@@ -19,15 +18,13 @@ function CoursesSection() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        setLoading(true);
         const response = await getAllPublishedCardView();
         console.log('Courses API response:', response.data);
         setCourses(response.data);
+        setHasLoaded(true);
       } catch (err) {
         console.error('Error fetching courses:', err);
-        setError('Failed to load courses. Please try again.');
-      } finally {
-        setLoading(false);
+        setHasLoaded(true);
       }
     };
 
@@ -132,26 +129,9 @@ function CoursesSection() {
     setHoveredCourse(null);
   };
 
-  if (loading) {
-    return (
-      <section className="courses">
-        <div className="container">
-          <h2>Popular Courses</h2>
-          <div className="loading-spinner">Loading courses...</div>
-        </div>
-      </section>
-    );
-  }
-
-  if (error) {
-    return (
-      <section className="courses">
-        <div className="container">
-          <h2>Popular Courses</h2>
-          <p className="error-message">{error}</p>
-        </div>
-      </section>
-    );
+  // Don't render anything until courses are loaded
+  if (!hasLoaded) {
+    return null;
   }
 
   return (

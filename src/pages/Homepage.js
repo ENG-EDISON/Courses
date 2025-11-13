@@ -35,6 +35,7 @@ function Homepage() {
           </div>
         </div>
       </section>
+
       {/* Features Section */}
       <section className="features">
         <div className="container">
@@ -56,7 +57,9 @@ function Homepage() {
           </div>
         </div>
       </section>
+
       <CoursesSection />  
+
       {/* Testimonials Section */}
       <section className="testimonials">
         <div className="container">
@@ -64,15 +67,15 @@ function Homepage() {
           <div className="testimonial-cards">
             <div className="testimonial-card">
               <p>"Hayducate's courses helped me land my dream job. Highly recommend!"</p>
-              <h3>— Jane Doe</h3>
+              <h3>Michael Jones</h3>
             </div>
             <div className="testimonial-card">
               <p>"The interactive exercises and real-world projects are amazing."</p>
-              <h3>— John Smith</h3>
+              <h3>Brian Kagiri</h3>
             </div>
             <div className="testimonial-card">
-              <p>"A complete learning platform with certificates that matter."</p>
-              <h3>— Sarah Lee</h3>
+              <p>"The instructors are experts who actually care about your success."</p>
+              <h3>Sarah Mwende</h3>
             </div>
           </div>
         </div>
@@ -82,9 +85,7 @@ function Homepage() {
       <section className="cta">
         <h2>Ready to Start Learning?</h2>
         <p>Join thousands of students transforming their careers today.</p>
-        <Link to="/get-started" className="btn btn-cta">
-          Get Started
-        </Link>
+        <Link to="/all-courses" className="btn btn-cta">Get Started</Link>
       </section>
     </main>
   );
