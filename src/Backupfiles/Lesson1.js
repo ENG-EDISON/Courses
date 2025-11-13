@@ -726,9 +726,10 @@
 //   );
 // };
 
-// export default Lesson;
+
+
 import React, { useCallback, useState } from 'react';
-import LessonResource from './LessonResource';
+import LessonResource from '../components/course_management/CourseStructure/LessonResource';
 
 // Helper function to detect YouTube video ID
 const getYouTubeVideoId = (url) => {
@@ -755,6 +756,92 @@ const Lesson = ({
   const [videoSource, setVideoSource] = useState(
     lesson.video_file ? 'upload' : (lesson.video_url ? 'url' : 'upload')
   );
+
+  // ✅ ADD RESOURCE API CALLBACKS
+  const handleResourceCreate = useCallback((newResourceData, sectionIndex, subsectionIndex, lessonIndex, resourceIndex) => {
+    const updatedSections = sections.map((section, secIndex) => {
+      if (secIndex === sectionIndex) {
+        const updatedSubsections = section.subsections.map((subsection, subIndex) => {
+          if (subIndex === subsectionIndex) {
+            const updatedLessons = subsection.lessons.map((lesson, lesIndex) => {
+              if (lesIndex === lessonIndex) {
+                const updatedResources = lesson.resources.map((resource, resIndex) => {
+                  if (resIndex === resourceIndex) {
+                    return { 
+                      ...newResourceData, 
+                      isExisting: true 
+                    };
+                  }
+                  return resource;
+                });
+                return { ...lesson, resources: updatedResources };
+              }
+              return lesson;
+            });
+            return { ...subsection, lessons: updatedLessons };
+          }
+          return subsection;
+        });
+        return { ...section, subsections: updatedSubsections };
+      }
+      return section;
+    });
+    
+    setSections(updatedSections);
+    if (onUpdate) {
+      onUpdate(updatedSections);
+    }
+  }, [sections, setSections, onUpdate]);
+
+  const handleResourceUpdate = useCallback((resourceId, updatedData) => {
+    const updatedSections = sections.map(section => ({
+      ...section,
+      subsections: section.subsections.map(subsection => ({
+        ...subsection,
+        lessons: subsection.lessons.map(lesson => ({
+          ...lesson,
+          resources: lesson.resources.map(resource => 
+            resource.id === resourceId ? { 
+              ...updatedData, 
+              isExisting: true 
+            } : resource
+          )
+        }))
+      }))
+    }));
+    
+    setSections(updatedSections);
+    if (onUpdate) {
+      onUpdate(updatedSections);
+    }
+  }, [sections, setSections, onUpdate]);
+
+  const handleResourceDelete = useCallback((resourceId, sectionIndex, subsectionIndex, lessonIndex, resourceIndex) => {
+    const updatedSections = sections.map((section, secIndex) => {
+      if (secIndex === sectionIndex) {
+        const updatedSubsections = section.subsections.map((subsection, subIndex) => {
+          if (subIndex === subsectionIndex) {
+            const updatedLessons = subsection.lessons.map((lesson, lesIndex) => {
+              if (lesIndex === lessonIndex) {
+                const updatedResources = lesson.resources.filter((_, resIndex) => resIndex !== resourceIndex);
+                return { ...lesson, resources: updatedResources };
+              }
+              return lesson;
+            });
+            return { ...subsection, lessons: updatedLessons };
+          }
+          return subsection;
+        });
+        return { ...section, subsections: updatedSubsections };
+      }
+      return section;
+    });
+    
+    setSections(updatedSections);
+    if (onUpdate) {
+      onUpdate(updatedSections);
+    }
+  }, [sections, setSections, onUpdate]);
 
   const updateLesson = useCallback(
     (field, value) => {
@@ -1046,7 +1133,7 @@ const Lesson = ({
               </div>
             )}
 
-            {/* Lesson Meta Fields - ADDED BACK */}
+            {/* Lesson Meta Fields */}
             <div className="lesson-meta-grid">
               <div className="meta-field">
                 <label>Duration (minutes)</label>
@@ -1106,8 +1193,13 @@ const Lesson = ({
                     setSections={setSections}
                     onUpdate={onUpdate}
                     isExistingInDatabase={isExistingInDatabase}
+                    lessonId={lesson.id} // ✅ Pass lesson ID
+                    onResourceCreate={handleResourceCreate} // ✅ Pass callbacks
+                    onResourceUpdate={handleResourceUpdate}
+                    onResourceDelete={handleResourceDelete}
                   />
                 ))}
+                {console.log("lessonId",lessonId)}
               </div>
             )}
           </div>

@@ -5,7 +5,7 @@ import VideoSettings from './VideoSettings';
 import LessonMeta from './LessonMeta';
 import LessonResources from './LessonResources';
 
-const Lesson = ({
+const Lesson =({
   lesson,
   sectionIndex,
   subsectionIndex,
@@ -16,7 +16,7 @@ const Lesson = ({
   isExistingInDatabase,
   isExpanded,
   onToggle,
-  course // Add course prop to get course ID
+  course
 }) => {
   const [isAddingResource, setIsAddingResource] = useState(false);
   const [videoSource, setVideoSource] = useState(
@@ -33,6 +33,106 @@ const Lesson = ({
     const currentSubsection = sections[sectionIndex]?.subsections?.[subsectionIndex];
     return currentSubsection?.id || null;
   }, [sectionIndex, subsectionIndex, sections]);
+
+  // ✅ Check if lesson has ID for resource creation
+  const canAddResources = useCallback(() => {
+    return lesson.id || !isExistingInDatabase(lesson);
+  }, [lesson, isExistingInDatabase]);
+
+  // ✅ ADD MISSING RESOURCE API CALLBACKS
+  const handleResourceCreate = useCallback((newResourceData, sectionIndex, subsectionIndex, lessonIndex, resourceIndex) => {
+    console.log('🔄 Creating resource in state:', { newResourceData, sectionIndex, subsectionIndex, lessonIndex, resourceIndex });
+    
+    const updatedSections = sections.map((section, secIndex) => {
+      if (secIndex === sectionIndex) {
+        const updatedSubsections = section.subsections.map((subsection, subIndex) => {
+          if (subIndex === subsectionIndex) {
+            const updatedLessons = subsection.lessons.map((lesson, lesIndex) => {
+              if (lesIndex === lessonIndex) {
+                const updatedResources = lesson.resources.map((resource, resIndex) => {
+                  if (resIndex === resourceIndex) {
+                    return { 
+                      ...newResourceData, 
+                      isExisting: true 
+                    };
+                  }
+                  return resource;
+                });
+                return { ...lesson, resources: updatedResources };
+              }
+              return lesson;
+            });
+            return { ...subsection, lessons: updatedLessons };
+          }
+          return subsection;
+        });
+        return { ...section, subsections: updatedSubsections };
+      }
+      return section;
+    });
+    
+    console.log('🔄 Setting updated sections after resource creation');
+    setSections(updatedSections);
+    if (onUpdate) {
+      onUpdate(updatedSections);
+    }
+  }, [sections, setSections, onUpdate]);
+
+  const handleResourceUpdate = useCallback((resourceId, updatedData) => {
+    console.log('🔄 Updating resource in state:', { resourceId, updatedData });
+    
+    const updatedSections = sections.map(section => ({
+      ...section,
+      subsections: section.subsections.map(subsection => ({
+        ...subsection,
+        lessons: subsection.lessons.map(lesson => ({
+          ...lesson,
+          resources: lesson.resources.map(resource => 
+            resource.id === resourceId ? { 
+              ...updatedData, 
+              isExisting: true 
+            } : resource
+          )
+        }))
+      }))
+    }));
+    
+    console.log('🔄 Setting updated sections after resource update');
+    setSections(updatedSections);
+    if (onUpdate) {
+      onUpdate(updatedSections);
+    }
+  }, [sections, setSections, onUpdate]);
+
+  const handleResourceDelete = useCallback((resourceId, sectionIndex, subsectionIndex, lessonIndex, resourceIndex) => {
+    console.log('🔄 Deleting resource from state:', { resourceId, sectionIndex, subsectionIndex, lessonIndex, resourceIndex });
+    
+    const updatedSections = sections.map((section, secIndex) => {
+      if (secIndex === sectionIndex) {
+        const updatedSubsections = section.subsections.map((subsection, subIndex) => {
+          if (subIndex === subsectionIndex) {
+            const updatedLessons = subsection.lessons.map((lesson, lesIndex) => {
+              if (lesIndex === lessonIndex) {
+                const updatedResources = lesson.resources.filter((_, resIndex) => resIndex !== resourceIndex);
+                return { ...lesson, resources: updatedResources };
+              }
+              return lesson;
+            });
+            return { ...subsection, lessons: updatedLessons };
+          }
+          return subsection;
+        });
+        return { ...section, subsections: updatedSubsections };
+      }
+      return section;
+    });
+    
+    console.log('🔄 Setting updated sections after resource deletion');
+    setSections(updatedSections);
+    if (onUpdate) {
+      onUpdate(updatedSections);
+    }
+  }, [sections, setSections, onUpdate]);
 
   const updateLesson = useCallback((field, value) => {
     const updatedSections = sections.map((section, secIndex) => {
@@ -62,11 +162,9 @@ const Lesson = ({
           if (subIndex === subsectionIndex) {
             const updatedLessons = subsection.lessons.map((lesson, lesIndex) => {
               if (lesIndex === lessonIndex) {
-                // Replace the local lesson with the one from API (with ID)
                 return { 
                   ...newLessonData, 
                   isExisting: true,
-                  // Preserve local state that might not be in API response
                   resources: lesson.resources || []
                 };
               }
@@ -95,7 +193,6 @@ const Lesson = ({
           lesson.id === lessonId ? { 
             ...updatedData, 
             isExisting: true,
-            // Preserve local state
             resources: lesson.resources || []
           } : lesson
         )
@@ -132,7 +229,6 @@ const Lesson = ({
     if (lessonToDelete?.id) {
       if (window.confirm('This lesson exists in the database. Do you want to delete it permanently?')) {
         console.log('Should delete existing lesson from database:', lessonToDelete.id);
-        // This will now be handled by the API delete in LessonHeader
         return;
       } else {
         return;
@@ -159,6 +255,12 @@ const Lesson = ({
   const addResource = useCallback(() => {
     if (isAddingResource) return;
 
+    // ✅ CHECK IF LESSON HAS ID BEFORE ADDING RESOURCE
+    if (!lesson.id && isExistingInDatabase(lesson)) {
+      alert('Please save the lesson to the database before adding resources.');
+      return;
+    }
+
     setIsAddingResource(true);
     try {
       const updatedSections = sections.map((section, secIndex) => {
@@ -172,7 +274,7 @@ const Lesson = ({
                     file: null,
                     resource_type: 'document',
                     order: les.resources?.length || 0,
-                    lesson: lessonIndex,
+                    lesson: lesson.id,
                     isExisting: false
                   };
                   return {
@@ -195,7 +297,7 @@ const Lesson = ({
     } finally {
       setTimeout(() => setIsAddingResource(false), 300);
     }
-  }, [sectionIndex, subsectionIndex, lessonIndex, sections, setSections, onUpdate, isAddingResource]);
+  }, [sectionIndex, subsectionIndex, lessonIndex, sections, setSections, onUpdate, isAddingResource, lesson, isExistingInDatabase]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -229,6 +331,15 @@ const Lesson = ({
     }
   };
 
+  // ✅ Debug: log when lesson changes
+  React.useEffect(() => {
+    console.log('📝 Lesson component updated:', { 
+      lessonId: lesson.id, 
+      hasResources: lesson.resources?.length || 0,
+      canAddResources: canAddResources() 
+    });
+  }, [lesson.id, lesson.resources, canAddResources]);
+
   return (
     <div className={`lesson-card ${isExistingInDatabase(lesson) ? 'existing-lesson' : 'new-lesson'}`}>
       <LessonHeader
@@ -241,7 +352,6 @@ const Lesson = ({
         onTitleChange={(e) => updateLesson('title', e.target.value)}
         onAddResource={addResource}
         onDelete={deleteLesson}
-        // New API integration props
         onLessonCreate={handleLessonCreate}
         onLessonUpdate={handleLessonUpdate}
         onLessonDelete={handleLessonDelete}
@@ -251,6 +361,7 @@ const Lesson = ({
         subsectionIndex={subsectionIndex}
         lessonIndex={lessonIndex}
         course={course}
+        canAddResources={canAddResources()}
       />
 
       {isExpanded && (
@@ -289,6 +400,11 @@ const Lesson = ({
             isExistingInDatabase={isExistingInDatabase}
             isAddingResource={isAddingResource}
             onAddResource={addResource}
+            canAddResources={canAddResources()}
+            // ✅ PASS THE RESOURCE CALLBACKS TO LessonResources
+            onResourceCreate={handleResourceCreate}
+            onResourceUpdate={handleResourceUpdate}
+            onResourceDelete={handleResourceDelete}
           />
         </div>
       )}
