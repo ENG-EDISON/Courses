@@ -101,7 +101,6 @@ const ResourcesTab = ({ course }) => {
                     <div className="summary-icon">📚</div>
                     <div className="summary-content">
                         <h4>{allResources.length} Resources Available</h4>
-                        <p>Downloadable materials to enhance your learning experience</p>
                     </div>
                 </div>
             </div>
@@ -109,7 +108,6 @@ const ResourcesTab = ({ course }) => {
             {/* All Resources Grid */}
             {allResources.length > 0 ? (
                 <div className="resources-section">
-                    <h4>All Resources ({allResources.length})</h4>
                     <div className="resources-grid">
                         {allResources.map((resource, index) => (
                             <div key={resource.id || index} className="resource-card">
@@ -117,16 +115,8 @@ const ResourcesTab = ({ course }) => {
                                     {getResourceIcon(resource.file)}
                                 </div>
                                 <div className="resource-content">
-                                    <h5>{resource.title || 'Untitled Resource'}</h5>
-                                    <div className="resource-meta">
-                                        <span className="resource-source">
-                                            From: <strong>{resource.lessonTitle}</strong>
-                                        </span>
-                                        <span className="resource-section">
-                                            {resource.sectionTitle} • {resource.subsectionTitle}
-                                        </span>
-                                    </div>
-                                    <div className="resource-details">
+                                    <div className="resource-row">
+                                        <h5>{resource.title || 'Untitled Resource'}</h5>
                                         <span className="resource-type">
                                             {getFileType(resource.file)}
                                         </span>
@@ -135,21 +125,29 @@ const ResourcesTab = ({ course }) => {
                                                 {formatFileSize(resource.file_size)}
                                             </span>
                                         )}
+                                        <a 
+                                            href={getFileUrl(resource.file)} 
+                                            className="resource-download-btn"
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            download
+                                        >
+                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                                <path d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M4.66675 6.66667L8.00008 10L11.3334 6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M8 10V2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                            Download
+                                        </a>
                                     </div>
-                                    <a 
-                                        href={getFileUrl(resource.file)} 
-                                        className="resource-download-btn"
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        download
-                                    >
-                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                            <path d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                            <path d="M4.66675 6.66667L8.00008 10L11.3334 6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                            <path d="M8 10V2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
-                                        Download {getFileType(resource.file)}
-                                    </a>
+                                    <div className="resource-meta">
+                                        <span className="resource-source">
+                                            From: <strong>{resource.lessonTitle}</strong>
+                                        </span>
+                                        <span className="resource-section">
+                                            {resource.sectionTitle} • {resource.subsectionTitle}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         ))}
