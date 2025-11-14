@@ -129,8 +129,8 @@ function CoursesSection() {
     setHoveredCourse(null);
   };
 
-  // Don't render anything until courses are loaded
-  if (!hasLoaded) {
+  // Don't render anything until courses are loaded OR if no courses exist
+  if (!hasLoaded || courses.length === 0) {
     return null;
   }
 
