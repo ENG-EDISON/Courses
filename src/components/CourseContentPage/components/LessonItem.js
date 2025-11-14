@@ -9,11 +9,6 @@ const LessonItem = ({
     onSelect, 
     onMarkComplete 
 }) => {
-    const formatDuration = (minutes) => {
-        if (!minutes) return '';
-        return `${minutes} min`;
-    };
-
     const videoSource = getVideoSource(lesson);
     
     const getVideoIcon = () => {
@@ -62,23 +57,9 @@ const LessonItem = ({
             </div>
 
             <div className="lesson-item__content">
-                <h6 className="lesson-item__title">{lesson.title}</h6>
-                <div className="lesson-item__meta">
-                    {lesson.video_duration && (
-                        <span className="lesson-item__duration">
-                            {formatDuration(lesson.video_duration)}
-                        </span>
-                    )}
-                    {lesson.is_preview && (
-                        <span className="lesson-item__preview">Preview</span>
-                    )}
-                    <span className="lesson-item__source">
-                        {videoSource.type === 'uploaded' && 'Uploaded'}
-                        {videoSource.type === 'youtube' && 'YouTube'}
-                        {videoSource.type === 'self-hosted' && 'Video'}
-                        {videoSource.type === 'none' && 'Content'}
-                    </span>
-                </div>
+                <h6 className="lesson-item__title">
+                    {lesson.title}
+                </h6>
             </div>
 
             {!isCompleted && (

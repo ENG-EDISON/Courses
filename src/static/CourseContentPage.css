@@ -761,7 +761,7 @@
 }
 
 .section-accordion__header {
-    padding: 1.5rem;
+    padding: 0.6rem;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
@@ -862,12 +862,6 @@
     margin-bottom: 1rem;
 }
 
-.subsection-title h5 {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #1e293b;
-    margin: 0 0 0.5rem 0;
-}
 
 .subsection-description {
     font-size: 0.85rem;
@@ -893,21 +887,23 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 1rem;
-    border-radius: 8px;
+    padding: 1.0rem;
+    border-radius: 4px;
     cursor: pointer;
     transition: all 0.3s ease;
     margin-bottom: 0.25rem;
     position: relative;
+    color: #333; /* Ensure default text is dark */
 }
 
 .lesson-item:hover {
-    background: #f8fafc;
+    background: #2563eb; /* Much darker blue */
+    color: white; /* Change text to white on hover */
     transform: translateX(4px);
 }
 
 .lesson-item--active {
-    background: #4f46e5;
+    background: #5f58e6;
     color: white;
     transform: translateX(4px);
 }
@@ -986,24 +982,6 @@
     display: flex;
     gap: 0.5rem;
     align-items: center;
-}
-
-.lesson-item__duration {
-    color: #64748b;
-    font-size: 0.75rem;
-}
-
-.lesson-item--active .lesson-item__duration {
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.lesson-item__preview {
-    color: #f59e0b;
-    font-size: 0.7rem;
-    font-weight: 600;
-    background: #fef3c7;
-    padding: 0.125rem 0.5rem;
-    border-radius: 12px;
 }
 
 .lesson-item--active .lesson-item__preview {
