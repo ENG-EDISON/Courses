@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import "../static/CourseSection.css";
 import { getAllPublishedCardView } from "../api/CoursesApi";
-import UdemyStylePopup from "./common/UdemyStylePopup";
-import CourseCard from "./common/CourseCard";
-function CourseSection() {
+import UdemyStylePopup from "../components/common/UdemyStylePopup";
+
+function CoursesSection() {
   const [searchQuery, setSearchQuery] = useState("");
   const [courses, setCourses] = useState([]);
   const [hoveredCourse, setHoveredCourse] = useState(null);
@@ -69,6 +70,19 @@ function CourseSection() {
         behavior: "smooth",
       });
     }
+  };
+
+  // Format price display
+  const formatPrice = (course) => {
+    if (course.discount_price && course.discount_price !== course.price) {
+      return (
+        <div className="course-price">
+          <span className="original-price">${course.price}</span>
+          <span className="discount-price">${course.discount_price}</span>
+        </div>
+      );
+    }
+    return <div className="course-price">${course.price}</div>;
   };
 
   // Handle mouse enter for course card
@@ -140,14 +154,37 @@ function CourseSection() {
           <div className="course-cards" ref={scrollRef}>
             {filteredCourses.length > 0 ? (
               filteredCourses.map(course => (
-                <CourseCard 
-                  key={course.id}
-                  course={course}
+                <div 
+                  key={course.id} 
+                  className="course-card"
                   onMouseEnter={(e) => handleMouseEnter(course, e)}
                   onMouseLeave={handleMouseLeave}
-                  showCategory={false}
-                  layout="vertical"
-                />
+                >
+                  <Link to={`/course/${course.id}`}>
+                    <img 
+                      src={course.thumbnail || "/japan.png"} 
+                      alt={course.title} 
+                      onError={(e) => {
+                        e.target.src = "/japan.png";
+                      }}
+                    />
+                    <div className="course-card-content">
+                      <h3>{course.title}</h3>
+                      <div className="course-meta">
+                        <span className="course-level">{course.level}</span>
+                        <span className="course-duration">{course.duration_hours}h</span>
+                        {course.certificate_available && (
+                          <span className="course-certificate">📜 Certificate</span>
+                        )}
+                      </div>
+                      {formatPrice(course)}
+                      <div className="course-rating">
+                        ⭐ {course.average_rating || 'No ratings'} 
+                        <span className="reviews-count">({course.total_reviews})</span>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
               ))
             ) : (
               <div className="no-courses">
@@ -171,4 +208,4 @@ function CourseSection() {
   );
 }
 
-export default CourseSection;
+export default CoursesSection;

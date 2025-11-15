@@ -10,8 +10,8 @@ function UdemyStylePopup({ course, isVisible, position, onMouseEnter, onMouseLea
   useEffect(() => {
     if (isVisible && popupRef.current && course) {
       const popup = popupRef.current;
-      const offsetX = -30; // Move 20px to the left
-      const offsetY = -30; // Move 30px up
+      const offsetX = -15;
+      const offsetY = -100;
       
       const adjustedX = position.x + offsetX;
       const adjustedY = position.y + offsetY;
@@ -20,8 +20,8 @@ function UdemyStylePopup({ course, isVisible, position, onMouseEnter, onMouseLea
       const maxY = window.innerHeight - popup.offsetHeight - 20;
       
       const finalPosition = {
-        x: Math.max(20, Math.min(adjustedX, maxX)), // Ensure it doesn't go off-screen left
-        y: Math.max(20, Math.min(adjustedY, maxY))  // Ensure it doesn't go off-screen top
+        x: Math.max(20, Math.min(adjustedX, maxX)),
+        y: Math.max(20, Math.min(adjustedY, maxY))
       };
       
       popup.style.left = `${finalPosition.x}px`;
@@ -38,14 +38,12 @@ function UdemyStylePopup({ course, isVisible, position, onMouseEnter, onMouseLea
     };
   }, []);
 
-  // Handle mouse leave with delay to allow moving to popup
   const handleMouseLeave = () => {
     popupTimerRef.current = setTimeout(() => {
       onMouseLeave();
     }, 100);
   };
 
-  // Handle mouse enter to clear any pending leave
   const handleMouseEnter = () => {
     if (popupTimerRef.current) {
       clearTimeout(popupTimerRef.current);
@@ -80,18 +78,23 @@ function UdemyStylePopup({ course, isVisible, position, onMouseEnter, onMouseLea
                   {course.learning_objectives.slice(0, 3).map((objective, index) => (
                     <li key={objective.id || index}>
                       <span className="check-icon">✓</span>
-                      {objective.objective}
+                      <span className="objective-text">{objective.objective}</span>
                     </li>
                   ))}
                   {course.learning_objectives.length > 3 && (
                     <li className="more-objectives">
-                      <span className="check-icon">⋯</span>
-                      +{course.learning_objectives.length - 3} more objectives
+                      <span className="check-icon">+</span>
+                      <span className="objective-text">
+                        +{course.learning_objectives.length - 3} more objectives
+                      </span>
                     </li>
                   )}
                 </>
               ) : (
-                <li>No learning objectives specified</li>
+                <li className="no-objectives">
+                  <span className="check-icon">•</span>
+                  <span className="objective-text">No learning objectives specified</span>
+                </li>
               )}
             </ul>
           </div>

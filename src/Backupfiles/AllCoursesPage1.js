@@ -1,9 +1,97 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { getAllPublishedCardView, searchCourses } from "../api/CoursesApi";
 import "../static/AllCoursesPage.css";
 import UdemyStylePopup from "../components/common/UdemyStylePopup";
-import CourseCard from "../components/common/CourseCard";
-import { Link } from "react-router-dom";
+
+// StarRating Component
+const StarRating = ({ rating, maxStars = 5 }) => {
+  const numericRating = parseFloat(rating) || 0;
+  const fullStars = Math.floor(numericRating);
+  const hasHalfStar = numericRating % 1 >= 0.5;
+  const emptyStars = maxStars - fullStars - (hasHalfStar ? 1 : 0);
+
+  return (
+    <span className="allcourses-rating-stars">
+      {'★'.repeat(fullStars)}
+      {hasHalfStar && '½'}
+      {'☆'.repeat(emptyStars)}
+    </span>
+  );
+};
+
+// Course Card Component
+const AllCoursesCard = ({ course, formatPrice, getLevelColor, onMouseEnter, onMouseLeave }) => (
+  <div 
+    className="allcourses-course-card"
+    onMouseEnter={onMouseEnter}
+    onMouseLeave={onMouseLeave}
+  >
+    <Link to={`/course/${course.id}`} className="allcourses-course-link">
+      <div className="allcourses-course-image-container">
+        {course.thumbnail ? (
+          <img 
+            src={course.thumbnail} 
+            alt={course.title}
+            className="allcourses-course-thumbnail"
+          />
+        ) : (
+          <div className="allcourses-thumbnail-placeholder">
+            <i className="fas fa-book-open"></i>
+          </div>
+        )}
+        
+        <div className="allcourses-course-badges">
+          {course.is_featured && (
+            <span className="allcourses-badge featured">Featured</span>
+          )}
+          {course.certificate_available && (
+            <span className="allcourses-badge certificate">Cert</span>
+          )}
+        </div>
+
+        <div 
+          className="allcourses-level-badge"
+          style={{ backgroundColor: getLevelColor(course.level) }}
+        >
+          {course.level}
+        </div>
+      </div>
+
+      <div className="allcourses-course-content">
+        <div className="allcourses-course-header">
+          <h3 className="allcourses-course-title">{course.title}</h3>
+        </div>
+
+        <div className="allcourses-course-meta">
+          <div className="allcourses-rating">
+            <StarRating rating={course.average_rating || 0} />
+            <span className="allcourses-rating-value">
+              {course.average_rating ? course.average_rating.toFixed(1) : '0.0'}
+            </span>
+            <span>({course.total_reviews || 0})</span>
+          </div>
+          
+          <div className="allcourses-pricing">
+            {formatPrice(course)}
+          </div>
+        </div>
+
+        <div className="allcourses-course-footer">
+          <div className="allcourses-enrollments">
+            <i className="fas fa-users"></i>
+            <span>{course.enrollment_count} enrolled</span>
+          </div>
+          <div className="allcourses-duration">
+            <i className="fas fa-clock"></i>
+            <span>{course.duration_hours}h</span>
+          </div>
+        </div>
+      </div>
+    </Link>
+  </div>
+);
+
 function AllCoursesPage() {
     const [courses, setCourses] = useState([]);
     const [groupedCourses, setGroupedCourses] = useState({});
@@ -148,6 +236,32 @@ function AllCoursesPage() {
         setSearchQuery("");
         setSearchResults(null);
         setError("");
+    };
+
+    // Format price with discount
+    const formatPrice = (course) => {
+        if (course.discount_price && course.discount_price < course.price) {
+            return (
+                <div className="allcourses-price-container">
+                    <span className="allcourses-original-price">${course.price}</span>
+                    <span className="allcourses-discount-price">${course.discount_price}</span>
+                    <span className="allcourses-discount-badge">
+                        Save {Math.round(((course.price - course.discount_price) / course.price) * 100)}%
+                    </span>
+                </div>
+            );
+        }
+        return <span className="allcourses-current-price">${course.price}</span>;
+    };
+
+    // Get level badge color
+    const getLevelColor = (level) => {
+        const colors = {
+            beginner: '#10b981',
+            intermediate: '#f59e0b',
+            advanced: '#ef4444'
+        };
+        return colors[level] || '#64748b';
     };
 
     // Mouse handlers for course cards
@@ -298,13 +412,13 @@ function AllCoursesPage() {
                             <>
                                 <div className="allcourses-results-grid">
                                     {searchResults.map(course => (
-                                        <CourseCard 
-                                            key={course.id}
-                                            course={course}
-                                            onMouseEnter={(e) => handleCardMouseEnter(course, e)}
-                                            onMouseLeave={handleCardMouseLeave}
-                                            showCategory={true}
-                                            layout="vertical"
+                                        <AllCoursesCard 
+                                          key={course.id} 
+                                          course={course} 
+                                          formatPrice={formatPrice} 
+                                          getLevelColor={getLevelColor}
+                                          onMouseEnter={(e) => handleCardMouseEnter(course, e)}
+                                          onMouseLeave={handleCardMouseLeave}
                                         />
                                     ))}
                                 </div>
@@ -374,13 +488,13 @@ function AllCoursesPage() {
                                     {categoryData.courses.length > 0 ? (
                                         <div className="allcourses-scroll">
                                             {categoryData.courses.map(course => (
-                                                <CourseCard 
-                                                    key={course.id}
-                                                    course={course}
-                                                    onMouseEnter={(e) => handleCardMouseEnter(course, e)}
-                                                    onMouseLeave={handleCardMouseLeave}
-                                                    showCategory={false}
-                                                    layout="vertical"
+                                                <AllCoursesCard 
+                                                  key={course.id} 
+                                                  course={course} 
+                                                  formatPrice={formatPrice} 
+                                                  getLevelColor={getLevelColor}
+                                                  onMouseEnter={(e) => handleCardMouseEnter(course, e)}
+                                                  onMouseLeave={handleCardMouseLeave}
                                                 />
                                             ))}
                                         </div>

@@ -1,40 +1,29 @@
-/* Professional Udemy-style Popup */
+/* Professional Udemy-style Popup with Colors - NO OVERFLOW */
 .udemy-popup {
   position: fixed;
-  width: 380px;
-  background: white;
+  width: 340px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border-radius: 8px;
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15), 0 8px 24px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
   border: 1px solid #e5e5e5;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  overflow: hidden;
-  animation: slideInUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(10px);
-  z-index: 1000;
+  overflow: visible; /* NO OVERFLOW */
+  animation: popupSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10000;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .udemy-popup:hover {
-  box-shadow: 0 16px 56px rgba(0, 0, 0, 0.18), 0 12px 32px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 12px 24px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
 }
 
-.udemy-popup::before {
-  content: '';
-  position: absolute;
-  top: -8px;
-  left: 20px;
-  width: 16px;
-  height: 16px;
-  background: white;
-  border-left: 1px solid #e5e5e5;
-  border-top: 1px solid #e5e5e5;
-  transform: rotate(45deg);
-}
-
-@keyframes slideInUp {
+@keyframes popupSlideIn {
   from {
     opacity: 0;
-    transform: translateY(12px) scale(0.98);
+    transform: translateY(8px) scale(0.95);
   }
   to {
     opacity: 1;
@@ -48,199 +37,185 @@
   display: block;
 }
 
-/* Header with thumbnail */
-.popup-header {
-  position: relative;
-  border-bottom: 1px solid #f1f1f1;
-}
-
-.popup-thumbnail {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.3s ease;
-}
-
-.udemy-popup:hover .popup-thumbnail {
-  transform: scale(1.02);
-}
-
-.popup-badge {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  background: linear-gradient(135deg, #a435f0, #7c1dc1);
-  color: white;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* Main content */
+/* Main content - NO OVERFLOW */
 .popup-body {
   padding: 20px;
-  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
-  max-height: 400px;
-  overflow-y: auto;
+  background: transparent;
+  overflow: visible; /* NO OVERFLOW */
+  max-height: none;
 }
 
+/* Title */
 .popup-title {
-  font-size: 17px;
-  font-weight: 800;
-  color: #1c1d1f;
-  margin: 0 0 12px 0;
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Meta information */
-.popup-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
-  align-items: center;
-}
-
-.popup-updated {
-  background: linear-gradient(135deg, #fef7ed, #fed7aa);
-  color: #92400e;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 11px;
+  font-size: 1.1rem;
   font-weight: 700;
-  border: 1px solid #fed7aa;
+  color: #1e293b;
+  margin: 0 0 16px 0;
+  line-height: 1.4;
+  display: block; /* Changed from -webkit-box */
+  overflow: visible; /* NO OVERFLOW */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding: 0 4px;
 }
 
-.popup-duration {
-  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-  color: #0369a1;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  border: 1px solid #e0f2fe;
-}
-
-.popup-level {
-  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-  color: #166534;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  border: 1px solid #dcfce7;
-  text-transform: capitalize;
-}
-
-/* Description */
+/* Description - FULLY VISIBLE with proper padding */
 .popup-description {
-  font-size: 13px;
-  color: #6a6f73;
-  line-height: 1.5;
-  margin-bottom: 16px;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Learning objectives */
-.popup-objectives {
-  margin-bottom: 0;
-  background: white;
+  font-size: 0.9rem;
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  background: rgba(99, 102, 241, 0.05);
   padding: 16px;
   border-radius: 8px;
-  border: 1px solid #f1f1f1;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  border-left: 4px solid #6366f1;
+  display: block;
+  overflow: visible; /* NO OVERFLOW */
+  white-space: normal;
+  word-wrap: break-word;
+  max-height: none;
+}
+
+/* Learning objectives - NO OVERFLOW */
+.popup-objectives {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #bae6fd;
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
+  margin-top: 8px;
+  overflow: visible; /* NO OVERFLOW */
 }
 
 .popup-objectives strong {
   display: block;
-  font-size: 13px;
-  color: #1c1d1f;
-  margin-bottom: 12px;
+  font-size: 0.8rem;
+  color: #0369a1;
+  margin-bottom: 16px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  background: linear-gradient(135deg, #a435f0, #7c1dc1);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 4px solid #0ea5e9;
+  overflow: visible; /* NO OVERFLOW */
 }
 
 .popup-objectives ul {
   list-style: none;
   padding: 0;
   margin: 0;
+  overflow: visible; /* NO OVERFLOW */
 }
 
 .popup-objectives li {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  font-size: 13px;
-  color: #404145;
+  gap: 12px;
+  font-size: 0.8rem;
+  color: #475569;
   line-height: 1.5;
-  margin-bottom: 8px;
-  padding: 6px 0;
-  border-bottom: 1px solid #f8f8f8;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.7);
   transition: all 0.2s ease;
+  border-left: 3px solid #22d3ee;
+  overflow: visible; /* NO OVERFLOW */
 }
 
 .popup-objectives li:hover {
-  background: #f8f7ff;
-  border-radius: 4px;
-  padding: 6px 8px;
-  margin: 0 -8px;
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(34, 211, 238, 0.2);
 }
 
 .popup-objectives li:last-child {
-  border-bottom: none;
   margin-bottom: 0;
 }
 
 .check-icon {
-  color: #1e6055;
+  color: #06b6d4;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 1rem;
   flex-shrink: 0;
   margin-top: 2px;
-  background: linear-gradient(135deg, #10b981, #059669);
+  min-width: 18px;
+  background: linear-gradient(135deg, #06b6d4, #0ea5e9);
+  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+  overflow: visible; /* NO OVERFLOW */
+}
+
+.objective-text {
+  flex: 1;
+  line-height: 1.5;
+  padding-right: 4px;
+  overflow: visible; /* NO OVERFLOW */
 }
 
 .more-objectives {
-  color: #6a6f73;
   font-style: italic;
-  font-size: 12px;
-  border-top: 1px dashed #e5e5e5;
-  padding-top: 8px;
-  margin-top: 4px;
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  padding: 10px 12px;
+  border-left: 3px solid #94a3b8;
+  margin-top: 8px;
+  overflow: visible; /* NO OVERFLOW */
 }
 
-/* Scrollbar styling */
-.popup-body::-webkit-scrollbar {
-  width: 6px;
+.more-objectives .check-icon {
+  color: #64748b;
+  background: none;
+  -webkit-text-fill-color: #64748b;
 }
 
-.popup-body::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
+.no-objectives {
+  color: #94a3b8;
+  font-style: italic;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 10px 12px;
+  border-radius: 6px;
+  border-left: 3px solid #cbd5e1;
+  overflow: visible; /* NO OVERFLOW */
 }
 
-.popup-body::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
+.no-objectives .check-icon {
+  color: #94a3b8;
+  background: none;
+  -webkit-text-fill-color: #94a3b8;
 }
 
-.popup-body::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
+/* Responsive Design */
+@media (max-width: 768px) {
+  .udemy-popup {
+    width: 300px;
+  }
+  
+  .popup-body {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .udemy-popup {
+    width: 280px;
+  }
+  
+  .popup-body {
+    padding: 16px;
+  }
+  
+  .popup-title {
+    font-size: 1rem;
+  }
+  
+  .popup-description {
+    padding: 14px;
+  }
 }
