@@ -1,7 +1,7 @@
 /* Professional Udemy-style Popup */
 .udemy-popup {
   position: fixed;
-  max-width: 380px;
+  width: 380px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15), 0 8px 24px rgba(0, 0, 0, 0.1);

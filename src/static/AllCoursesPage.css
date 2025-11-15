@@ -361,8 +361,8 @@
 
 /* Compact Course Card Styles */
 .allcourses-course-card {
-    min-width: 380px;
-    min-height: 390px;
+    width: 350px;
+    height: 400px;
     background: white;
     border-radius: 12px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
