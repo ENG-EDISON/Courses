@@ -10,16 +10,22 @@ function UdemyStylePopup({ course, isVisible, position, onMouseEnter, onMouseLea
   useEffect(() => {
     if (isVisible && popupRef.current && course) {
       const popup = popupRef.current;
+      const offsetX = -30; // Move 20px to the left
+      const offsetY = -30; // Move 30px up
+      
+      const adjustedX = position.x + offsetX;
+      const adjustedY = position.y + offsetY;
+      
       const maxX = window.innerWidth - popup.offsetWidth - 20;
       const maxY = window.innerHeight - popup.offsetHeight - 20;
       
-      const adjustedPosition = {
-        x: Math.min(position.x, maxX),
-        y: Math.min(position.y, maxY)
+      const finalPosition = {
+        x: Math.max(20, Math.min(adjustedX, maxX)), // Ensure it doesn't go off-screen left
+        y: Math.max(20, Math.min(adjustedY, maxY))  // Ensure it doesn't go off-screen top
       };
       
-      popup.style.left = `${adjustedPosition.x}px`;
-      popup.style.top = `${adjustedPosition.y}px`;
+      popup.style.left = `${finalPosition.x}px`;
+      popup.style.top = `${finalPosition.y}px`;
     }
   }, [isVisible, position, course]);
 

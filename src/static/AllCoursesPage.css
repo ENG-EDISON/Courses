@@ -361,7 +361,8 @@
 
 /* Compact Course Card Styles */
 .allcourses-course-card {
-    width: var(--card-width);
+    min-width: 380px;
+    min-height: 390px;
     background: white;
     border-radius: 12px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
@@ -385,13 +386,13 @@
 /* Compact Image Container */
 .allcourses-course-image-container {
     position: relative;
-    height: 160px;
+    height: 220px;
     overflow: hidden;
 }
 
 .allcourses-course-thumbnail {
     width: 100%;
-    height: 100%;
+    height: 220px;
     object-fit: cover;
     transition: transform 0.3s ease;
 }
