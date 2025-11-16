@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import "./NavigationBar.css";
 import { getMyProfile } from "../../api/ProfileApis";
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></link>
+
 function NavigationBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -128,14 +129,12 @@ function NavigationBar() {
     setProfileDropdownOpen(false);
   };
 
+  // Don't show anything while loading
   if (isLoading) {
     return (
       <nav className="navbar">
         <div className="nav-left">
           <Link to="/" className="company-name">Hayducate</Link>
-        </div>
-        <div style={{ color: '#666', fontSize: '14px' }}>
-          Loading...
         </div>
       </nav>
     );

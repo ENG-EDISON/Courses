@@ -1,163 +1,414 @@
-/* Homepage General Container */
-.homepage-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
+/* Homepage Enterprise Sleek Design - White Background */
+.homepage {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Homepage Hero Section */
-.homepage-hero {
-  background-color: #ffffff;
-  padding: 80px 0;
+/* Homepage General Container */
+.homepage-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 32px;
 }
+
+/* Homepage Hero Section - Enterprise Style with White Background */
+.homepage-hero {
+  background: #ffffff;
+  padding: 120px 0 100px;
+  position: relative;
+  overflow: hidden;
+}
+
 .homepage-hero-content {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 40px;
+  gap: 60px;
 }
+
 .homepage-hero-text {
   flex: 1;
   min-width: 300px;
 }
+
 .homepage-hero-text h1 {
-  font-size: 48px;
+  font-size: 3.5rem;
   font-weight: 800;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   color: #111827;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #111827 0%, #4f46e5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
+
 .homepage-hero-text p {
-  font-size: 18px;
-  color: #4b5563;
-  margin-bottom: 30px;
+  font-size: 1.25rem;
+  color: #6b7280;
+  margin-bottom: 40px;
+  line-height: 1.6;
+  font-weight: 400;
 }
+
 .homepage-hero-buttons {
   display: flex;
-  gap: 16px;
+  gap: 20px;
   flex-wrap: wrap;
 }
+
 .homepage-btn {
-  padding: 12px 24px;
-  border-radius: 6px;
+  padding: 16px 32px;
+  border-radius: 12px;
   font-weight: 600;
   text-decoration: none;
-  display: inline-block;
-  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 1rem;
+  border: 2px solid transparent;
+  cursor: pointer;
 }
+
 .homepage-btn-primary {
-  background-color: #4f46e5;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
   color: white;
+  box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.3);
 }
+
 .homepage-btn-primary:hover {
-  background-color: #4338ca;
+  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
 }
+
 .homepage-btn-outline {
   border: 2px solid #4f46e5;
   color: #4f46e5;
+  background: transparent;
 }
+
 .homepage-btn-outline:hover {
-  background-color: #ede9fe;
+  background: #4f46e5;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.2);
 }
+
+.homepage-hero-image {
+  flex: 1;
+  min-width: 300px;
+  position: relative;
+}
+
+.homepage-hero-image::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  right: 20px;
+  bottom: 20px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border-radius: 20px;
+  z-index: -1;
+  opacity: 0.1;
+}
+
 .homepage-hero-image img {
   width: 100%;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+  transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
+  transition: transform 0.5s ease;
+  border: 1px solid #f3f4f6;
 }
 
-/* Homepage Features Section */
+.homepage-hero-image:hover img {
+  transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+}
+
+/* Homepage Features Section - Enterprise Style with White Background */
 .homepage-features {
-  background-color: #f9fafb;
-  padding: 80px 0;
-  text-align: center;
+  background: #f8fafc;
+  padding: 100px 0;
+  position: relative;
 }
+
+.homepage-features::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+}
+
 .homepage-features h2 {
-  font-size: 36px;
+  font-size: 3rem;
   font-weight: 800;
   color: #111827;
+  margin-bottom: 16px;
+  text-align: center;
 }
+
 .homepage-features p {
-  color: #4b5563;
-  max-width: 700px;
-  margin: 16px auto 40px;
+  color: #6b7280;
+  max-width: 600px;
+  margin: 0 auto 60px;
+  text-align: center;
+  font-size: 1.125rem;
+  line-height: 1.6;
 }
+
 .homepage-feature-cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 30px;
   justify-content: center;
 }
+
 .homepage-feature-card {
-  background-color: #ffffff;
-  padding: 24px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-  flex: 1 1 300px;
-  max-width: 350px;
+  background: white;
+  padding: 48px 32px;
+  border-radius: 20px;
+  border: 1px solid #f1f5f9;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 }
+
+.homepage-feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+}
+
+.homepage-feature-card:hover {
+  transform: translateY(-8px);
+  border-color: #e2e8f0;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
 .homepage-feature-card h3 {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 12px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #111827;
 }
+
 .homepage-feature-card p {
-  color: #4b5563;
+  color: #6b7280;
+  margin: 0;
+  text-align: left;
+  font-size: 1rem;
+  line-height: 1.6;
 }
 
-/* Homepage Testimonials Section */
+/* Homepage Testimonials Section - Enterprise Style with White Background */
 .homepage-testimonials {
-  background-color: #ffffff;
-  padding: 80px 0;
-  text-align: center;
+  background: white;
+  padding: 100px 0;
+  position: relative;
 }
+
+.homepage-testimonials::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #f1f5f9, transparent);
+}
+
 .homepage-testimonials h2 {
-  font-size: 36px;
+  font-size: 3rem;
   font-weight: 800;
   color: #111827;
-  margin-bottom: 40px;
+  margin-bottom: 60px;
+  text-align: center;
 }
+
 .homepage-testimonial-cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 30px;
 }
+
 .homepage-testimonial-card {
-  background-color: #f3f4f6;
-  padding: 24px;
-  border-radius: 12px;
-  flex: 1 1 300px;
-  max-width: 350px;
+  background: #f8fafc;
+  padding: 40px 32px;
+  border-radius: 20px;
+  border: 1px solid #f1f5f9;
+  transition: all 0.3s ease;
+  position: relative;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
+
+.homepage-testimonial-card::before {
+  content: '"';
+  position: absolute;
+  top: 20px;
+  right: 32px;
+  font-size: 4rem;
+  color: #4f46e5;
+  opacity: 0.2;
+  font-family: serif;
+}
+
+.homepage-testimonial-card:hover {
+  transform: translateY(-5px);
+  border-color: #e2e8f0;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
 .homepage-testimonial-card p {
-  color: #4b5563;
+  color: #6b7280;
   font-style: italic;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 2;
 }
+
 .homepage-testimonial-card h3 {
-  margin-top: 16px;
   color: #111827;
   font-weight: 600;
+  font-size: 1.125rem;
+  margin: 0;
 }
 
-/* Homepage Call to Action */
+/* Homepage Call to Action - Enterprise Style with White Background */
 .homepage-cta {
-  background-color: #4f46e5;
-  color: white;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  color: #111827;
   text-align: center;
-  padding: 80px 24px;
+  padding: 120px 24px;
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid #f1f5f9;
 }
+
+.homepage-cta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 30% 20%, rgba(79, 70, 229, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 70% 80%, rgba(124, 58, 237, 0.05) 0%, transparent 50%);
+}
+
 .homepage-cta h2 {
-  font-size: 42px;
+  font-size: 3.5rem;
   font-weight: 800;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(135deg, #111827 0%, #4f46e5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
+
 .homepage-cta p {
-  font-size: 18px;
-  margin-bottom: 40px;
+  font-size: 1.25rem;
+  margin-bottom: 48px;
+  color: #6b7280;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 2;
 }
+
 .homepage-btn-cta {
-  background-color: white;
-  color: #4f46e5;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: white;
+  box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.3);
+  position: relative;
+  z-index: 2;
 }
+
 .homepage-btn-cta:hover {
-  background-color: #e5e7eb;
+  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .homepage-container {
+    padding: 0 20px;
+  }
+  
+  .homepage-hero {
+    padding: 80px 0 60px;
+  }
+  
+  .homepage-hero-text h1 {
+    font-size: 2.5rem;
+  }
+  
+  .homepage-hero-text p {
+    font-size: 1.125rem;
+  }
+  
+  .homepage-hero-buttons {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .homepage-features h2,
+  .homepage-testimonials h2 {
+    font-size: 2.5rem;
+  }
+  
+  .homepage-cta h2 {
+    font-size: 2.5rem;
+  }
+  
+  .homepage-feature-cards,
+  .homepage-testimonial-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .homepage-hero-image::before {
+    display: none;
+  }
+  
+  .homepage-hero-image img {
+    transform: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .homepage-hero-text h1 {
+    font-size: 2rem;
+  }
+  
+  .homepage-features h2,
+  .homepage-testimonials h2,
+  .homepage-cta h2 {
+    font-size: 2rem;
+  }
+  
+  .homepage-btn {
+    padding: 14px 24px;
+    font-size: 0.9rem;
+  }
+  
+  .homepage-feature-card,
+  .homepage-testimonial-card {
+    padding: 32px 24px;
+  }
 }
