@@ -1,7 +1,7 @@
-/* Professional Udemy-style Popup with Colors - NO OVERFLOW */
+/* Professional Udemy-style Popup with Dialog Box Positioning */
 .udemy-popup {
   position: fixed;
-  width: 340px;
+  width: 360px;
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border-radius: 8px;
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
@@ -12,6 +12,68 @@
   z-index: 10000;
   cursor: pointer;
   transition: all 0.3s ease;
+}
+
+/* Dialog box positioning classes */
+.udemy-popup.dialog-right {
+  transform-origin: left center;
+}
+
+.udemy-popup.dialog-left {
+  transform-origin: right center;
+}
+
+/* Arrow indicators for dialog box */
+.udemy-popup.dialog-right::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -8px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 8px 8px 8px 0;
+  border-color: transparent #e5e5e5 transparent transparent;
+}
+
+.udemy-popup.dialog-right::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -6px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 8px 8px 8px 0;
+  border-color: transparent white transparent transparent;
+}
+
+.udemy-popup.dialog-left::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -8px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 8px 0 8px 8px;
+  border-color: transparent transparent transparent #e5e5e5;
+}
+
+.udemy-popup.dialog-left::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -6px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 8px 0 8px 8px;
+  border-color: transparent transparent transparent white;
 }
 
 .udemy-popup:hover {

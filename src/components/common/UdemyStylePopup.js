@@ -8,9 +8,13 @@ function UdemyStylePopup({ course, isVisible, position, onMouseEnter, onMouseLea
 
   // Handle positioning and visibility
   useEffect(() => {
+    console.log('Popup effect running:', { isVisible, position, course: !!course });
+    
     if (isVisible && popupRef.current && course) {
       const popup = popupRef.current;
-      const offsetX = -15;
+      console.log('Popup dimensions:', popup.offsetWidth, popup.offsetHeight);
+      
+      const offsetX = 20; // Show to the right of cursor
       const offsetY = -100;
       
       const adjustedX = position.x + offsetX;
@@ -24,8 +28,11 @@ function UdemyStylePopup({ course, isVisible, position, onMouseEnter, onMouseLea
         y: Math.max(20, Math.min(adjustedY, maxY))
       };
       
+      console.log('Final position:', finalPosition);
+      
       popup.style.left = `${finalPosition.x}px`;
       popup.style.top = `${finalPosition.y}px`;
+      popup.style.display = 'block';
     }
   }, [isVisible, position, course]);
 
@@ -51,7 +58,12 @@ function UdemyStylePopup({ course, isVisible, position, onMouseEnter, onMouseLea
     onMouseEnter();
   };
 
-  if (!isVisible || !course) return null;
+  console.log('Popup render:', { isVisible, course: !!course });
+
+  if (!isVisible || !course) {
+    console.log('Popup not rendering - condition not met');
+    return null;
+  }
 
   return (
     <Link 
@@ -63,11 +75,16 @@ function UdemyStylePopup({ course, isVisible, position, onMouseEnter, onMouseLea
         className="udemy-popup"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        style={{ display: 'block' }}
       >
         <div className="popup-body">
           <h4 className="popup-title">{course.title}</h4>
           <div className="popup-description">
-            {course.short_description || 'No description available.'}
+            {course.short_description 
+              ? course.short_description.split(' ').slice(0, 20).join(' ') + 
+                (course.short_description.split(' ').length > 20 ? '...' : '')
+              : 'No description available.'
+            }
           </div>
 
           <div className="popup-objectives">
@@ -75,17 +92,17 @@ function UdemyStylePopup({ course, isVisible, position, onMouseEnter, onMouseLea
             <ul>
               {course.learning_objectives && course.learning_objectives.length > 0 ? (
                 <>
-                  {course.learning_objectives.slice(0, 3).map((objective, index) => (
+                  {course.learning_objectives.slice(0, 2).map((objective, index) => (
                     <li key={objective.id || index}>
                       <span className="check-icon">✓</span>
                       <span className="objective-text">{objective.objective}</span>
                     </li>
                   ))}
-                  {course.learning_objectives.length > 3 && (
+                  {course.learning_objectives.length > 2 && (
                     <li className="more-objectives">
                       <span className="check-icon">+</span>
                       <span className="objective-text">
-                        +{course.learning_objectives.length - 3} more objectives
+                        +{course.learning_objectives.length - 2} more objectives
                       </span>
                     </li>
                   )}

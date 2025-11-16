@@ -1,4 +1,5 @@
 // components/CourseHero.js
+import { Link } from 'react-router-dom';
 function CourseHero({ course }) {
     const renderPricing = () => {
         const regularPrice = parseFloat(course.price);
@@ -24,7 +25,7 @@ function CourseHero({ course }) {
             <div className="hero-background"></div>
             <div className="hero-content">
                 <div className="course-breadcrumb">
-                    <span>Courses</span>
+                    <span><Link to="/all-courses" className="breadcrumb-course-link">Courses</Link></span>
                     <span className="breadcrumb-divider">/</span>
                     <span>{course.category || 'Uncategorized'}</span>
                     <span className="breadcrumb-divider">/</span>
