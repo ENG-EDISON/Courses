@@ -1,6 +1,7 @@
 // components/course/CurriculumSection.js
 import CurriculumSubsection from './CurriculumSubsection';
 import { getTotalSectionDuration, formatDuration } from '../utils/courseUtils';
+import "../css/CurriculumSection.css"
 
 function CurriculumSection({ 
     section, 
@@ -22,11 +23,11 @@ function CurriculumSection({
             >
                 <div className="section-header-main">
                     <div className="section-indicator">
+                    <div className="section-toggle">
+                        <i className={`fas fa-chevron-${isExpanded ? 'down' : 'right'}`}></i>
+                    </div>
                         <div className="section-number">
                             {String(sectionIndex + 1).padStart(2, '0')}
-                        </div>
-                        <div className="section-toggle">
-                            <i className={`fas fa-chevron-${isExpanded ? 'up' : 'down'}`}></i>
                         </div>
                     </div>
                     <div className="section-content-main">

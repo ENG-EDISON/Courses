@@ -6,6 +6,7 @@ import {
     getVideoBadgeType, 
     formatDuration 
 } from '../utils/courseUtils';
+import "../css/LessonItem.css"
 
 function LessonItem({ lesson, onPlayPreviewVideo }) {
     return (

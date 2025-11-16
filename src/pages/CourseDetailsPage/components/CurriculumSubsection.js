@@ -1,6 +1,7 @@
 // components/course/CurriculumSubsection.js
 import LessonItem from './LessonItem';
 import { getTotalSubsectionDuration, formatDuration } from '../utils/courseUtils';
+import "../css/CurriculumSubsection.css"
 
 function CurriculumSubsection({ 
     subsection, 
@@ -20,16 +21,18 @@ function CurriculumSubsection({
                 onClick={onToggleSubsection}
             >
                 <div className="subsection-indicator">
+                <div className="subsection-toggle">
+                    <i className={`fas fa-chevron-${isExpanded ? 'down' : 'right'}`}></i>
+                </div>
                     <div className="subsection-number">
                         {sectionIndex + 1}.{subIndex + 1}
-                    </div>
-                    <div className="subsection-toggle">
-                        <i className={`fas fa-chevron-${isExpanded ? 'up' : 'down'}`}></i>
                     </div>
                 </div>
                 <div className="subsection-content-main">
                     <div className="subsection-title">{subsection.title}</div>
-                    <div>{subsection.lessons?.length || 0} Lectures&nbsp; • {formatDuration(subsectionDuration)}</div>
+                    <div className="subsection-meta">
+                        {subsection.lessons?.length || 0} Lectures • {formatDuration(subsectionDuration)}
+                    </div>
                 </div>
             </div>
 

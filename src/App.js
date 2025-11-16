@@ -11,7 +11,7 @@ import AllCourses from './pages/AllCoursesPage';
 import MyEnrolledCourses from './pages/MyEnrolledCourses';
 import CourseContentPage from './components/CourseContentPage/CourseContentPage';
 import CourseEditor from './components/course_management/CourseEditor/CourseEditor';
-
+import '@fortawesome/fontawesome-free/css/all.min.css';
 const router = createBrowserRouter([
   {
     path: '/',

@@ -1,0 +1,196 @@
+/* ===== LESSON ITEM COMPONENT ===== */
+.lesson-item-enterprise {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px; /* Minimal padding */
+    background: var(--background-secondary);
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--border-light);
+    transition: all 0.3s ease;
+    margin-bottom: 2px; /* Very small margin */
+    gap: 6px; /* Minimal gap */
+}
+
+.lesson-item-enterprise:hover {
+    border-color: var(--primary-color);
+    transform: translateX(2px); /* Smaller translate */
+    box-shadow: var(--shadow-sm);
+}
+
+.lesson-item-enterprise.preview-available:hover {
+    background: var(--primary-light);
+    cursor: pointer;
+}
+
+.lesson-item-enterprise:last-child {
+    margin-bottom: var(--spacing-md); /* Smaller bottom margin */
+}
+
+.lesson-icon {
+    width: 24px; /* Smaller icon */
+    height: 24px; /* Smaller icon */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem; /* Smaller icon font */
+    flex-shrink: 0;
+}
+
+.lesson-order {
+    width: 20px; /* Smaller order circle */
+    height: 20px; /* Smaller order circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--background-tertiary);
+    color: var(--text-secondary);
+    border-radius: 50%;
+    font-size: 0.7rem; /* Smaller font */
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.lesson-content-horizontal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+    gap: 12px; /* Smaller gap */
+    min-width: 0;
+}
+
+.lesson-content-horizontal .lesson-title {
+    flex: 1;
+    margin: 0;
+    font-size: 0.85rem; /* Smaller title */
+    font-weight: 500;
+    color: var(--text-primary);
+    min-width: 120px; /* Smaller min-width */
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lesson-meta-horizontal {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Smaller gap */
+    flex-shrink: 0;
+}
+
+.lesson-type {
+    text-transform: capitalize;
+    color: var(--text-secondary);
+    background: var(--background-tertiary);
+    padding: 2px 6px; /* Smaller padding */
+    border-radius: 10px; /* Smaller radius */
+    font-size: 0.7rem; /* Smaller font */
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.lesson-duration {
+    color: var(--text-tertiary);
+    font-weight: 500;
+    font-size: 0.7rem; /* Smaller font */
+    white-space: nowrap;
+}
+
+.video-source-mini-badge {
+    display: flex;
+    align-items: center;
+    font-size: 0.7rem; /* Smaller font */
+    white-space: nowrap;
+}
+
+.video-source-mini-badge i {
+    font-size: 0.8rem; /* Smaller icon */
+}
+
+.lesson-actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.preview-badge {
+    background: var(--accent-color);
+    color: white;
+    padding: 4px 8px; /* Smaller padding */
+    border-radius: 10px; /* Smaller radius */
+    font-size: 0.7rem; /* Smaller font */
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 3px; /* Smaller gap */
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.preview-badge.clickable:hover {
+    background: var(--primary-color);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.preview-badge i {
+    font-size: 0.6rem; /* Smaller icon */
+}
+
+.locked-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px; /* Smaller badge */
+    height: 24px; /* Smaller badge */
+    color: var(--text-tertiary);
+    background: var(--background-tertiary);
+    border-radius: 6px; /* Smaller radius */
+    border: 1px solid var(--border-light);
+    font-size: 0.7rem; /* Smaller icon */
+}
+
+/* ===== RESPONSIVE DESIGN FOR LESSON ITEM ===== */
+@media (max-width: 768px) {
+    .lesson-content-horizontal {
+        flex-wrap: wrap;
+        gap: 6px; /* Smaller gap */
+    }
+
+    .lesson-order {
+        order: 1;
+    }
+
+    .lesson-content-horizontal .lesson-title {
+        min-width: calc(100% - 32px); /* Adjusted for smaller order */
+        order: 2;
+        font-size: 0.8rem; /* Smaller title on mobile */
+    }
+
+    .lesson-meta-horizontal {
+        order: 3;
+        flex: 1;
+        justify-content: flex-start;
+        gap: 6px; /* Smaller gap */
+    }
+
+    .lesson-actions {
+        order: 4;
+    }
+}
+
+@media (max-width: 480px) {
+    .lesson-meta-horizontal {
+        flex-direction: column;
+        gap: 2px; /* Smaller gap */
+        align-items: flex-start;
+    }
+    
+    .lesson-item-enterprise {
+        padding: 3px 6px; /* Even smaller padding on mobile */
+        gap: 4px; /* Smaller gap */
+    }
+}

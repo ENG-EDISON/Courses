@@ -1,0 +1,192 @@
+/* ===== CURRICULUM SECTION COMPONENT ===== */
+.curriculum-section {
+    background: var(--background-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius-md); /* Smaller radius */
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.curriculum-section:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-sm); /* Smaller shadow */
+}
+
+.section-header-enterprise {
+    padding: var(--spacing-sm) var(--spacing-md); /* Even smaller padding */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--background-primary);
+    border-bottom: 1px solid transparent;
+}
+
+.section-header-enterprise:hover {
+    background: var(--background-secondary);
+}
+
+.section-header-enterprise.expanded {
+    background: var(--background-secondary);
+    border-bottom-color: var(--border-light);
+}
+
+.section-header-main {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm); /* Smaller gap */
+    width: 100%;
+}
+
+.section-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs); /* Smaller gap */
+    flex-shrink: 0;
+}
+
+.section-toggle {
+    color: var(--text-secondary);
+    font-size: 0.8rem; /* Smaller icon */
+    transition: color 0.3s ease;
+    width: 16px; /* Smaller width */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Remove redundant rotation transforms since JSX handles icon changes */
+.section-number {
+    width: 32px; /* Even smaller */
+    height: 32px; /* Even smaller */
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border-radius: var(--border-radius-sm); /* Smaller radius */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem; /* Smaller font */
+    flex-shrink: 0;
+}
+
+.section-content-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm); /* Smaller gap */
+}
+
+.section-title {
+    margin: 0;
+    font-size: 1.1rem; /* Smaller title */
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+    flex: 1;
+}
+
+.section-meta {
+    display: flex;
+    gap: var(--spacing-md); /* Smaller gap */
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.section-meta .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px; /* Smaller gap */
+    font-size: 0.8rem; /* Smaller font */
+    color: var(--text-secondary);
+    background: none;
+    padding: 0;
+    border: none;
+    backdrop-filter: none;
+    white-space: nowrap;
+}
+
+.section-meta .meta-item i {
+    color: var(--primary-color);
+    font-size: 0.7rem; /* Smaller icons */
+}
+
+.section-content-enterprise {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+}
+
+.section-content-enterprise.expanded {
+    max-height: 5000px;
+}
+
+/* Hover effects */
+.section-header-enterprise:hover .section-toggle {
+    color: var(--primary-color);
+}
+
+/* ===== RESPONSIVE DESIGN FOR CURRICULUM SECTION ===== */
+@media (max-width: 768px) {
+    .section-header-main {
+        gap: var(--spacing-xs);
+    }
+
+    .section-indicator {
+        gap: 4px; /* Custom small gap */
+    }
+
+    .section-number {
+        width: 28px; /* Even smaller on mobile */
+        height: 28px;
+        font-size: 0.8rem;
+    }
+
+    .section-toggle {
+        font-size: 0.7rem;
+        width: 14px;
+    }
+
+    .section-content-main {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px; /* Smaller gap */
+    }
+
+    .section-title {
+        font-size: 1rem; /* Smaller on mobile */
+    }
+
+    .section-meta {
+        gap: var(--spacing-sm);
+    }
+
+    .section-meta .meta-item {
+        font-size: 0.75rem; /* Smaller on mobile */
+    }
+
+    .section-meta .meta-item i {
+        font-size: 0.65rem; /* Smaller icons on mobile */
+    }
+}
+
+@media (max-width: 480px) {
+    .section-header-enterprise {
+        padding: 6px 8px; /* Minimal padding */
+    }
+
+    .section-indicator {
+        flex-direction: row; /* Keep horizontal on mobile */
+        gap: 6px;
+    }
+
+    .section-meta {
+        flex-direction: column;
+        gap: 4px; /* Minimal gap */
+        align-items: flex-start;
+    }
+
+    .section-content-main {
+        gap: 4px; /* Minimal gap */
+    }
+}

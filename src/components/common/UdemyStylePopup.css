@@ -1,4 +1,4 @@
-/* Professional Udemy-style Popup with Dialog Box Positioning */
+/* Professional Udemy-style Popup with Udemy Sans Font */
 .udemy-popup {
   position: fixed;
   width: 360px;
@@ -6,24 +6,15 @@
   border-radius: 8px;
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
   border: 1px solid #e5e5e5;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  overflow: visible; /* NO OVERFLOW */
+  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  overflow: visible;
   animation: popupSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 10000;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
-/* Dialog box positioning classes */
-.udemy-popup.dialog-right {
-  transform-origin: left center;
-}
-
-.udemy-popup.dialog-left {
-  transform-origin: right center;
-}
-
-/* Arrow indicators for dialog box */
+/* Arrow for right-positioned dialog (points left) */
 .udemy-popup.dialog-right::before {
   content: '';
   position: absolute;
@@ -50,6 +41,7 @@
   border-color: transparent white transparent transparent;
 }
 
+/* Arrow for left-positioned dialog (points right) */
 .udemy-popup.dialog-left::before {
   content: '';
   position: absolute;
@@ -103,27 +95,28 @@
 .popup-body {
   padding: 20px;
   background: transparent;
-  overflow: visible; /* NO OVERFLOW */
+  overflow: visible;
   max-height: none;
 }
 
-/* Title */
+/* Title - Udemy Sans styling */
 .popup-title {
   font-size: 1.1rem;
   font-weight: 700;
   color: #1e293b;
   margin: 0 0 16px 0;
   line-height: 1.4;
-  display: block; /* Changed from -webkit-box */
-  overflow: visible; /* NO OVERFLOW */
+  display: block;
+  overflow: visible;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   padding: 0 4px;
+  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Description - FULLY VISIBLE with proper padding */
+/* Description - Udemy Sans styling */
 .popup-description {
   font-size: 0.9rem;
   color: #475569;
@@ -134,13 +127,14 @@
   border-radius: 8px;
   border-left: 4px solid #6366f1;
   display: block;
-  overflow: visible; /* NO OVERFLOW */
+  overflow: visible;
   white-space: normal;
   word-wrap: break-word;
   max-height: none;
+  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Learning objectives - NO OVERFLOW */
+/* Learning objectives - Udemy Sans styling */
 .popup-objectives {
   background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
   padding: 20px;
@@ -148,7 +142,8 @@
   border: 1px solid #bae6fd;
   box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
   margin-top: 8px;
-  overflow: visible; /* NO OVERFLOW */
+  overflow: visible;
+  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .popup-objectives strong {
@@ -163,14 +158,16 @@
   padding: 8px 12px;
   border-radius: 6px;
   border-left: 4px solid #0ea5e9;
-  overflow: visible; /* NO OVERFLOW */
+  overflow: visible;
+  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .popup-objectives ul {
   list-style: none;
   padding: 0;
   margin: 0;
-  overflow: visible; /* NO OVERFLOW */
+  overflow: visible;
+  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .popup-objectives li {
@@ -180,13 +177,15 @@
   font-size: 0.8rem;
   color: #475569;
   line-height: 1.5;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   padding: 10px 12px;
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.7);
   transition: all 0.2s ease;
   border-left: 3px solid #22d3ee;
-  overflow: visible; /* NO OVERFLOW */
+  overflow: visible;
+  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  text-align: left;
 }
 
 .popup-objectives li:hover {
@@ -210,14 +209,15 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  overflow: visible; /* NO OVERFLOW */
+  overflow: visible;
 }
 
 .objective-text {
   flex: 1;
   line-height: 1.5;
   padding-right: 4px;
-  overflow: visible; /* NO OVERFLOW */
+  overflow: visible;
+  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .more-objectives {
@@ -228,7 +228,9 @@
   padding: 10px 12px;
   border-left: 3px solid #94a3b8;
   margin-top: 8px;
-  overflow: visible; /* NO OVERFLOW */
+  overflow: visible;
+  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+
 }
 
 .more-objectives .check-icon {
@@ -244,7 +246,8 @@
   padding: 10px 12px;
   border-radius: 6px;
   border-left: 3px solid #cbd5e1;
-  overflow: visible; /* NO OVERFLOW */
+  overflow: visible;
+  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .no-objectives .check-icon {
