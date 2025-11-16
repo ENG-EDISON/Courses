@@ -12,6 +12,12 @@ import MyEnrolledCourses from './pages/MyEnrolledCourses';
 import CourseContentPage from './components/CourseContentPage/CourseContentPage';
 import CourseEditor from './components/course_management/CourseEditor/CourseEditor';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import Footer from './components/common/Footer';
+import ContactPage from './pages/ContactPage';
+import AboutUsPage from './pages/AboutUsPage';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -19,6 +25,7 @@ const router = createBrowserRouter([
       <>
         <NavigationBar />
         <Homepage />
+        <Footer/>
       </>
     ),
     errorElement: <p>404 Not found</p>,
@@ -29,6 +36,8 @@ const router = createBrowserRouter([
       <>
         <NavigationBar />
         <EnterpriseLogin />
+        <Footer/>
+
       </>
     ),
     errorElement: <p>404 Not found</p>,
@@ -39,6 +48,8 @@ const router = createBrowserRouter([
       <>
         <NavigationBar />
         <Profile />
+        <Footer/>
+
       </>
     )
   },
@@ -48,6 +59,7 @@ const router = createBrowserRouter([
       <>
         <NavigationBar />
         <CourseDetails /> {/* ✅ Updated component name */}
+        <Footer/>
       </>
     )
   },
@@ -57,6 +69,7 @@ const router = createBrowserRouter([
       <>
         <NavigationBar />
         <AllCourses />
+        <Footer/>
       </>
     )
   },
@@ -66,6 +79,7 @@ const router = createBrowserRouter([
       <>
         <NavigationBar />
         <CourseContentPage />
+        <Footer/>
       </>
     )
   },
@@ -75,6 +89,7 @@ const router = createBrowserRouter([
       <>
         <NavigationBar />
         <CourseEditor />
+        <Footer/>
       </>
     )
   },
@@ -83,6 +98,7 @@ const router = createBrowserRouter([
     element: (
       <>
         <NavigationBar />
+        <Footer/>
       </>
     ),
     errorElement: <p>404 Not found</p>,
@@ -93,9 +109,50 @@ const router = createBrowserRouter([
       <>
         <NavigationBar />
         <MyEnrolledCourses />
+        <Footer/>
       </>
     )
-  }
+  },
+  {
+  path: '/contact',
+  element: (
+    <>
+      <NavigationBar />
+      <ContactPage />
+      <Footer />
+    </>
+  )
+},
+{
+  path: '/about',
+  element: (
+    <>
+      <NavigationBar />
+      <AboutUsPage />
+      <Footer />
+    </>
+  )
+},
+{
+  path: '/privacy',
+  element: (
+    <>
+      <NavigationBar />
+      <PrivacyPolicy />
+      <Footer />
+    </>
+  )
+},
+{
+  path: '/terms',
+  element: (
+    <>
+      <NavigationBar />
+      <TermsOfService />
+      <Footer />
+    </>
+  )
+}
 ]);
 
 function App() {

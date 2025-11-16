@@ -1,0 +1,152 @@
+/* Privacy Policy Specific Styles */
+.privacy-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem 0;
+}
+
+.privacy-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.privacy-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    color: white;
+    position: relative;
+}
+
+.privacy-back-button {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    font-size: 1rem;
+}
+
+.privacy-back-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.privacy-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.privacy-last-updated {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+.privacy-content {
+    background: white;
+    border-radius: 15px;
+    padding: 3rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    line-height: 1.7;
+}
+
+.privacy-section {
+    margin-bottom: 3rem;
+}
+
+.privacy-section h2 {
+    color: #2c3e50;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #3498db;
+}
+
+.privacy-section h3 {
+    color: #34495e;
+    font-size: 1.2rem;
+    margin: 1.5rem 0 0.5rem 0;
+}
+
+.privacy-section p {
+    color: #5a6c7d;
+    margin-bottom: 1rem;
+    text-align: justify;
+}
+
+.privacy-list {
+    color: #5a6c7d;
+    margin: 1rem 0;
+    padding-left: 2rem;
+}
+
+.privacy-list li {
+    margin-bottom: 0.5rem;
+    text-align: justify;
+}
+
+.privacy-section strong {
+    color: #2c3e50;
+}
+
+.privacy-link {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.privacy-link:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+.privacy-contact-info {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+}
+
+.privacy-contact-info p {
+    margin-bottom: 0.5rem;
+}
+
+/* Responsive Design for Privacy Page */
+@media (max-width: 768px) {
+    .privacy-header h1 {
+        font-size: 2rem;
+    }
+    
+    .privacy-content {
+        padding: 2rem;
+    }
+    
+    .privacy-back-button {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+    
+    .privacy-section {
+        margin-bottom: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .privacy-content {
+        padding: 1.5rem;
+    }
+    
+    .privacy-list {
+        padding-left: 1.5rem;
+    }
+    
+    .privacy-header h1 {
+        font-size: 1.75rem;
+    }
+}

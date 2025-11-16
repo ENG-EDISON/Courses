@@ -4,7 +4,7 @@ import ObjectivesTab from './tabs/ObjectivesTab';
 import ResourcesTab from './tabs/ResourcesTab';
 
 const CourseDetails = ({ course }) => {
-    const [activeTab, setActiveTab] = useState('description');
+    const [activeTab, setActiveTab] = useState('resources'); // Changed default to 'resources'
 
     const renderTabContent = () => {
         switch (activeTab) {
@@ -22,20 +22,20 @@ const CourseDetails = ({ course }) => {
     return (
         <div className="course-details-section">
             <div className="details-tabs">
-                <TabButton 
-                    active={activeTab === 'description'} 
+                <TabButton
+                    active={activeTab === 'resources'}
+                    onClick={() => setActiveTab('resources')}
+                    label="Resources"
+                />
+                <TabButton
+                    active={activeTab === 'description'}
                     onClick={() => setActiveTab('description')}
                     label="Description"
                 />
-                <TabButton 
-                    active={activeTab === 'objectives'} 
+                <TabButton
+                    active={activeTab === 'objectives'}
                     onClick={() => setActiveTab('objectives')}
                     label="Objectives"
-                />
-                <TabButton 
-                    active={activeTab === 'resources'} 
-                    onClick={() => setActiveTab('resources')}
-                    label="Resources"
                 />
             </div>
 

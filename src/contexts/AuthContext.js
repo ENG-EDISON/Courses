@@ -1,3 +1,4 @@
+// AuthContext.js
 import React, { createContext, useState, useContext, useEffect, useRef } from "react";
 import { getMyProfile } from "../api/ProfileApis";
 
@@ -15,10 +16,9 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const hasCheckedAuth = useRef(false); // ✅ Prevent multiple auth checks
+  const hasCheckedAuth = useRef(false);
 
   useEffect(() => {
-    // ✅ Only check auth once on mount
     if (!hasCheckedAuth.current) {
       checkAuth();
       hasCheckedAuth.current = true;
@@ -27,13 +27,17 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
+      // ✅ FIXED: Use the same keys as Http.js
+      const token = localStorage.getItem('access_token');
+      console.log('🔍 Auth check - token found:', !!token);
+      
       if (!token) {
         throw new Error('No token found');
       }
       
       const response = await getMyProfile();
       if (response.status === 200) {
+        console.log('✅ Auth check successful');
         setIsLoggedIn(true);
         setUser(response.data);
       }
@@ -41,27 +45,32 @@ export const AuthProvider = ({ children }) => {
       console.error('Auth check failed:', error);
       setIsLoggedIn(false);
       setUser(null);
-      // Clear invalid tokens
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
+      // ✅ FIXED: Clear with correct keys
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
     } finally {
       setIsLoading(false);
     }
   };
 
   const login = (userData, tokens) => {
+    console.log('🔍 Login called with tokens:', tokens);
     setIsLoggedIn(true);
     setUser(userData);
-    // ✅ Store tokens if provided
+    
     if (tokens) {
-      localStorage.setItem('accessToken', tokens.access);
-      localStorage.setItem('refreshToken', tokens.refresh);
+      // ✅ FIXED: Use consistent keys
+      localStorage.setItem('access_token', tokens.access);
+      localStorage.setItem('refresh_token', tokens.refresh);
+      console.log('✅ Tokens stored in localStorage');
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    console.log('🔍 Logout called');
+    // ✅ FIXED: Use consistent keys
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
     setIsLoggedIn(false);
     setUser(null);
   };
@@ -72,7 +81,7 @@ export const AuthProvider = ({ children }) => {
     isLoading,
     login,
     logout,
-    checkAuth // ✅ Keep checkAuth for manual refreshes if needed
+    checkAuth
   };
 
   return (

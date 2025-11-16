@@ -1,0 +1,230 @@
+/* Terms of Service Specific Styles */
+.terms-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem 0;
+}
+
+.terms-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.terms-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    color: white;
+    position: relative;
+}
+
+.terms-back-button {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    font-size: 1rem;
+}
+
+.terms-back-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.terms-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.terms-last-updated {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+.terms-content {
+    background: white;
+    border-radius: 15px;
+    padding: 3rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    line-height: 1.7;
+}
+
+.terms-section {
+    margin-bottom: 3rem;
+}
+
+.terms-section h2 {
+    color: #2c3e50;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #3498db;
+}
+
+.terms-section h3 {
+    color: #34495e;
+    font-size: 1.2rem;
+    margin: 1.5rem 0 0.5rem 0;
+}
+
+.terms-section p {
+    color: #5a6c7d;
+    margin-bottom: 1rem;
+    text-align: justify;
+}
+
+.terms-list {
+    color: #5a6c7d;
+    margin: 1rem 0;
+    padding-left: 2rem;
+}
+
+.terms-list li {
+    margin-bottom: 0.5rem;
+    text-align: justify;
+}
+
+.terms-section strong {
+    color: #2c3e50;
+}
+
+.terms-link {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.terms-link:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+.terms-contact-info {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+}
+
+.terms-contact-info p {
+    margin-bottom: 0.5rem;
+}
+
+/* Benefits Grid Styles */
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.benefit-item {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 10px;
+    border-left: 4px solid #3498db;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.benefit-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.benefit-item i {
+    font-size: 2rem;
+    color: #3498db;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.benefit-item h4 {
+    color: #2c3e50;
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.benefit-item p {
+    color: #5a6c7d;
+    line-height: 1.5;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.notice-box {
+    background: #e3f2fd;
+    border: 1px solid #bbdefb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.notice-box i {
+    color: #1976d2;
+    font-size: 1.5rem;
+    margin-top: 0.25rem;
+}
+
+.notice-box p {
+    margin: 0;
+    color: #1565c0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .terms-header h1 {
+        font-size: 2rem;
+    }
+    
+    .terms-content {
+        padding: 2rem;
+    }
+    
+    .terms-back-button {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+    
+    .terms-section {
+        margin-bottom: 2rem;
+    }
+    
+    .benefits-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .benefit-item {
+        padding: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .terms-content {
+        padding: 1.5rem;
+    }
+    
+    .terms-list {
+        padding-left: 1.5rem;
+    }
+    
+    .terms-header h1 {
+        font-size: 1.75rem;
+    }
+    
+    .notice-box {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+}
