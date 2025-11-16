@@ -1,0 +1,163 @@
+/* ===== REQUIREMENTS COMPONENT ===== */
+.requirements-content {
+    color: var(--text-primary);
+    line-height: 1.6;
+    text-align: left;
+}
+
+.requirement-section {
+    margin: var(--spacing-lg) 0 var(--spacing-md) 0;
+    text-align: left;
+}
+
+.requirement-section:first-child {
+    margin-top: 0;
+}
+
+.requirement-heading {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin: 0 0 var(--spacing-sm) 0;
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 2px solid var(--primary-light);
+    text-align: left;
+}
+
+.requirement-subheading-plain {
+    margin: var(--spacing-md) 0 var(--spacing-sm) 0;
+    text-align: left;
+}
+
+.requirement-subheading-plain h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin: 0;
+    text-align: left;
+}
+
+.requirement-numbered-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    margin: var(--spacing-xs) 0 var(--spacing-xs) var(--spacing-lg);
+    padding: 2px 0;
+    text-align: left;
+}
+
+.requirement-number {
+    font-weight: 600;
+    color: var(--primary-color);
+    min-width: 24px;
+}
+
+.requirement-arrow-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    margin: var(--spacing-xs) 0 var(--spacing-xs) var(--spacing-xl);
+    padding: 2px 0;
+    text-align: left;
+}
+
+.requirement-arrow-icon {
+    color: var(--primary-color);
+    font-size: 0.7rem;
+    margin-top: 0.3rem;
+    flex-shrink: 0;
+}
+
+.requirement-subitem {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    margin: var(--spacing-xs) 0 var(--spacing-xs) var(--spacing-xl);
+    padding: 2px 0;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+.subitem-bullet {
+    color: var(--text-secondary);
+    font-size: 0.6rem;
+    margin-top: 0.4rem;
+    flex-shrink: 0;
+}
+
+.requirement-definition {
+    margin: var(--spacing-sm) 0 var(--spacing-sm) var(--spacing-lg);
+    padding: var(--spacing-xs) 0;
+    text-align: left;
+}
+
+.requirement-definition strong {
+    color: var(--primary-color);
+    margin-right: var(--spacing-xs);
+}
+
+.requirement-note {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    margin: var(--spacing-sm) 0 var(--spacing-sm) var(--spacing-lg);
+    padding: var(--spacing-sm);
+    background: var(--background-tertiary);
+    border-radius: var(--border-radius-sm);
+    border-left: 3px solid var(--info-color);
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+.note-icon {
+    color: var(--info-color);
+    font-size: 0.8rem;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+}
+
+.requirement-paragraph {
+    margin: var(--spacing-sm) 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    text-align: left;
+}
+
+/* Responsive Design for Requirements */
+@media (max-width: 768px) {
+    .requirement-heading {
+        font-size: 1rem;
+    }
+    
+    .requirement-subheading-plain h5 {
+        font-size: 0.95rem;
+    }
+    
+    .requirement-arrow-item,
+    .requirement-subitem,
+    .requirement-definition,
+    .requirement-note {
+        margin-left: var(--spacing-md);
+    }
+    
+    .requirement-numbered-item {
+        margin-left: var(--spacing-md);
+    }
+}
+
+@media (max-width: 480px) {
+    .requirement-paragraph {
+        font-size: 0.9rem;
+    }
+    
+    .requirement-arrow-item,
+    .requirement-subitem,
+    .requirement-definition,
+    .requirement-note {
+        margin-left: var(--spacing-sm);
+    }
+    
+    .requirement-numbered-item {
+        margin-left: var(--spacing-sm);
+    }
+}

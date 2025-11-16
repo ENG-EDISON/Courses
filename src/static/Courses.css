@@ -392,17 +392,6 @@
     line-height: 1.2;
 }
 
-/* ===== REQUIREMENTS COMPONENT ===== */
-.requirements-content {
-    color: var(--text-primary);
-    line-height: 1.6;
-}
-
-.requirements-content p {
-    margin: 0;
-    font-size: 1rem;
-}
-
 /* ===== COURSE SIDEBAR COMPONENT ===== */
 .course-sidebar {
     display: flex;
