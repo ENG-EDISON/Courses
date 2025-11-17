@@ -4,12 +4,13 @@
   display: inline-block;
   border: 2px solid rgba(223, 221, 221, 0.6);
   border-radius: 10px;
-  max-width: 350px;
-  min-width: 320px;
+  max-width: 380px;
+  min-width: 350px;
   width: 100%;
-  min-height: 350px;
+  min-height: 390px;
   box-sizing: border-box;
   transition: all 0.3s ease;
+  flex-shrink: 0; /* Important for horizontal scrolling */
 }
 
 .coursecard-wrapper:hover {
@@ -366,23 +367,56 @@
   border: 0;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* Large Tablets and Small Laptops */
+@media (max-width: 1200px) {
   .coursecard-wrapper {
-    max-width: 320px;
-    padding: 10px;
+    max-width: 340px;
+    min-width: 320px;
+    min-height: 370px;
   }
   
   .coursecard.vertical .coursecard-image-container {
     height: 130px;
   }
+  
+  .coursecard-title {
+    font-size: 0.92rem;
+  }
 }
 
+/* Tablets */
+@media (max-width: 1024px) {
+  .coursecard-wrapper {
+    max-width: 320px;
+    min-width: 300px;
+    min-height: 350px;
+    padding: 10px;
+  }
+  
+  .coursecard.vertical .coursecard-image-container {
+    height: 125px;
+  }
+  
+  .coursecard-content {
+    padding: 10px;
+    gap: 5px;
+  }
+  
+  .coursecard-title {
+    font-size: 0.9rem;
+    min-height: 2.2em;
+  }
+}
+
+/* Small Tablets and Large Phones */
 @media (max-width: 768px) {
   .coursecard-wrapper {
     max-width: 300px;
+    min-width: 280px;
+    min-height: 330px;
     padding: 10px;
-    min-height: 300px;
   }
   
   .coursecard.vertical .coursecard-image-container {
@@ -395,7 +429,7 @@
   }
   
   .coursecard-title {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     min-height: 2.2em;
   }
   
@@ -406,18 +440,26 @@
   .coursecard-rating,
   .coursecard-duration {
     padding: 3px 6px;
+    font-size: 0.75rem;
   }
   
   .coursecard-price-container {
     padding: 4px 8px;
   }
+  
+  .coursecard-discount-price,
+  .coursecard-current-price {
+    font-size: 0.95rem;
+  }
 }
 
+/* Medium Phones */
 @media (max-width: 640px) {
   .coursecard-wrapper {
     max-width: 280px;
+    min-width: 260px;
+    min-height: 310px;
     padding: 8px;
-    min-height: 280px;
   }
   
   .coursecard.vertical .coursecard-image-container {
@@ -426,6 +468,7 @@
   
   .coursecard-content {
     padding: 8px;
+    gap: 4px;
   }
   
   .coursecard-title {
@@ -433,10 +476,22 @@
     min-height: 2.2em;
   }
   
+  .coursecard-instructor-name {
+    font-size: 0.72rem;
+  }
+  
   .coursecard-meta-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
+    padding: 6px 0;
+  }
+  
+  .coursecard-rating,
+  .coursecard-duration {
+    width: 100%;
+    justify-content: center;
+    padding: 3px 6px;
   }
   
   .coursecard-pricing {
@@ -446,18 +501,19 @@
     padding-top: 6px;
   }
   
-  .coursecard-rating,
-  .coursecard-duration {
+  .coursecard-price-container {
     width: 100%;
     justify-content: center;
   }
 }
 
+/* Small Phones */
 @media (max-width: 480px) {
   .coursecard-wrapper {
     max-width: 260px;
+    min-width: 240px;
+    min-height: 290px;
     padding: 8px;
-    min-height: 260px;
   }
   
   .coursecard.vertical .coursecard-image-container {
@@ -466,20 +522,34 @@
   
   .coursecard-content {
     padding: 6px;
+    gap: 3px;
   }
   
   .coursecard-title {
     font-size: 0.82rem;
     min-height: 2em;
+    line-height: 1.2;
+  }
+  
+  .coursecard-instructor-name {
+    font-size: 0.7rem;
   }
   
   .coursecard-rating {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
+  }
+  
+  .coursecard-duration {
+    font-size: 0.72rem;
   }
   
   .coursecard-discount-price,
   .coursecard-current-price {
     font-size: 0.9rem;
+  }
+  
+  .coursecard-original-price {
+    font-size: 0.75rem;
   }
   
   .coursecard-rating,
@@ -490,14 +560,25 @@
   .coursecard-price-container {
     padding: 3px 6px;
   }
+  
+  .coursecard-badge {
+    font-size: 0.6rem;
+    padding: 2px 4px;
+  }
+  
+  .coursecard-level-badge {
+    font-size: 0.6rem;
+    padding: 2px 4px;
+  }
 }
 
-/* Very Small Screens */
+/* Very Small Phones */
 @media (max-width: 360px) {
   .coursecard-wrapper {
     max-width: 240px;
+    min-width: 220px;
+    min-height: 270px;
     padding: 6px;
-    min-height: 240px;
   }
   
   .coursecard.vertical .coursecard-image-container {
@@ -506,26 +587,107 @@
   
   .coursecard-content {
     padding: 6px;
-    gap: 4px;
+    gap: 3px;
   }
   
   .coursecard-title {
     font-size: 0.8rem;
     min-height: 1.8em;
+    line-height: 1.2;
+  }
+  
+  .coursecard-instructor-name {
+    font-size: 0.68rem;
   }
   
   .coursecard-rating {
     font-size: 0.7rem;
   }
   
+  .coursecard-duration {
+    font-size: 0.7rem;
+  }
+  
+  .coursecard-discount-price,
+  .coursecard-current-price {
+    font-size: 0.85rem;
+  }
+  
+  .coursecard-original-price {
+    font-size: 0.72rem;
+  }
+  
   .coursecard-meta-row {
     min-height: 18px;
+    padding: 4px 0;
   }
   
   .coursecard-rating,
   .coursecard-duration {
     padding: 2px 4px;
     font-size: 0.7rem;
+  }
+  
+  .coursecard-price-container {
+    padding: 2px 4px;
+  }
+  
+  .coursecard-badge {
+    font-size: 0.55rem;
+    padding: 1px 3px;
+  }
+  
+  .coursecard-level-badge {
+    font-size: 0.55rem;
+    padding: 1px 3px;
+  }
+}
+
+/* Extra Small Phones (Galaxy Fold, etc.) */
+@media (max-width: 320px) {
+  .coursecard-wrapper {
+    max-width: 220px;
+    min-width: 200px;
+    min-height: 250px;
+    padding: 4px;
+  }
+  
+  .coursecard.vertical .coursecard-image-container {
+    height: 80px;
+  }
+  
+  .coursecard-content {
+    padding: 4px;
+    gap: 2px;
+  }
+  
+  .coursecard-title {
+    font-size: 0.78rem;
+    min-height: 1.6em;
+    line-height: 1.1;
+  }
+  
+  .coursecard-instructor-name {
+    font-size: 0.65rem;
+  }
+  
+  .coursecard-rating,
+  .coursecard-duration {
+    font-size: 0.65rem;
+    padding: 1px 3px;
+  }
+  
+  .coursecard-discount-price,
+  .coursecard-current-price {
+    font-size: 0.8rem;
+  }
+  
+  .coursecard-original-price {
+    font-size: 0.7rem;
+  }
+  
+  .coursecard-meta-row {
+    padding: 3px 0;
   }
 }
 
@@ -610,7 +772,7 @@
   }
 }
 
-/* Dark mode support (optional addition) */
+/* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .coursecard {
     background: #1f2937;
@@ -662,5 +824,26 @@
   .coursecard-meta-row {
     border-top-color: #374151;
     border-bottom-color: #374151;
+  }
+}
+
+/* Landscape mode for small screens */
+@media (max-height: 500px) and (orientation: landscape) {
+  .coursecard-wrapper {
+    min-height: 240px;
+  }
+  
+  .coursecard.vertical .coursecard-image-container {
+    height: 80px;
+  }
+  
+  .coursecard-content {
+    padding: 4px;
+    gap: 2px;
+  }
+  
+  .coursecard-title {
+    font-size: 0.8rem;
+    min-height: 1.6em;
   }
 }
