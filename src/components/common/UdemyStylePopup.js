@@ -14,8 +14,8 @@ function UdemyStylePopup({ course, isVisible, position, onMouseEnter, onMouseLea
       const popup = popupRef.current;
       console.log('Popup dimensions:', popup.offsetWidth, popup.offsetHeight);
       
-      const offsetX = 120;
-      const offsetY = -60;
+      const offsetX = -30;
+      const offsetY = -200;
       
       const adjustedX = position.x + offsetX;
       const adjustedY = position.y + offsetY;

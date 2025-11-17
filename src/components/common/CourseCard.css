@@ -4,10 +4,10 @@
   display: inline-block;
   border: 2px solid rgba(223, 221, 221, 0.6);
   border-radius: 10px;
-  max-width: 380px;
-  min-width: 370px;
+  max-width: 320px;
+  min-width: 300px;
   width: 100%;
-  min-height: 390px;
+  min-height: 350px;
   box-sizing: border-box;
   transition: all 0.3s ease;
   flex-shrink: 0; /* Important for horizontal scrolling */
@@ -432,6 +432,10 @@
     font-size: 0.88rem;
     min-height: 2.2em;
   }
+  
+
+
+
   
   .coursecard-meta-row {
     gap: 6px;
