@@ -4,6 +4,7 @@ import "../static/AllCoursesPage.css";
 import UdemyStylePopup from "../components/common/UdemyStylePopup";
 import CourseCard from "../components/common/CourseCard";
 import { Link } from "react-router-dom";
+
 function AllCoursesPage() {
     const [courses, setCourses] = useState([]);
     const [groupedCourses, setGroupedCourses] = useState({});
@@ -16,6 +17,9 @@ function AllCoursesPage() {
     const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
     const [isPopupVisible, setIsPopupVisible] = useState(false);
     const hoverTimerRef = useRef(null);
+    
+    // Refs for each category scroll container
+    const scrollRefs = useRef({});
 
     // Fetch all courses
     useEffect(() => {
@@ -81,6 +85,18 @@ function AllCoursesPage() {
         });
         
         setGroupedCourses(grouped);
+    };
+
+    // Scroll function for each category
+    const scrollCategory = (categoryName, direction) => {
+        const scrollContainer = scrollRefs.current[categoryName];
+        if (scrollContainer) {
+            const scrollAmount = 300;
+            scrollContainer.scrollBy({
+                left: direction === "left" ? -scrollAmount : scrollAmount,
+                behavior: "smooth",
+            });
+        }
     };
 
     // Handle search
@@ -371,30 +387,38 @@ function AllCoursesPage() {
                                 </div>
                                 
                                 <div className="allcourses-scroll-container">
-                                    {categoryData.courses.length > 0 ? (
-                                        <div className="allcourses-scroll">
-                                            {categoryData.courses.map(course => (
-                                                <CourseCard 
-                                                    key={course.id}
-                                                    course={course}
-                                                    onMouseEnter={(e) => handleCardMouseEnter(course, e)}
-                                                    onMouseLeave={handleCardMouseLeave}
-                                                    showCategory={false}
-                                                    layout="vertical"
-                                                />
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <div className="allcourses-coming-soon">
-                                            <div className="coming-soon-content">
-                                                <i className="fas fa-clock coming-soon-icon"></i>
-                                                <h3 className="coming-soon-title">Coming Soon</h3>
-                                                <p className="coming-soon-message">
-                                                    New courses in this category are on their way!
-                                                </p>
-                                            </div>
-                                        </div>
-                                    )}
+                                    {/* Left Arrow */}
+                                    <button 
+                                        className="allcourses-scroll-arrow left"
+                                        onClick={() => scrollCategory(categoryName, "left")}
+                                    >
+                                        &lt;
+                                    </button>
+                                    
+                                    {/* Scrollable Content */}
+                                    <div 
+                                        className="allcourses-scroll"
+                                        ref={el => scrollRefs.current[categoryName] = el}
+                                    >
+                                        {categoryData.courses.map(course => (
+                                            <CourseCard 
+                                                key={course.id}
+                                                course={course}
+                                                onMouseEnter={(e) => handleCardMouseEnter(course, e)}
+                                                onMouseLeave={handleCardMouseLeave}
+                                                showCategory={false}
+                                                layout="vertical"
+                                            />
+                                        ))}
+                                    </div>
+                                    
+                                    {/* Right Arrow */}
+                                    <button 
+                                        className="allcourses-scroll-arrow right"
+                                        onClick={() => scrollCategory(categoryName, "right")}
+                                    >
+                                        &gt;
+                                    </button>
                                 </div>
                             </div>
                         ))

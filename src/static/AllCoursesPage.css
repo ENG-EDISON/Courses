@@ -240,6 +240,7 @@
 
 .allcourses-category-section {
     margin-bottom: 3rem;
+    position: relative;
 }
 
 .allcourses-category-header {
@@ -285,32 +286,69 @@
     color: white;
 }
 
-/* Courses Scroll Container */
+/* Courses Scroll Container with Arrows */
 .allcourses-scroll-container {
     position: relative;
     overflow: hidden;
+    padding: 0 50px; /* Space for arrows */
 }
 
 .allcourses-scroll {
     display: flex;
     gap: 1.5rem;
     overflow-x: auto;
-    padding: 1rem 0.5rem;
-    scrollbar-width: thin;
+    padding: 1rem 0;
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    -ms-overflow-style: none; /* Hide scrollbar for IE and Edge */
+    scroll-behavior: smooth;
 }
 
 .allcourses-scroll::-webkit-scrollbar {
-    height: 6px;
+    display: none; /* Hide scrollbar for Chrome, Safari and Opera */
 }
 
-.allcourses-scroll::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 3px;
+/* Scroll Arrows */
+.allcourses-scroll-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    border: none;
+    font-size: 1.2rem;
+    width: 40px;
+    height: 50px;
+    cursor: pointer;
+    z-index: 10;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.allcourses-scroll::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 3px;
+.allcourses-scroll-arrow:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.allcourses-scroll-arrow:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: translateY(-50%);
+}
+
+.allcourses-scroll-arrow:disabled:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+    transform: translateY(-50%);
+}
+
+.allcourses-scroll-arrow.left {
+    left: 0;
+}
+
+.allcourses-scroll-arrow.right {
+    right: 0;
 }
 
 /* No Courses State */
@@ -536,7 +574,7 @@
     
     .allcourses-scroll-container {
         margin: 0 -1rem;
-        padding: 0 1rem;
+        padding: 0 40px; /* Reduced padding for mobile */
     }
     
     .allcourses-scroll {
@@ -552,14 +590,13 @@
         flex-shrink: 0;
     }
     
-    /* Hide scrollbar on mobile */
-    .allcourses-scroll::-webkit-scrollbar {
+    /* Hide arrows on mobile */
+    .allcourses-scroll-arrow {
         display: none;
     }
     
-    .allcourses-scroll {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
+    .allcourses-scroll-container {
+        padding: 0 10px;
     }
     
     .no-courses-actions {
