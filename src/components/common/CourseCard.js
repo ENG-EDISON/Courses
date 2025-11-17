@@ -53,7 +53,7 @@ const validateCourseData = (course) => {
 };
 
 // StarRating Component - Improved format
-const StarRating = ({ rating, maxStars = COURSE_CONSTANTS.MAX_STARS }) => {
+const StarRating = ({ rating, total_reviews, maxStars = COURSE_CONSTANTS.MAX_STARS }) => {
   const numericRating = parseFloat(rating) || 0;
   const fullStars = Math.floor(numericRating);
   const hasHalfStar = numericRating % 1 >= 0.5;
@@ -70,7 +70,7 @@ const StarRating = ({ rating, maxStars = COURSE_CONSTANTS.MAX_STARS }) => {
         {'☆'.repeat(emptyStars)}
       </span>
       <span className="coursecard-reviews-count">
-        ({Math.max(0, parseInt(rating) || 0)} reviews)
+        ({Math.max(0, parseInt(total_reviews) || 0)} reviews)
       </span>
     </div>
   );
@@ -149,28 +149,29 @@ function CourseCard({
 }) {
   // Validate and normalize course data
   const validatedCourse = useMemo(() => validateCourseData(course), [course]);
+  console.log("Course Card", course);
 
-  // Memoized calculations
-  // In the priceInfo useMemo, update the hasDiscount logic:
+  // Memoized calculations with improved discount logic
   const priceInfo = useMemo(() => {
     const originalPrice = parseFloat(validatedCourse.price) || 0;
-    const discountPrice = validatedCourse.discount_price ?
+    const discountPrice = validatedCourse.discount_price ? 
       parseFloat(validatedCourse.discount_price) : null;
 
-    // Only show discount if it's valid AND greater than 0%
-    const discountPercentage = discountPrice && discountPrice < originalPrice ?
-      calculateDiscountPercentage(originalPrice, discountPrice) : 0;
+    // Use the discount if explicitly marked as on discount OR if discount price is valid
+    const hasDiscount = validatedCourse.is_on_discount || 
+      (discountPrice && discountPrice < originalPrice && discountPrice > 0);
 
-    const hasDiscount = discountPercentage > 0;
+    const discountPercentage = hasDiscount && discountPrice ?
+      calculateDiscountPercentage(originalPrice, discountPrice) : 0;
 
     return {
       originalPrice,
       discountPrice,
-      hasDiscount,
+      hasDiscount: hasDiscount && discountPercentage > 0,
       discountPercentage,
-      displayPrice: hasDiscount ? discountPrice : originalPrice
+      displayPrice: hasDiscount && discountPrice ? discountPrice : originalPrice
     };
-  }, [validatedCourse.price, validatedCourse.discount_price]);
+  }, [validatedCourse.price, validatedCourse.discount_price, validatedCourse.is_on_discount]);
 
   // Event handlers
   const handleCardClick = (e) => {
@@ -241,7 +242,10 @@ function CourseCard({
 
             {/* Rating & Duration in one line */}
             <div className="coursecard-meta-row">
-              <StarRating rating={validatedCourse.average_rating} />
+              <StarRating 
+                rating={validatedCourse.average_rating} 
+                total_reviews={validatedCourse.total_reviews} 
+              />
 
               <div className="coursecard-duration">
                 <i className="fas fa-clock" aria-hidden="true"></i>
