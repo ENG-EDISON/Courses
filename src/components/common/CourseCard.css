@@ -5,7 +5,7 @@
   border: 2px solid rgba(223, 221, 221, 0.6);
   border-radius: 10px;
   max-width: 380px;
-  min-width: 350px;
+  min-width: 370px;
   width: 100%;
   min-height: 390px;
   box-sizing: border-box;
@@ -646,9 +646,9 @@
 /* Extra Small Phones (Galaxy Fold, etc.) */
 @media (max-width: 320px) {
   .coursecard-wrapper {
-    max-width: 220px;
-    min-width: 200px;
-    min-height: 250px;
+    max-width: 320px;
+    min-width: 300px;
+    min-height: 300px;
     padding: 4px;
   }
   
@@ -830,7 +830,7 @@
 /* Landscape mode for small screens */
 @media (max-height: 500px) and (orientation: landscape) {
   .coursecard-wrapper {
-    min-height: 240px;
+    min-height: 300px;
   }
   
   .coursecard.vertical .coursecard-image-container {
