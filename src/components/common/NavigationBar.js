@@ -101,8 +101,10 @@ function NavigationBar() {
     };
   }, []);
 
-  // ✅ Check if user is an instructor
-  const isInstructor = user?.user_type === 'instructor';
+  // ✅ Check if user is an instructor (based on user_type_display)
+  const isInstructor = user?.user_type_display === 'Instructor';
+  // ✅ Check if user is an admin
+  const isAdmin = user?.is_admin === true;
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
@@ -171,6 +173,17 @@ function NavigationBar() {
               <li className="nav-item">
                 <Link to="/enrolled-courses" onClick={handleNavLinkClick}>My Courses</Link>
               </li>
+              
+              {/* ✅ Show Admin link if user is admin */}
+              {isAdmin && (
+                <li className="nav-item">
+                  <Link to="/admin" onClick={handleNavLinkClick} className="admin-link">
+                    <i className="fas fa-crown admin-icon"></i>
+                    Admin
+                  </Link>
+                </li>
+              )}
+
               <li className="nav-item profile-dropdown-container" ref={dropdownRef}>
                 <button 
                   className="profile-dropdown-toggle"
@@ -190,15 +203,22 @@ function NavigationBar() {
                   </svg>
                   {/* ✅ Show instructor badge if user is instructor */}
                   {isInstructor && <span className="instructor-badge">Instructor</span>}
+                  {/* ✅ Show admin badge if user is admin */}
+                  {isAdmin && <span className="admin-badge">Admin</span>}
                 </button>
                 {profileDropdownOpen && (
                   <div className="profile-dropdown-menu">
                     {/* ✅ Show user role in profile dropdown */}
-                    {isInstructor && (
-                      <div className="user-role-info">
-                        <span className="role-badge">Instructor</span>
-                      </div>
-                    )}
+                    <div className="user-role-info">
+                      {isAdmin && isInstructor && (
+                        <div className="multiple-roles">
+                          <span className="role-badge admin-role">Administrator</span>
+                          <span className="role-badge instructor-role">Instructor</span>
+                        </div>
+                      )}
+                      {isAdmin && !isInstructor && <span className="role-badge admin-role">Administrator</span>}
+                      {isInstructor && !isAdmin && <span className="role-badge instructor-role">Instructor</span>}
+                    </div>
                     
                     <Link 
                       to="/profile" 
@@ -210,9 +230,18 @@ function NavigationBar() {
                         <circle cx="12" cy="7" r="4" />
                       </svg>
                       Profile
-                      {isInstructor && <span className="role-indicator">👑</span>}
+                      {/* ✅ Show both indicators if user has both roles */}
+                      {isAdmin && isInstructor && (
+                        <>
+                          <span className="role-indicator">👑</span>
+                          <span className="role-indicator">📚</span>
+                        </>
+                      )}
+                      {isAdmin && !isInstructor && <span className="role-indicator">👑</span>}
+                      {isInstructor && !isAdmin && <span className="role-indicator">📚</span>}
                     </Link>
-                    {/* ✅ Show instructor-specific links in dropdown */}
+                    
+                    {/* ✅ Show Course Editor link if user is instructor (including admin instructors) */}
                     {isInstructor && (
                       <>
                         <div className="dropdown-divider"></div>
@@ -230,6 +259,16 @@ function NavigationBar() {
                           Course Editor
                         </Link>
                       </>
+                    )}
+                    
+                    {/* ✅ Show admin-specific links in dropdown if user is admin */}
+                    {isAdmin && (
+                      <li className="nav-item">
+                        <Link to="/admin" onClick={handleNavLinkClick} className="admin-link">
+                          <i className="fas fa-crown admin-icon"></i>
+                          Admin
+                        </Link>
+                      </li>
                     )}
                     
                     <div className="dropdown-divider"></div>

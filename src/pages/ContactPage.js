@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "../static/ContactPage.css"
+import { createMessage } from '../api/ContactMessages';
 
 const ContactPage = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        name: '',
-        email: '',
+        customer_name: '',
+        customer_email: '',
+        subject: '',
         message: ''
     });
     const [errors, setErrors] = useState({});
@@ -33,19 +35,19 @@ const ContactPage = () => {
         const newErrors = {};
 
         // Name validation
-        if (!formData.name.trim()) {
-            newErrors.name = 'Name is required';
-        } else if (formData.name.trim().length < 2) {
-            newErrors.name = 'Name must be at least 2 characters long';
-        } else if (formData.name.trim().length > 50) {
-            newErrors.name = 'Name must be less than 50 characters';
+        if (!formData.customer_name.trim()) {
+            newErrors.customer_name = 'Name is required';
+        } else if (formData.customer_name.trim().length < 2) {
+            newErrors.customer_name = 'Name must be at least 2 characters long';
+        } else if (formData.customer_name.trim().length > 50) {
+            newErrors.customer_name = 'Name must be less than 50 characters';
         }
 
         // Email validation
-        if (!formData.email) {
-            newErrors.email = 'Email is required';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Email is invalid';
+        if (!formData.customer_email) {
+            newErrors.customer_email = 'Email is required';
+        } else if (!/\S+@\S+\.\S+/.test(formData.customer_email)) {
+            newErrors.customer_email = 'Email is invalid';
         }
 
         // Message validation
@@ -55,6 +57,11 @@ const ContactPage = () => {
             newErrors.message = 'Message must be at least 10 characters long';
         } else if (formData.message.trim().length > 1000) {
             newErrors.message = 'Message must be less than 1000 characters';
+        }
+
+        // Subject validation (optional)
+        if (formData.subject && formData.subject.length > 200) {
+            newErrors.subject = 'Subject must be less than 200 characters';
         }
 
         return newErrors;
@@ -73,22 +80,30 @@ const ContactPage = () => {
         setSubmitStatus('');
 
         try {
-            // Simulate API call - replace with actual API endpoint
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Here you would typically send the data to your backend
-            console.log('Form submitted:', formData);
+            // Send data to your Django REST API
+            await createMessage(formData);
             
             setSubmitStatus('success');
-            setFormData({ name: '', email: '', message: '' });
+            // Reset form
+            setFormData({ 
+                customer_name: '', 
+                customer_email: '', 
+                subject: '', 
+                message: '' 
+            });
             
-            // Reset status after 3 seconds
+            // Reset status after 5 seconds
             setTimeout(() => {
                 setSubmitStatus('');
-            }, 3000);
+            }, 5000);
             
         } catch (error) {
             console.error('Error submitting form:', error);
+            
+            if (error.response && error.response.data) {
+                // Handle Django validation errors
+                setErrors(error.response.data);
+            }
             setSubmitStatus('error');
         } finally {
             setIsSubmitting(false);
@@ -139,33 +154,48 @@ const ContactPage = () => {
                     <div className="contact-form-container">
                         <form className="contact-form" onSubmit={handleSubmit}>
                             <div className="form-group">
-                                <label htmlFor="name">Full Name *</label>
+                                <label htmlFor="customer_name">Full Name *</label>
                                 <input
                                     type="text"
-                                    id="name"
-                                    name="name"
-                                    value={formData.name}
+                                    id="customer_name"
+                                    name="customer_name"
+                                    value={formData.customer_name}
                                     onChange={handleChange}
-                                    className={errors.name ? 'error' : ''}
+                                    className={errors.customer_name ? 'error' : ''}
                                     placeholder="Enter your full name"
                                     disabled={isSubmitting}
                                 />
-                                {errors.name && <span className="error-message">{errors.name}</span>}
+                                {errors.customer_name && <span className="error-message">{errors.customer_name}</span>}
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="email">Email Address *</label>
+                                <label htmlFor="customer_email">Email Address *</label>
                                 <input
                                     type="email"
-                                    id="email"
-                                    name="email"
-                                    value={formData.email}
+                                    id="customer_email"
+                                    name="customer_email"
+                                    value={formData.customer_email}
                                     onChange={handleChange}
-                                    className={errors.email ? 'error' : ''}
+                                    className={errors.customer_email ? 'error' : ''}
                                     placeholder="Enter your email"
                                     disabled={isSubmitting}
                                 />
-                                {errors.email && <span className="error-message">{errors.email}</span>}
+                                {errors.customer_email && <span className="error-message">{errors.customer_email}</span>}
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="subject">Subject (Optional)</label>
+                                <input
+                                    type="text"
+                                    id="subject"
+                                    name="subject"
+                                    value={formData.subject}
+                                    onChange={handleChange}
+                                    className={errors.subject ? 'error' : ''}
+                                    placeholder="What is this regarding?"
+                                    disabled={isSubmitting}
+                                />
+                                {errors.subject && <span className="error-message">{errors.subject}</span>}
                             </div>
 
                             <div className="form-group">
@@ -207,7 +237,7 @@ const ContactPage = () => {
                             {submitStatus === 'success' && (
                                 <div className="success-message">
                                     <i className="fas fa-check-circle"></i>
-                                    Thank you! Your message has been sent successfully.
+                                    Thank you! Your message has been sent successfully. We'll get back to you soon.
                                 </div>
                             )}
 

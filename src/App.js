@@ -17,6 +17,8 @@ import ContactPage from './pages/ContactPage';
 import AboutUsPage from './pages/AboutUsPage';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
+import AdminMessagesList from "./pages/AdminMessagesList"
+import AdminDashboard from './pages/AdminDashboard';
 
 const router = createBrowserRouter([
   {
@@ -36,6 +38,18 @@ const router = createBrowserRouter([
       <>
         <NavigationBar />
         <EnterpriseLogin />
+        <Footer/>
+
+      </>
+    ),
+    errorElement: <p>404 Not found</p>,
+  },
+  {
+    path: '/admin',
+    element: (
+      <>
+        <NavigationBar />
+        <AdminDashboard />
         <Footer/>
 
       </>
@@ -149,6 +163,17 @@ const router = createBrowserRouter([
     <>
       <NavigationBar />
       <TermsOfService />
+      <Footer />
+    </>
+  )
+}
+,
+{
+  path: '/admin/messages',
+  element: (
+    <>
+      <NavigationBar />
+      <AdminMessagesList />
       <Footer />
     </>
   )
