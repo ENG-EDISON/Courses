@@ -1,77 +1,24 @@
-/* Professional Udemy-style Popup with Udemy Sans Font */
+/* Enterprise Udemy-style Popup - Matching Card Design */
 .udemy-popup {
   position: fixed;
-  width: 360px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border-radius: 8px;
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e5e5e5;
-  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  overflow: visible;
+  width: 380px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 2px solid rgba(223, 221, 221, 0.6);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow: hidden;
   animation: popupSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 10000;
   cursor: pointer;
   transition: all 0.3s ease;
-}
-
-/* Arrow for right-positioned dialog (points left) */
-.udemy-popup.dialog-right::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: -8px;
-  transform: translateY(-50%);
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 8px 8px 8px 0;
-  border-color: transparent #e5e5e5 transparent transparent;
-}
-
-.udemy-popup.dialog-right::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: -6px;
-  transform: translateY(-50%);
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 8px 8px 8px 0;
-  border-color: transparent white transparent transparent;
-}
-
-/* Arrow for left-positioned dialog (points right) */
-.udemy-popup.dialog-left::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  right: -8px;
-  transform: translateY(-50%);
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 8px 0 8px 8px;
-  border-color: transparent transparent transparent #e5e5e5;
-}
-
-.udemy-popup.dialog-left::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  right: -6px;
-  transform: translateY(-50%);
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 8px 0 8px 8px;
-  border-color: transparent transparent transparent white;
+  text-align: left;
 }
 
 .udemy-popup:hover {
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 12px 24px rgba(0, 0, 0, 0.1);
+  border-color: rgba(158, 158, 158, 0.8);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 6px 20px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
-  background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
 }
 
 @keyframes popupSlideIn {
@@ -91,107 +38,135 @@
   display: block;
 }
 
-/* Main content - NO OVERFLOW */
-.popup-body {
-  padding: 20px;
-  background: transparent;
-  overflow: visible;
-  max-height: none;
+/* Header Section */
+.popup-header {
+  padding: 20px 20px 16px 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 1px solid #e2e8f0;
 }
 
-/* Title - Udemy Sans styling */
+.popup-header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
 .popup-title {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #1e293b;
-  margin: 0 0 16px 0;
+  color: #1c1d1f;
+  margin: 0;
   line-height: 1.4;
-  display: block;
-  overflow: visible;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  padding: 0 4px;
-  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+  text-align: center;
 }
 
-/* Description - Udemy Sans styling */
-.popup-description {
-  font-size: 0.9rem;
-  color: #475569;
-  line-height: 1.6;
-  margin-bottom: 20px;
-  background: rgba(99, 102, 241, 0.05);
-  padding: 16px;
-  border-radius: 8px;
-  border-left: 4px solid #6366f1;
-  display: block;
-  overflow: visible;
-  white-space: normal;
-  word-wrap: break-word;
-  max-height: none;
-  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-/* Learning objectives - Udemy Sans styling */
-.popup-objectives {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  padding: 20px;
-  border-radius: 8px;
-  border: 1px solid #bae6fd;
-  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
-  margin-top: 8px;
-  overflow: visible;
-  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-.popup-objectives strong {
-  display: block;
-  font-size: 0.8rem;
-  color: #0369a1;
-  margin-bottom: 16px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  background: rgba(255, 255, 255, 0.7);
-  padding: 8px 12px;
+.popup-instructor-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #6a6f73;
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
   border-radius: 6px;
-  border-left: 4px solid #0ea5e9;
-  overflow: visible;
-  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  background: white;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.popup-instructor-badge i {
+  color: #3b82f6;
+  font-size: 0.7rem;
+}
+
+.popup-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.8rem;
+}
+
+.popup-level {
+  padding: 4px 8px;
+  background: #10b981;
+  color: white;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: capitalize;
+  font-size: 0.75rem;
+}
+
+.popup-duration {
+  color: #6a6f73;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.popup-duration::before {
+  content: '⏱';
+  font-size: 0.7rem;
+}
+
+/* Main Body */
+.popup-body {
+  padding: 0;
+  background: white;
+}
+
+/* Description */
+.popup-description {
+  font-size: 0.85rem;
+  color: #475569;
+  line-height: 1.5;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  background: white;
+}
+
+/* Learning Objectives */
+.popup-objectives {
+  padding: 10px 15px;
+  background: white;
+}
+
+.objectives-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+  color: #1c1d1f;
+  font-weight: 700;
+}
+
+.objectives-header i {
+  color: #3b82f6;
+  font-size: 0.9rem;
 }
 
 .popup-objectives ul {
   list-style: none;
   padding: 0;
   margin: 0;
-  overflow: visible;
-  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .popup-objectives li {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 8px;
   font-size: 0.8rem;
   color: #475569;
-  line-height: 1.5;
-  margin-bottom: 5px;
-  padding: 10px 12px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.7);
-  transition: all 0.2s ease;
-  border-left: 3px solid #22d3ee;
-  overflow: visible;
-  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-  text-align: left;
-}
-
-.popup-objectives li:hover {
-  background: rgba(255, 255, 255, 0.9);
-  transform: translateX(4px);
-  box-shadow: 0 2px 8px rgba(34, 211, 238, 0.2);
+  line-height: 1.4;
+  margin-bottom: 2px;
+  padding: 3px 0;
 }
 
 .popup-objectives li:last-child {
@@ -199,88 +174,108 @@
 }
 
 .check-icon {
-  color: #06b6d4;
+  color: #10b981;
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 0.9rem;
   flex-shrink: 0;
-  margin-top: 2px;
-  min-width: 18px;
-  background: linear-gradient(135deg, #06b6d4, #0ea5e9);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  overflow: visible;
+  margin-top: 1px;
+  min-width: 16px;
 }
 
 .objective-text {
   flex: 1;
-  line-height: 1.5;
-  padding-right: 4px;
-  overflow: visible;
-  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.4;
 }
 
 .more-objectives {
-  font-style: italic;
   color: #64748b;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 6px;
-  padding: 10px 12px;
-  border-left: 3px solid #94a3b8;
+  font-style: italic;
+  padding-top: 4px;
+  border-top: 1px dashed #e2e8f0;
   margin-top: 8px;
-  overflow: visible;
-  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-
 }
 
 .more-objectives .check-icon {
   color: #64748b;
-  background: none;
-  -webkit-text-fill-color: #64748b;
 }
 
 .no-objectives {
   color: #94a3b8;
   font-style: italic;
-  background: rgba(255, 255, 255, 0.6);
-  padding: 10px 12px;
-  border-radius: 6px;
-  border-left: 3px solid #cbd5e1;
-  overflow: visible;
-  font-family: "Udemy Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .no-objectives .check-icon {
   color: #94a3b8;
-  background: none;
-  -webkit-text-fill-color: #94a3b8;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
   .udemy-popup {
-    width: 300px;
+    width: 340px;
+  }
+  
+  .popup-header {
+    padding: 16px;
+  }
+  
+  .popup-header-top {
+    flex-direction: column;
+    gap: 8px;
   }
   
   .popup-body {
-    padding: 18px;
+    padding: 0;
+  }
+  
+  .popup-description,
+  .popup-objectives {
+    padding: 14px 16px;
   }
 }
 
 @media (max-width: 480px) {
   .udemy-popup {
-    width: 280px;
+    width: 300px;
   }
   
-  .popup-body {
-    padding: 16px;
+  .popup-header {
+    padding: 14px;
   }
   
   .popup-title {
     font-size: 1rem;
   }
   
-  .popup-description {
-    padding: 14px;
+  .popup-description,
+  .popup-objectives {
+    padding: 12px 14px;
+  }
+  
+  .popup-instructor-badge {
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .udemy-popup {
+    border: 2px solid #000;
+  }
+  
+  .popup-instructor-badge {
+    border: 1px solid #000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .udemy-popup {
+    animation: none;
+    transition: none;
+  }
+  
+  .udemy-popup:hover {
+    transform: none;
   }
 }

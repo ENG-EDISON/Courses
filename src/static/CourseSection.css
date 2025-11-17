@@ -1,67 +1,95 @@
 .courses {
   padding: 40px 0;
   text-align: center;
+  position: relative; /* Added for absolute positioning context */
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 60px; /* Increased padding to make space for outside buttons */
+  position: relative;
 }
 
 .courses-wrapper {
-  position: relative;
   display: flex;
   align-items: center;
   margin-top: 20px;
-  padding:0 20px;
+  width: 100%;
 }
 
+/* This is the key container - hidden overflow and horizontal scrolling */
 .course-cards {
   display: flex;
-  gap: 15px;
-  overflow-x: auto;
+  gap: 20px;
+  overflow-x: auto; /* Enable horizontal scrolling */
+  overflow-y: hidden; /* Hide vertical overflow */
   scroll-behavior: smooth;
-  padding: 8px 15px;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  padding: 20px 0; /* Removed side padding since buttons are outside */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  width: 100%;
+  flex-wrap: nowrap; /* Prevent wrapping */
 }
 
 .course-cards::-webkit-scrollbar {
-  display: none;
+  display: none; /* Chrome, Safari and Opera */
 }
 
-/* Scroll buttons */
+/* Scroll buttons - POSITIONED OUTSIDE THE COURSES-WRAPPER */
 .scroll-btn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background-color: rgba(0,0,0,0.7);
+  background-color: rgba(0, 0, 0, 0.7);
   color: #fff;
   border: none;
   font-size: 1.2rem;
-  width: 35px;
-  height: 45px;
+  width: 40px;
+  height: 50px;
   cursor: pointer;
   z-index: 10;
   border-radius: 6px;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* Position left button outside the container on the left */
 .scroll-btn.left {
-  left: -10px;
+  left: 10px; /* Position at left edge of container */
 }
 
+/* Position right button outside the container on the right */
 .scroll-btn.right {
-  right: -10px;
+  right: 10px; /* Position at right edge of container */
 }
 
 .scroll-btn:hover {
-  background-color: rgba(0,0,0,0.9);
+  background-color: rgba(0, 0, 0, 0.9);
+  transform: translateY(-50%) scale(1.05);
 }
 
+.scroll-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.scroll-btn:disabled:hover {
+  transform: translateY(-50%) scale(1);
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Search bar */
 .course-search {
   width: 100%;
   max-width: 400px;
-  padding: 10px 14px;
-  font-size: 0.9rem;
-  margin: 15px auto;
+  padding: 12px 16px;
+  font-size: 1rem;
+  margin: 20px auto;
   border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  border-radius: 8px;
   display: block;
   transition: border-color 0.3s ease;
 }
@@ -69,58 +97,136 @@
 .course-search:focus {
   outline: none;
   border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .no-courses {
-  padding: 30px;
+  padding: 40px;
   color: #666;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  width: 100%;
 }
 
 /* Mobile First Responsive Design */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .courses {
     padding: 20px 0;
   }
   
+  .container {
+    padding: 0 20px; /* Reduced padding on mobile */
+  }
+  
   .course-cards {
-    gap: 12px;
-    padding: 8px 10px;
+    gap: 15px;
+    padding: 15px 0;
+  }
+  
+  .scroll-btn {
+    display: none; /* Hide scroll buttons on mobile */
   }
   
   .course-search {
     max-width: 90%;
-    margin: 10px auto;
-    padding: 8px 12px;
-    font-size: 0.85rem;
-  }
-  
-  .scroll-btn {
-    display: none;
-  }
-  
-  .no-courses {
-    padding: 20px;
-    font-size: 0.85rem;
+    margin: 15px auto;
+    padding: 10px 14px;
   }
 }
 
-/* Tablet */
-@media (min-width: 481px) and (max-width: 768px) {
-  .scroll-btn {
-    display: none;
+@media (max-width: 480px) {
+  .courses {
+    padding: 15px 0;
+  }
+  
+  .container {
+    padding: 0 15px;
   }
   
   .course-cards {
+    gap: 12px;
+    padding: 12px 0;
+  }
+  
+  .course-search {
+    max-width: 95%;
+    margin: 10px auto;
     padding: 8px 12px;
-    gap: 14px;
+    font-size: 0.9rem;
+  }
+  
+  .no-courses {
+    padding: 30px 20px;
+    font-size: 0.9rem;
   }
 }
 
-/* Desktop */
+/* Desktop enhancements */
 @media (min-width: 769px) {
   .scroll-btn {
-    display: block;
+    display: flex;
+  }
+}
+
+/* Large desktop screens */
+@media (min-width: 1200px) {
+  .container {
+    padding: 0 70px; /* Even more padding for very large screens */
+  }
+  
+  .scroll-btn.left {
+    left: 15px;
+  }
+  
+  .scroll-btn.right {
+    right: 15px;
+  }
+}
+
+/* Extra large screens */
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1300px;
+    padding: 0 80px;
+  }
+  
+  .scroll-btn {
+    width: 45px;
+    height: 55px;
+    font-size: 1.3rem;
+  }
+  
+  .scroll-btn.left {
+    left: 20px;
+  }
+  
+  .scroll-btn.right {
+    right: 20px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .scroll-btn {
+    border: 2px solid #000;
+  }
+  
+  .scroll-btn:hover {
+    border: 2px solid #fff;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .course-cards {
+    scroll-behavior: auto;
+  }
+  
+  .scroll-btn {
+    transition: none;
+  }
+  
+  .scroll-btn:hover {
+    transform: translateY(-50%);
   }
 }

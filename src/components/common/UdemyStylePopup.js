@@ -14,8 +14,8 @@ function UdemyStylePopup({ course, isVisible, position, onMouseEnter, onMouseLea
       const popup = popupRef.current;
       console.log('Popup dimensions:', popup.offsetWidth, popup.offsetHeight);
       
-      const offsetX = 20; // Show to the right of cursor
-      const offsetY = -100;
+      const offsetX = 120;
+      const offsetY = -60;
       
       const adjustedX = position.x + offsetX;
       const adjustedY = position.y + offsetY;
@@ -77,32 +77,48 @@ function UdemyStylePopup({ course, isVisible, position, onMouseEnter, onMouseLea
         onMouseLeave={handleMouseLeave}
         style={{ display: 'block' }}
       >
+        <div className="popup-header">
+          <div className="popup-header-top">
+            <h4 className="popup-title">{course.title}</h4>
+          </div>
+          <div className="popup-meta">
+            <span className="popup-level">{course.level || 'Beginner'}</span>
+            <span className="popup-duration">{course.duration_hours || 0} total hours</span>
+                        <div className="popup-instructor-badge">
+              <i className="fas fa-chalkboard-teacher"></i>
+              <span>{course.instructor_name || course.instructor || 'Professional Instructor'}</span>
+            </div>
+          </div>
+        </div>
+
         <div className="popup-body">
-          <h4 className="popup-title">{course.title}</h4>
           <div className="popup-description">
             {course.short_description 
-              ? course.short_description.split(' ').slice(0, 20).join(' ') + 
-                (course.short_description.split(' ').length > 20 ? '...' : '')
+              ? course.short_description.split(' ').slice(0, 25).join(' ') + 
+                (course.short_description.split(' ').length > 25 ? '...' : '')
               : 'No description available.'
             }
           </div>
 
           <div className="popup-objectives">
-            <strong>What you'll learn:</strong>
+            <div className="objectives-header">
+              <i className="fas fa-bullseye"></i>
+              <strong>Key Learning Objectives</strong>
+            </div>
             <ul>
               {course.learning_objectives && course.learning_objectives.length > 0 ? (
                 <>
-                  {course.learning_objectives.slice(0, 2).map((objective, index) => (
+                  {course.learning_objectives.slice(0, 3).map((objective, index) => (
                     <li key={objective.id || index}>
                       <span className="check-icon">✓</span>
                       <span className="objective-text">{objective.objective}</span>
                     </li>
                   ))}
-                  {course.learning_objectives.length > 2 && (
+                  {course.learning_objectives.length > 3 && (
                     <li className="more-objectives">
                       <span className="check-icon">+</span>
                       <span className="objective-text">
-                        +{course.learning_objectives.length - 2} more objectives
+                        {course.learning_objectives.length - 3} more objectives
                       </span>
                     </li>
                   )}
@@ -110,7 +126,7 @@ function UdemyStylePopup({ course, isVisible, position, onMouseEnter, onMouseLea
               ) : (
                 <li className="no-objectives">
                   <span className="check-icon">•</span>
-                  <span className="objective-text">No learning objectives specified</span>
+                  <span className="objective-text">Learning objectives coming soon</span>
                 </li>
               )}
             </ul>
