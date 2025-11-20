@@ -16,7 +16,10 @@
   padding: 120px 0 100px;
   position: relative;
   overflow: hidden;
+  /* Add top padding to account for fixed navbar */
+  padding-top: calc(120px + 80px); /* Original padding + navbar height */
 }
+
 
 .homepage-hero-content {
   display: flex;
@@ -255,10 +258,9 @@
   content: '"';
   position: absolute;
   top: 20px;
-  right: 32px;
+  left: 32px;
   font-size: 4rem;
-  color: #4f46e5;
-  opacity: 0.2;
+  color: #000000;
   font-family: serif;
 }
 
@@ -346,6 +348,7 @@
 }
 
 /* Responsive Design */
+/* Responsive Design - Fix mobile issues */
 @media (max-width: 768px) {
   .homepage-container {
     padding: 0 20px;
@@ -353,10 +356,13 @@
   
   .homepage-hero {
     padding: 80px 0 60px;
+    /* Adjust top padding for mobile navbar */
+    padding-top: calc(80px + 70px); /* Reduced padding + mobile navbar height */
   }
   
   .homepage-hero-text h1 {
     font-size: 2.5rem;
+    margin-top: 0; /* Ensure no extra margin */
   }
   
   .homepage-hero-text p {
@@ -368,47 +374,92 @@
     align-items: flex-start;
   }
   
-  .homepage-features h2,
-  .homepage-testimonials h2 {
-    font-size: 2.5rem;
+  .homepage-hero-content {
+    gap: 40px; /* Reduce gap on mobile */
   }
   
-  .homepage-cta h2 {
-    font-size: 2.5rem;
-  }
-  
-  .homepage-feature-cards,
-  .homepage-testimonial-cards {
-    grid-template-columns: 1fr;
-  }
-  
-  .homepage-hero-image::before {
-    display: none;
-  }
-  
-  .homepage-hero-image img {
-    transform: none;
+  /* Ensure hero content doesn't overlap with navbar */
+  .homepage-hero-text,
+  .homepage-hero-image {
+    position: relative;
+    z-index: 1;
   }
 }
 
 @media (max-width: 480px) {
-  .homepage-hero-text h1 {
-    font-size: 2rem;
+  .homepage-hero {
+    padding: 60px 0 40px;
+    /* Further reduce padding for very small screens */
+    padding-top: calc(60px + 60px);
   }
   
-  .homepage-features h2,
-  .homepage-testimonials h2,
-  .homepage-cta h2 {
+  .homepage-hero-text h1 {
     font-size: 2rem;
+    margin-bottom: 16px;
+  }
+  
+  .homepage-hero-text p {
+    font-size: 1rem;
+    margin-bottom: 30px;
+  }
+  
+  .homepage-hero-buttons {
+    gap: 12px;
   }
   
   .homepage-btn {
-    padding: 14px 24px;
+    padding: 12px 24px;
+    font-size: 0.9rem;
+    width: 100%; /* Full width buttons on mobile */
+    justify-content: center;
+  }
+  
+  .homepage-hero-content {
+    gap: 30px;
+  }
+  
+  .homepage-hero-image::before {
+    display: none; /* Remove decorative element on very small screens */
+  }
+  
+  .homepage-hero-image img {
+    transform: none; /* Remove 3D effect on very small screens */
+  }
+}
+
+/* Extra small devices (phones under 375px) */
+@media (max-width: 375px) {
+  .homepage-hero {
+    padding: 40px 0 30px;
+    padding-top: calc(40px + 50px);
+  }
+  
+  .homepage-container {
+    padding: 0 16px;
+  }
+  
+  .homepage-hero-text h1 {
+    font-size: 1.75rem;
+  }
+  
+  .homepage-hero-text p {
     font-size: 0.9rem;
   }
   
-  .homepage-feature-card,
-  .homepage-testimonial-card {
-    padding: 32px 24px;
+  .homepage-hero-buttons {
+    gap: 8px;
   }
+}
+
+/* Ensure other sections also account for fixed navbar */
+.homepage-features,
+.homepage-testimonials,
+.homepage-cta {
+  scroll-margin-top: 80px; /* This helps with anchor links accounting for fixed navbar */
+}
+
+/* Fix for very small screens - prevent horizontal overflow */
+.homepage {
+  overflow-x: hidden;
+  width: 100%;
 }

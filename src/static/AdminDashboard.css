@@ -1,9 +1,9 @@
-/* Enhanced CSS */
+/* Admin Dashboard Styles */
 .admin-container {
   display: flex;
-  height: 100vh;
+  min-height: calc(100vh - 80px);
   background: #f6f8fa;
-  margin-top: 200px;
+  margin-top: 80px;
 }
 
 .admin-sidebar {
@@ -13,12 +13,19 @@
   padding: 24px;
   display: flex;
   flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 80px;
+  height: calc(100vh - 80px);
+  overflow-y: auto;
+  z-index: 1000;
 }
 
 .admin-sidebar-title {
   font-size: 22px;
   font-weight: 700;
   margin-bottom: 24px;
+  color: white;
 }
 
 .admin-sidebar-nav {
@@ -45,14 +52,17 @@
 
 .admin-menu-item:hover {
   background: #1f2937;
+  transform: translateX(4px);
 }
 
 .admin-menu-item.active {
   background: #374151;
+  font-weight: 600;
 }
 
 .menu-item-icon {
   font-size: 18px;
+  flex-shrink: 0;
 }
 
 .menu-item-label {
@@ -64,7 +74,8 @@
   padding: 30px;
   overflow-y: auto;
   background: #f8fafc;
-  margin-top: 200px;
+  margin-left: 240px;
+  min-height: calc(100vh - 80px);
 }
 
 .admin-page {
@@ -122,42 +133,194 @@
 .content-card p {
   color: #6b7280;
   line-height: 1.5;
+  margin: 0;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
 }
 
-/* Responsive Design */
+/* Mobile Responsive Design - FIXED GRID LAYOUT */
 @media (max-width: 768px) {
   .admin-container {
     flex-direction: column;
+    margin-top: 60px;
+    min-height: calc(100vh - 60px);
   }
   
   .admin-sidebar {
+    position: fixed;
+    top: 60px;
+    left: 0;
     width: 100%;
-    padding: 16px;
+    height: auto; /* Let height adjust to content */
+    min-height: auto;
+    padding: 12px 16px;
+    border-bottom: 1px solid #374151;
+    z-index: 1000;
+    overflow-y: visible;
   }
   
-  .admin-sidebar-nav {
-    flex-direction: row;
-    overflow-x: auto;
-  }
-  
-  .admin-menu-item {
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-  
-  .menu-item-label {
+  .admin-sidebar-title {
     display: none;
   }
   
-  .admin-content {
-    padding: 20px;
+  .admin-sidebar-nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    overflow-x: visible;
+    padding-bottom: 0;
   }
   
+  .admin-menu-item {
+    flex-direction: column;
+    text-align: center;
+    justify-content: center;
+    padding: 8px 4px;
+    font-size: 12px;
+    gap: 4px;
+    border-radius: 6px;
+    min-height: 50px;
+    width: 100%;
+  }
+  
+  .admin-menu-item:hover {
+    transform: translateY(-2px);
+  }
+  
+  .menu-item-icon {
+    font-size: 14px;
+  }
+  
+  .menu-item-label {
+    display: block;
+    font-size: 11px;
+    line-height: 1.2;
+  }
+  
+  /* FIX: Calculate proper margin based on grid height */
+  .admin-content {
+    margin-left: 0;
+    margin-top: 160px; /* Increased to account for 2 rows of grid */
+    padding: 20px 16px;
+    min-height: calc(100vh - 220px);
+  }
+}
+
+/* Extra Small Devices - 2 COLUMN GRID */
+@media (max-width: 480px) {
+  .admin-container {
+    margin-top: 50px;
+    min-height: calc(100vh - 50px);
+  }
+  
+  .admin-sidebar {
+    top: 50px;
+    padding: 10px 12px;
+  }
+  
+  .admin-sidebar-nav {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+  }
+  
+  .admin-menu-item {
+    padding: 8px 4px;
+    font-size: 11px;
+    gap: 4px;
+    min-height: 45px;
+  }
+  
+  .menu-item-icon {
+    font-size: 13px;
+  }
+  
+  .menu-item-label {
+    font-size: 10px;
+  }
+  
+  .admin-content {
+    margin-top: 150px; /* Adjusted for 3 rows in 2-column layout */
+    padding: 16px 12px;
+    min-height: calc(100vh - 200px);
+  }
+}
+
+/* Very Small Devices - COMPACT GRID */
+@media (max-width: 375px) {
+  .admin-sidebar {
+    padding: 8px 10px;
+  }
+  
+  .admin-sidebar-nav {
+    gap: 4px;
+  }
+  
+  .admin-menu-item {
+    padding: 6px 3px;
+    font-size: 10px;
+    gap: 3px;
+    min-height: 40px;
+    border-radius: 4px;
+  }
+  
+  .menu-item-icon {
+    font-size: 12px;
+  }
+  
+  .menu-item-label {
+    font-size: 9px;
+  }
+  
+  .admin-content {
+    margin-top: 140px; /* Further adjusted for compact layout */
+    padding: 12px 10px;
+    min-height: calc(100vh - 190px);
+  }
+}
+
+/* For extremely small screens */
+@media (max-width: 320px) {
+  .admin-sidebar {
+    padding: 6px 8px;
+  }
+  
+  .admin-sidebar-nav {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3px;
+  }
+  
+  .admin-menu-item {
+    padding: 5px 2px;
+    font-size: 9px;
+    min-height: 35px;
+  }
+  
+  .menu-item-icon {
+    font-size: 11px;
+  }
+  
+  .menu-item-label {
+    font-size: 8px;
+  }
+  
+  .admin-content {
+    margin-top: 130px;
+    padding: 10px 8px;
+    min-height: calc(100vh - 180px);
+  }
+}
+
+/* Ensure content doesn't get hidden behind grid */
+@media (max-width: 768px) {
   .content-section {
     padding: 16px;
     margin-bottom: 16px;
@@ -167,4 +330,31 @@
     grid-template-columns: 1fr;
     gap: 16px;
   }
+  
+  .content-card {
+    padding: 16px;
+  }
+  
+  .content-section h2 {
+    font-size: 20px;
+    margin-top: 0; /* Remove any top margin that could cause overlap */
+  }
+}
+
+/* Scrollbar styling */
+.admin-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.admin-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.admin-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.admin-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }

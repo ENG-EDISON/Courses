@@ -24,7 +24,7 @@ const PrivacyPolicy = () => {
                     <section className="privacy-section">
                         <h2>1. Introduction</h2>
                         <p>
-                            Welcome to Hayducate ("we," "our," or "us"). We are committed to protecting your privacy 
+                            Welcome to Hayducate . We are committed to protecting your privacy 
                             and ensuring the security of your personal information. This Privacy Policy explains how 
                             we collect, use, disclose, and safeguard your information when you use our website, 
                             mobile application, and services (collectively, the "Services").
