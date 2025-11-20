@@ -1,6 +1,6 @@
 // ResourcesTab.jsx
 import React from 'react';
-
+import "../../css/ResourcesTab.css"
 const ResourcesTab = ({ course }) => {
     // Helper function to get file type from URL
     const getFileType = (url) => {
