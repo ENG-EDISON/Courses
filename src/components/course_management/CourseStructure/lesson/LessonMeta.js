@@ -3,27 +3,31 @@ import React from 'react';
 
 const LessonMeta = ({ lesson, onDurationChange, onPreviewChange }) => {
   return (
-    <div className="lesson-meta-grid">
-      <div className="meta-field">
-        <label>Duration (minutes)</label>
-        <input
-          type="number"
-          value={lesson.duration_minutes || 0}
-          onChange={onDurationChange}
-          min="0"
-          className="meta-input"
-        />
-      </div>
-
-      <div className="meta-field checkbox-field">
-        <label>
+    <div className="lesson-meta-compact">
+      <div className="meta-compact-group">
+        <div className="meta-compact-field">
+          <label>Duration (min)</label>
           <input
-            type="checkbox"
-            checked={lesson.is_preview || false}
-            onChange={onPreviewChange}
+            type="number"
+            value={lesson.duration_minutes || 0}
+            onChange={onDurationChange}
+            min="0"
+            className="meta-compact-input"
+            placeholder="0"
           />
-          Preview Lesson
-        </label>
+        </div>
+
+        <div className="meta-compact-checkbox">
+          <label className="compact-checkbox-label">
+            <input
+              type="checkbox"
+              checked={lesson.is_preview || false}
+              onChange={onPreviewChange}
+            />
+            <span className="compact-checkmark"></span>
+            Preview Lesson
+          </label>
+        </div>
       </div>
     </div>
   );

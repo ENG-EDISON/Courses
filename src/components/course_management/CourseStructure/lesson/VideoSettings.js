@@ -10,7 +10,7 @@ const VideoSettings = ({
   onVideoDurationChange // ✅ This prop is now being passed from Lesson component
 }) => {
   return (
-    <div className="lesson-content-section">
+    <div className="lesson-content-section-video">
       <label className="section-label">Video Settings</label>
 
       <VideoSourceToggle

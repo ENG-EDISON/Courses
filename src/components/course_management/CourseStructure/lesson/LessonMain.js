@@ -4,6 +4,7 @@ import LessonHeader from './LessonHeader';
 import VideoSettings from './VideoSettings';
 import LessonMeta from './LessonMeta';
 import LessonResources from './LessonResources';
+import "../css/LessonEdit.css"
 
 const Lesson =({
   lesson,
@@ -348,7 +349,7 @@ const Lesson =({
   }, [lesson.id, lesson.resources, lesson.video_duration, canAddResources]);
 
   return (
-    <div className={`lesson-card ${isExistingInDatabase(lesson) ? 'existing-lesson' : 'new-lesson'}`}>
+    <div className={`lesson-main-lesson-card ${isExistingInDatabase(lesson) ? 'existing-lesson' : 'new-lesson'}`}>
       <LessonHeader
         lesson={lesson}
         isExpanded={isExpanded}
@@ -372,14 +373,14 @@ const Lesson =({
       />
 
       {isExpanded && (
-        <div className="lesson-content">
-          <label className="section-label">Lesson Content</label>
+        <div className="lesson-main-lesson-content">
+          <label className="lesson-main-section-label">Lesson Content</label>
           <textarea
             value={lesson.content}
             onChange={(e) => updateLesson('content', e.target.value)}
             placeholder="Enter lesson content..."
             rows={4}
-            className="lesson-content-textarea"
+            className="lesson-main-lesson-content-textarea"
           />
 
           <VideoSettings

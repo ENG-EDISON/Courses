@@ -1,6 +1,5 @@
 // CourseStructure.jsx
 import { useState, useCallback } from 'react';
-import '../css/CourseStructure.css';
 import Section from '../Section';
 import LoadingState from './LoadingState';
 import SubmissionProgress from './SubmissionProgress';

@@ -1,7 +1,6 @@
 // LessonHeader.jsx
 import React, { useState } from 'react';
 import { createLesson, updateLesson, deleteLesson } from '../../../../api/LessonsApi';
-
 const LessonHeader = ({
   lesson,
   isExpanded,
@@ -205,7 +204,7 @@ const handleCreateLesson = async (e) => {
       return (
         <button
           onClick={handleCreateLesson}
-          className="btn-success"
+          className="lesson-card"
           disabled={isCreating}
           title="Save new lesson to database"
         >

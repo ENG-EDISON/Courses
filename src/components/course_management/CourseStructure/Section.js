@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import Subsection from './Subsection';
-// import { createSection, updateSection, deleteSection } from '../../api/SectionApi';
+import "./css/SectionEdit.css"
 import { createSection, updateSection, deleteSection } from '../../../api/SectionApi';
 const Section = ({ 
   section, 

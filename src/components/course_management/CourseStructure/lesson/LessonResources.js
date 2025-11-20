@@ -1,9 +1,9 @@
 // LessonResources.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import LessonResource from '../LessonResource';
 
 const LessonResources =({
-  lesson, // ✅ Now we have the full lesson object
+  lesson,
   sectionIndex,
   subsectionIndex,
   lessonIndex,
@@ -13,13 +13,13 @@ const LessonResources =({
   isExistingInDatabase,
   isAddingResource,
   onAddResource,
-  canAddResources, // For UI state control
-  // ✅ ADD THESE MISSING PROPS
+  canAddResources,
   onResourceCreate,
   onResourceUpdate,
   onResourceDelete
 }) => {
-  // ✅ Debug: log to verify props are being passed
+  const [isResourcesExpanded, setIsResourcesExpanded] = useState(true);
+
   React.useEffect(() => {
     console.log('📚 LessonResources props:', {
       lessonId: lesson.id,
@@ -30,45 +30,68 @@ const LessonResources =({
     });
   }, [lesson.id, lesson.resources, onResourceCreate, onResourceUpdate, onResourceDelete]);
 
+  const toggleResources = () => {
+    setIsResourcesExpanded(!isResourcesExpanded);
+  };
+
   return (
-    <div className="lesson-content-section">
+    <div className="resources-lesson-content-section">
       <ResourcesHeader 
         resourceCount={lesson.resources?.length || 0}
         onAddResource={onAddResource}
         isAddingResource={isAddingResource}
         canAddResources={canAddResources}
+        isExpanded={isResourcesExpanded}
+        onToggle={toggleResources}
       />
 
-      {(!lesson.resources || lesson.resources.length === 0) ? (
-        <EmptyResourcesState 
-          onAddResource={onAddResource}
-          isAddingResource={isAddingResource}
-          canAddResources={canAddResources}
-        />
-      ) : (
-        <ResourcesGrid 
-          resources={lesson.resources}
-          sectionIndex={sectionIndex}
-          subsectionIndex={subsectionIndex}
-          lessonIndex={lessonIndex}
-          sections={sections}
-          setSections={setSections}
-          onUpdate={onUpdate}
-          isExistingInDatabase={isExistingInDatabase}
-          lessonId={lesson.id} // ✅ Extract lesson.id here and pass to LessonResource
-          // ✅ PASS THE CALLBACKS TO ResourcesGrid
-          onResourceCreate={onResourceCreate}
-          onResourceUpdate={onResourceUpdate}
-          onResourceDelete={onResourceDelete}
-        />
+      {isResourcesExpanded && (
+        <>
+          {(!lesson.resources || lesson.resources.length === 0) ? (
+            <EmptyResourcesState 
+              onAddResource={onAddResource}
+              isAddingResource={isAddingResource}
+              canAddResources={canAddResources}
+            />
+          ) : (
+            <ResourcesGrid 
+              resources={lesson.resources}
+              sectionIndex={sectionIndex}
+              subsectionIndex={subsectionIndex}
+              lessonIndex={lessonIndex}
+              sections={sections}
+              setSections={setSections}
+              onUpdate={onUpdate}
+              isExistingInDatabase={isExistingInDatabase}
+              lessonId={lesson.id}
+              onResourceCreate={onResourceCreate}
+              onResourceUpdate={onResourceUpdate}
+              onResourceDelete={onResourceDelete}
+            />
+          )}
+        </>
       )}
     </div>
   );
 };
 
-const ResourcesHeader = ({ resourceCount, onAddResource, isAddingResource, canAddResources }) => (
+const ResourcesHeader = ({ 
+  resourceCount, 
+  onAddResource, 
+  isAddingResource, 
+  canAddResources,
+  isExpanded,
+  onToggle 
+}) => (
   <div className="resources-header">
     <div className="resources-title">
+      <button 
+        className={`resources-toggle ${isExpanded ? 'expanded' : ''}`}
+        onClick={onToggle}
+        aria-label={isExpanded ? 'Collapse resources' : 'Expand resources'}
+      >
+        <span className="toggle-icon">{isExpanded ? '▼' : '►'}</span>
+      </button>
       <h6>Lesson Resources</h6>
       <span className="resource-count">{resourceCount} resource(s)</span>
       {!canAddResources && (
@@ -79,7 +102,7 @@ const ResourcesHeader = ({ resourceCount, onAddResource, isAddingResource, canAd
     </div>
     <button 
       onClick={onAddResource} 
-      className="btn-primary btn-sm" 
+      className="btn-add-resource" 
       disabled={isAddingResource || !canAddResources}
       title={!canAddResources ? "Save the lesson first to add resources" : "Add resource"}
     >
@@ -100,7 +123,7 @@ const EmptyResourcesState = ({ onAddResource, isAddingResource, canAddResources 
     </p>
     <button 
       onClick={onAddResource} 
-      className="btn-primary" 
+      className="btn-add-resource" 
       disabled={isAddingResource || !canAddResources}
     >
       {!canAddResources ? "Save Lesson First" : "Add First Resource"}
@@ -117,8 +140,7 @@ const ResourcesGrid =({
   setSections,
   onUpdate,
   isExistingInDatabase,
-  lessonId, // ✅ Now passed from parent component
-  // ✅ ACCEPT THE CALLBACK PROPS
+  lessonId,
   onResourceCreate,
   onResourceUpdate,
   onResourceDelete
@@ -136,8 +158,7 @@ const ResourcesGrid =({
         setSections={setSections}
         onUpdate={onUpdate}
         isExistingInDatabase={isExistingInDatabase}
-        lessonId={lessonId} // ✅ Pass the extracted lesson ID
-        // ✅ PASS THE CALLBACKS TO LessonResource
+        lessonId={lessonId}
         onResourceCreate={onResourceCreate}
         onResourceUpdate={onResourceUpdate}
         onResourceDelete={onResourceDelete}

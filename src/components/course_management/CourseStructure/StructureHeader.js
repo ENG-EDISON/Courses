@@ -1,5 +1,7 @@
 // StructureHeader.js - Updated version
 import React from 'react';
+// import "./css/BaseStyles.css"
+import "./css/Structure.css"
 
 const StructureHeader = ({
   course,

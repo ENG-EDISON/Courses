@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-
+import "./css/ResourceEdit.css"
 import { createLessonResource, updateLessonResource, deleteLessonResource  } from '../../../api/LessonResourcesApis';
 const LessonResource = ({ 
   resource, 
