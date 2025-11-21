@@ -1,6 +1,8 @@
 // LessonHeader.jsx
 import React, { useState } from 'react';
 import { createLesson, updateLesson, deleteLesson } from '../../../../api/LessonsApi';
+import '../css/LessonHeader.css';
+
 const LessonHeader = ({
   lesson,
   isExpanded,
@@ -11,11 +13,11 @@ const LessonHeader = ({
   onTitleChange,
   onAddResource,
   onDelete,
-  onLessonUpdate, // New prop for handling lesson updates
-  onLessonCreate, // New prop for handling lesson creation
-  onLessonDelete, // New prop for handling lesson deletion
-  courseId, // Course ID for creating new lessons
-  subsectionId, // Subsection ID for creating new lessons
+  onLessonUpdate,
+  onLessonCreate,
+  onLessonDelete,
+  courseId,
+  subsectionId,
   sectionIndex,
   subsectionIndex,
   lessonIndex
@@ -25,77 +27,76 @@ const LessonHeader = ({
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Handle Create New Lesson
-  // Enhanced validation in LessonHeader.jsx
-const handleCreateLesson = async (e) => {
-  e.stopPropagation();
-  
-  if (isExistingInDatabase(lesson)) {
-    alert('This lesson already exists in the database. Use Update instead.');
-    return;
-  }
-
-  // Enhanced validation
-  const validationErrors = [];
-  
-  if (!lesson.title?.trim()) {
-    validationErrors.push('Lesson title is required');
-  }
-  
-  if (!courseId) {
-    validationErrors.push('Course ID is missing. Please check your course structure.');
-  }
-
-  if (!subsectionId) {
-    validationErrors.push('Subsection ID is missing. Please check your course structure.');
-  }
-
-  if (validationErrors.length > 0) {
-    alert(`Please fix the following errors:\n• ${validationErrors.join('\n• ')}`);
-    return;
-  }
-
-  setIsCreating(true);
-  try {
-    // Prepare the data for creation
-    const lessonData = {
-      title: lesson.title.trim(),
-      content: lesson.content || '',
-      lesson_type: lesson.lesson_type || 'video',
-      order: lesson.order !== undefined ? lesson.order : lessonIndex,
-      is_preview: lesson.is_preview || false,
-      subsection: subsectionId,
-      course: courseId,
-      video_url: lesson.video_url || '',
-      video_duration: lesson.video_duration || 0,
-    };
-
-    // Add video file if it exists and is a File object
-    if (lesson.video_file instanceof File) {
-      lessonData.video_file = lesson.video_file;
+  const handleCreateLesson = async (e) => {
+    e.stopPropagation();
+    
+    if (isExistingInDatabase(lesson)) {
+      alert('This lesson already exists in the database. Use Update instead.');
+      return;
     }
 
-    console.log('Creating lesson with data:', {
-      ...lessonData,
-      video_file: lessonData.video_file ? `File: ${lessonData.video_file.name}` : 'No file'
-    });
-
-    // Create the lesson using your API
-    const response = await createLesson(lessonData);
-
-    // Call the parent callback if provided
-    if (onLessonCreate) {
-      onLessonCreate(response.data, sectionIndex, subsectionIndex, lessonIndex);
+    // Enhanced validation
+    const validationErrors = [];
+    
+    if (!lesson.title?.trim()) {
+      validationErrors.push('Lesson title is required');
+    }
+    
+    if (!courseId) {
+      validationErrors.push('Course ID is missing. Please check your course structure.');
     }
 
-    alert('Lesson created successfully!');
-  } catch (error) {
-    console.error('Error creating lesson:', error);
-    const errorMessage = error.response?.data?.message || error.message || 'Unknown error occurred';
-    alert(`Error creating lesson: ${errorMessage}`);
-  } finally {
-    setIsCreating(false);
-  }
-};
+    if (!subsectionId) {
+      validationErrors.push('Subsection ID is missing. Please check your course structure.');
+    }
+
+    if (validationErrors.length > 0) {
+      alert(`Please fix the following errors:\n• ${validationErrors.join('\n• ')}`);
+      return;
+    }
+
+    setIsCreating(true);
+    try {
+      // Prepare the data for creation
+      const lessonData = {
+        title: lesson.title.trim(),
+        content: lesson.content || '',
+        lesson_type: lesson.lesson_type || 'video',
+        order: lesson.order !== undefined ? lesson.order : lessonIndex,
+        is_preview: lesson.is_preview || false,
+        subsection: subsectionId,
+        course: courseId,
+        video_url: lesson.video_url || '',
+        video_duration: lesson.video_duration || 0,
+      };
+
+      // Add video file if it exists and is a File object
+      if (lesson.video_file instanceof File) {
+        lessonData.video_file = lesson.video_file;
+      }
+
+      console.log('Creating lesson with data:', {
+        ...lessonData,
+        video_file: lessonData.video_file ? `File: ${lessonData.video_file.name}` : 'No file'
+      });
+
+      // Create the lesson using your API
+      const response = await createLesson(lessonData);
+
+      // Call the parent callback if provided
+      if (onLessonCreate) {
+        onLessonCreate(response.data, sectionIndex, subsectionIndex, lessonIndex);
+      }
+
+      alert('Lesson created successfully!');
+    } catch (error) {
+      console.error('Error creating lesson:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Unknown error occurred';
+      alert(`Error creating lesson: ${errorMessage}`);
+    } finally {
+      setIsCreating(false);
+    }
+  };
 
   // Handle Update Lesson
   const handleUpdateLesson = async (e) => {
@@ -204,7 +205,7 @@ const handleCreateLesson = async (e) => {
       return (
         <button
           onClick={handleCreateLesson}
-          className="lesson-card"
+          className="btn-primary"
           disabled={isCreating}
           title="Save new lesson to database"
         >
@@ -216,11 +217,11 @@ const handleCreateLesson = async (e) => {
 
   return (
     <div 
-      className={`lesson-header ${isExpanded ? 'expanded' : ''}`}
+      className={`lh-header ${isExpanded ? 'expanded' : ''}`}
       onClick={() => onToggle(sectionIndex, subsectionIndex, lessonIndex)}
     >
       <button
-        className={`lesson-toggle ${isExpanded ? 'expanded' : ''}`}
+        className={`lh-toggle ${isExpanded ? 'expanded' : ''}`}
         onClick={(e) => {
           e.stopPropagation();
           onToggle(sectionIndex, subsectionIndex, lessonIndex);
@@ -229,7 +230,7 @@ const handleCreateLesson = async (e) => {
         {isExpanded ? '▼' : '▶'}
       </button>
 
-      <OrderInput 
+      <LhOrderInput 
         value={lesson.order !== undefined ? lesson.order : lessonIndex}
         onChange={onOrderChange}
       />
@@ -238,12 +239,12 @@ const handleCreateLesson = async (e) => {
         type="text"
         value={lesson.title}
         onChange={onTitleChange}
-        className="lesson-title-input"
+        className="lh-title-input"
         placeholder="Lesson title"
         onClick={(e) => e.stopPropagation()}
       />
 
-      <LessonStatus 
+      <LhLessonStatus 
         isExisting={isExistingInDatabase(lesson)}
         hasVideoFile={!!lesson.video_file}
         lessonType={lesson.lesson_type}
@@ -252,7 +253,7 @@ const handleCreateLesson = async (e) => {
         isUpdating={isUpdating}
       />
 
-      <LessonActions 
+      <LhLessonActions 
         onAddResource={onAddResource}
         onDelete={handleDeleteLesson}
         isAddingResource={isAddingResource}
@@ -264,36 +265,36 @@ const handleCreateLesson = async (e) => {
   );
 };
 
-const OrderInput = ({ value, onChange }) => (
-  <div className="order-input-group">
-    <label>ORDER</label>
+const LhOrderInput = ({ value, onChange }) => (
+  <div className="lh-order-group">
+    <label className="lh-order-label">ORDER</label>
     <input
       type="number"
       value={value}
       onChange={onChange}
-      className="order-input"
+      className="lh-order-input"
       min="0"
       onClick={(e) => e.stopPropagation()}
     />
   </div>
 );
 
-const LessonStatus = ({ isExisting, hasVideoFile, lessonType, isPreview, isCreating, isUpdating }) => (
-  <div className="lesson-status">
-    <span className={`status-badge ${isExisting ? 'existing' : 'new'}`}>
+const LhLessonStatus = ({ isExisting, hasVideoFile, lessonType, isPreview, isCreating, isUpdating }) => (
+  <div className="lh-status">
+    <span className={`lh-status-badge ${isExisting ? 'existing' : 'new'}`}>
       {isExisting ? 'EXISTING' : 'NEW'}
     </span>
-    <span className={`type-badge ${lessonType}`}>
+    <span className={`lh-type-badge ${lessonType}`}>
       {lessonType?.toUpperCase() || 'LESSON'}
     </span>
-    {hasVideoFile && <span className="upload-badge">UPLOADED</span>}
-    {isPreview && <span className="preview-badge">PREVIEW</span>}
+    {hasVideoFile && <span className="lh-upload-badge">UPLOADED</span>}
+    {isPreview && <span className="lh-preview-badge">PREVIEW</span>}
     {isCreating && <span className="creating-badge">CREATING...</span>}
     {isUpdating && <span className="updating-badge">UPDATING...</span>}
   </div>
 );
 
-const LessonActions = ({ 
+const LhLessonActions = ({ 
   onAddResource, 
   onDelete, 
   isAddingResource, 
@@ -301,7 +302,7 @@ const LessonActions = ({
   isExisting,
   getActionButton
 }) => (
-  <div className="lesson-actions" onClick={(e) => e.stopPropagation()}>
+  <div className="lh-actions" onClick={(e) => e.stopPropagation()}>
     {/* Create/Update Button */}
     {getActionButton()}
 

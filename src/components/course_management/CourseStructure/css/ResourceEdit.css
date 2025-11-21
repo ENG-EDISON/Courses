@@ -170,6 +170,7 @@
   box-sizing: border-box;
   margin-bottom: 8px;
   width: 100%;
+  padding: 20px;
 }
 
 .resource-card:hover {

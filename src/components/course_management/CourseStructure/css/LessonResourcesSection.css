@@ -1,0 +1,150 @@
+/* LessonResourcesSection.css */
+.lrs-section {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 1rem;
+}
+
+.lrs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 1rem 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.lrs-title-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.lrs-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 12px;
+  color: #5c6b7a;
+  transition: transform 0.2s ease;
+  border-radius: 4px;
+}
+
+.lrs-toggle.expanded {
+  transform: rotate(90deg);
+  color: #3498db;
+}
+
+.lrs-title {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.lrs-count {
+  font-size: 12px;
+  color: #5c6b7a;
+  font-weight: 600;
+  background: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid #e1e5e9;
+}
+
+.lrs-warning {
+  font-size: 11px;
+  color: #e74c3c;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.lrs-add-button {
+  padding: 0.75rem 1.5rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.lrs-add-button:hover:not(:disabled) {
+  background: #2980b9;
+  transform: translateY(-1px);
+}
+
+.lrs-add-button:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.lrs-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 3rem 2rem;
+  background: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  border-radius: 12px;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.lrs-empty-icon {
+  font-size: 3rem;
+  opacity: 0.5;
+}
+
+.lrs-empty-text {
+  color: #5c6b7a;
+  font-size: 14px;
+  margin: 0;
+}
+
+.lrs-help-text {
+  color: #7f8c8d;
+  font-size: 12px;
+  margin: 0;
+  max-width: 300px;
+  line-height: 1.4;
+}
+
+.lrs-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .lrs-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .lrs-title-section {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .lrs-add-button {
+    width: 100%;
+    text-align: center;
+  }
+}

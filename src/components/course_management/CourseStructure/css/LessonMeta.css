@@ -1,0 +1,229 @@
+/* LessonMeta.css */
+.lm-compact {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 1rem;
+}
+
+.lm-compact-group {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.lm-compact-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-sizing: border-box;
+}
+
+.lm-compact-label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.lm-compact-input {
+  padding: 6px 8px;
+  border: 1px solid #dce1e6;
+  border-radius: 4px;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  background: white;
+  box-sizing: border-box;
+  width: 80px;
+  text-align: center;
+}
+
+.lm-compact-input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+.lm-compact-checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.lm-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  cursor: pointer;
+  padding: 6px 0;
+  box-sizing: border-box;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.lm-checkbox-label:hover {
+  color: #3498db;
+}
+
+.lm-checkbox-label input[type="checkbox"] {
+  display: none;
+}
+
+.lm-checkmark {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #bdc3c7;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  background: white;
+  flex-shrink: 0;
+}
+
+.lm-checkbox-label input[type="checkbox"]:checked + .lm-checkmark {
+  background: #3498db;
+  border-color: #3498db;
+}
+
+.lm-checkbox-label input[type="checkbox"]:checked + .lm-checkmark::after {
+  content: '✓';
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+/* Enhanced version */
+.lm-enhanced {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 1rem;
+}
+
+.lm-enhanced-group {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.lm-enhanced-field {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-sizing: border-box;
+}
+
+.lm-enhanced-label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.lm-enhanced-input {
+  padding: 8px 12px;
+  border: 1px solid #dce1e6;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background: white;
+  box-sizing: border-box;
+  width: 90px;
+  text-align: center;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.lm-enhanced-input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.lm-enhanced-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+  color: #2c3e50;
+  cursor: pointer;
+  padding: 8px 12px;
+  box-sizing: border-box;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.lm-enhanced-checkbox-label:hover {
+  border-color: #3498db;
+  background: #f8f9fa;
+}
+
+.lm-enhanced-checkmark {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #bdc3c7;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  background: white;
+  flex-shrink: 0;
+}
+
+.lm-enhanced-checkbox-label input[type="checkbox"]:checked + .lm-enhanced-checkmark {
+  background: #3498db;
+  border-color: #3498db;
+}
+
+.lm-enhanced-checkbox-label input[type="checkbox"]:checked + .lm-enhanced-checkmark::after {
+  content: '✓';
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .lm-compact-group {
+    gap: 1rem;
+  }
+  
+  .lm-enhanced-group {
+    gap: 1.5rem;
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .lm-compact-group,
+  .lm-enhanced-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+}

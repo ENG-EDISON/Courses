@@ -1,5 +1,6 @@
 // VideoSettings.jsx
 import React from 'react';
+import '../css/VideoSettings.css';
 
 const VideoSettings = ({
   lesson,
@@ -10,15 +11,15 @@ const VideoSettings = ({
   onVideoDurationChange // ✅ This prop is now being passed from Lesson component
 }) => {
   return (
-    <div className="lesson-content-section-video">
-      <label className="section-label">Video Settings</label>
+    <div className="vs-container">
+      <label className="vs-section-label">Video Settings</label>
 
       <VideoSourceToggle
         videoSource={videoSource}
         onVideoSourceChange={onVideoSourceChange}
       />
 
-      {videoSource === 'upload' && (
+      {videoSource === 'uploaded' && (
         <VideoUpload
           videoFile={lesson.video_file}
           onFileChange={onFileChange}
@@ -26,7 +27,7 @@ const VideoSettings = ({
         />
       )}
 
-      {videoSource === 'url' && (
+      {videoSource === 'external_url' && (
         <VideoUrlInput
           videoUrl={lesson.video_url}
           onVideoUrlChange={onVideoUrlChange}
@@ -37,24 +38,24 @@ const VideoSettings = ({
 };
 
 const VideoSourceToggle = ({ videoSource, onVideoSourceChange }) => (
-  <div className="video-source-toggle">
-    <label className="toggle-option">
+  <div className="vs-source-toggle">
+    <label className="vs-toggle-option">
       <input
         type="radio"
-        value="upload"
-        checked={videoSource === 'upload'}
+        value="uploaded"
+        checked={videoSource === 'uploaded'}
         onChange={(e) => onVideoSourceChange(e.target.value)}
       />
-      <span className="toggle-label">Upload Video File</span>
+      <span className="vs-toggle-label">Upload Video File</span>
     </label>
-    <label className="toggle-option">
+    <label className="vs-toggle-option">
       <input
         type="radio"
-        value="url"
-        checked={videoSource === 'url'}
+        value="external_url"
+        checked={videoSource === 'external_url'}
         onChange={(e) => onVideoSourceChange(e.target.value)}
       />
-      <span className="toggle-label">Use Video URL</span>
+      <span className="vs-toggle-label">Use Video URL</span>
     </label>
   </div>
 );
@@ -216,18 +217,18 @@ const VideoUpload = ({ videoFile, onFileChange, onVideoDurationChange }) => {
   }, [videoSrc, videoFile]);
 
   return (
-    <div className="file-upload-section">
+    <div className="vs-file-input">
       <input
         type="file"
         accept="video/mp4,video/mov,video/avi,video/mkv,video/webm"
         onChange={onFileChange}
-        className="file-input"
+        className="vs-file-input"
       />
       
       {videoFile && (
-        <div className="video-player-wrapper">
+        <div className="vs-player-wrapper">
           {videoError && (
-            <div className="video-error-message" style={{ 
+            <div className="vs-error-message" style={{ 
               color: 'red', 
               margin: '10px 0', 
               padding: '10px',
@@ -380,7 +381,7 @@ const VideoUrlInput = ({ videoUrl, onVideoUrlChange }) => {
         value={videoUrl || ''}
         onChange={onVideoUrlChange}
         placeholder="https://youtube.com/watch?v=..."
-        className="meta-input"
+        className="vs-url-input"
       />
       <small>Supports YouTube, Vimeo, or direct video links</small>
 

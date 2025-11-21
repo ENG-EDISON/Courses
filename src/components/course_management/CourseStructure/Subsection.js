@@ -375,7 +375,7 @@
 // export default Subsection;
 
 import React, { useCallback, useState } from 'react';
-import Lesson from '../CourseStructure/lesson/LessonMain';
+import Lesson from './lesson/Lesson';
 // import { createSubSection, updateSubsection,deleteSubsection } from '../../../../api/SubsectionApis'; // Import your APIs
 import "./css/SubsectionEdit.css"
 import { createSubSection, updateSubsection,deleteSubsection  } from '../../../api/SubsectionApi';

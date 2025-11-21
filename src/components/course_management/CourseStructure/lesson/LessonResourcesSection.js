@@ -1,8 +1,10 @@
-// LessonResources.jsx
+// LessonResourcesSection.jsx
 import React, { useState } from 'react';
-import LessonResource from '../LessonResource';
+import LessonResourceCard from './LessonResourceCard ';
+import '../css/LessonResourcesSection.css';
+import '../css/Shared.css';
 
-const LessonResources =({
+const LessonResourcesSection =({
   lesson,
   sectionIndex,
   subsectionIndex,
@@ -21,7 +23,7 @@ const LessonResources =({
   const [isResourcesExpanded, setIsResourcesExpanded] = useState(true);
 
   React.useEffect(() => {
-    console.log('📚 LessonResources props:', {
+    console.log('📚 LessonResourcesSection props:', {
       lessonId: lesson.id,
       resourceCount: lesson.resources?.length || 0,
       hasCreateCallback: !!onResourceCreate,
@@ -35,8 +37,8 @@ const LessonResources =({
   };
 
   return (
-    <div className="resources-lesson-content-section">
-      <ResourcesHeader 
+    <div className="lrs-section">
+      <LrsResourcesHeader 
         resourceCount={lesson.resources?.length || 0}
         onAddResource={onAddResource}
         isAddingResource={isAddingResource}
@@ -48,13 +50,13 @@ const LessonResources =({
       {isResourcesExpanded && (
         <>
           {(!lesson.resources || lesson.resources.length === 0) ? (
-            <EmptyResourcesState 
+            <LrsEmptyResourcesState 
               onAddResource={onAddResource}
               isAddingResource={isAddingResource}
               canAddResources={canAddResources}
             />
           ) : (
-            <ResourcesGrid 
+            <LrsResourcesGrid 
               resources={lesson.resources}
               sectionIndex={sectionIndex}
               subsectionIndex={subsectionIndex}
@@ -75,7 +77,7 @@ const LessonResources =({
   );
 };
 
-const ResourcesHeader = ({ 
+const LrsResourcesHeader = ({ 
   resourceCount, 
   onAddResource, 
   isAddingResource, 
@@ -83,26 +85,26 @@ const ResourcesHeader = ({
   isExpanded,
   onToggle 
 }) => (
-  <div className="resources-header">
-    <div className="resources-title">
+  <div className="lrs-header">
+    <div className="lrs-title-section">
       <button 
-        className={`resources-toggle ${isExpanded ? 'expanded' : ''}`}
+        className={`lrs-toggle ${isExpanded ? 'expanded' : ''}`}
         onClick={onToggle}
         aria-label={isExpanded ? 'Collapse resources' : 'Expand resources'}
       >
         <span className="toggle-icon">{isExpanded ? '▼' : '►'}</span>
       </button>
-      <h6>Lesson Resources</h6>
-      <span className="resource-count">{resourceCount} resource(s)</span>
+      <h6 className="lrs-title">Lesson Resources</h6>
+      <span className="lrs-count">{resourceCount} resource(s)</span>
       {!canAddResources && (
-        <span className="resource-warning">
+        <span className="lrs-warning">
           ⚠️ Save lesson to database before adding resources
         </span>
       )}
     </div>
     <button 
       onClick={onAddResource} 
-      className="btn-add-resource" 
+      className="lrs-add-button" 
       disabled={isAddingResource || !canAddResources}
       title={!canAddResources ? "Save the lesson first to add resources" : "Add resource"}
     >
@@ -111,11 +113,11 @@ const ResourcesHeader = ({
   </div>
 );
 
-const EmptyResourcesState = ({ onAddResource, isAddingResource, canAddResources }) => (
-  <div className="empty-resource-state">
-    <div className="empty-resource-icon">📎</div>
-    <p>No resources added yet</p>
-    <p className="resource-help-text">
+const LrsEmptyResourcesState = ({ onAddResource, isAddingResource, canAddResources }) => (
+  <div className="lrs-empty-state">
+    <div className="lrs-empty-icon">📎</div>
+    <p className="lrs-empty-text">No resources added yet</p>
+    <p className="lrs-help-text">
       {!canAddResources 
         ? "Save the lesson to the database first to add resources" 
         : "Add your first resource to this lesson"
@@ -123,7 +125,7 @@ const EmptyResourcesState = ({ onAddResource, isAddingResource, canAddResources 
     </p>
     <button 
       onClick={onAddResource} 
-      className="btn-add-resource" 
+      className="lrs-add-button" 
       disabled={isAddingResource || !canAddResources}
     >
       {!canAddResources ? "Save Lesson First" : "Add First Resource"}
@@ -131,7 +133,7 @@ const EmptyResourcesState = ({ onAddResource, isAddingResource, canAddResources 
   </div>
 );
 
-const ResourcesGrid =({
+const LrsResourcesGrid =({
   resources,
   sectionIndex,
   subsectionIndex,
@@ -145,9 +147,9 @@ const ResourcesGrid =({
   onResourceUpdate,
   onResourceDelete
 }) => (
-  <div className="resources-grid">
+  <div className="lrs-grid">
     {resources.map((resource, resourceIndex) => (
-      <LessonResource
+      <LessonResourceCard
         key={resource.id || `resource-${resourceIndex}`}
         resource={resource}
         sectionIndex={sectionIndex}
@@ -167,4 +169,4 @@ const ResourcesGrid =({
   </div>
 );
 
-export default LessonResources;
+export default LessonResourcesSection;

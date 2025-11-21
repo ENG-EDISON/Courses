@@ -1,0 +1,219 @@
+/* VideoSettings.css */
+.vs-container {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.vs-section-label {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.vs-source-toggle {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.vs-toggle-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: white;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 13px;
+  color: #5c6b7a;
+}
+
+.vs-toggle-option:hover {
+  border-color: #3498db;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.1);
+}
+
+.vs-toggle-option input[type="radio"] {
+  display: none;
+}
+
+.vs-toggle-option input[type="radio"]:checked + .vs-toggle-label {
+  color: #3498db;
+}
+
+.vs-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.vs-file-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #dce1e6;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  box-sizing: border-box;
+}
+
+.vs-url-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #dce1e6;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background: white;
+  box-sizing: border-box;
+}
+
+.vs-url-input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+.vs-player-wrapper {
+  width: 100%;
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #fafbfc 0%, #f8f9fa 100%);
+  border: 1px solid #e1e5e9;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.vs-player-wrapper:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-color: #3498db;
+  transform: translateY(-1px);
+}
+
+.vs-video-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  background: #000;
+}
+
+.vs-video-container video {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.vs-error-message {
+  background: linear-gradient(135deg, #ffe6e6 0%, #ffcccc 100%);
+  border: 1px solid #ff6b6b;
+  border-left: 4px solid #e74c3c;
+  color: #c0392b;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(231, 76, 60, 0.1);
+}
+
+.vs-debug-panel {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: #ecf0f1;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.vs-seek-controls {
+  background: white;
+  padding: 1.25rem;
+  border-radius: 10px;
+  border: 1px solid #e9ecef;
+  margin: 1rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.vs-seek-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.vs-seek-button {
+  padding: 0.75rem 0.5rem;
+  border: 1px solid #e1e5e9;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: #2c3e50;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.vs-seek-button:hover {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  border-color: #3498db;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+.vs-file-info {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 1px solid #e1e5e9;
+  padding: 1.25rem;
+  border-radius: 10px;
+  margin: 1rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.vs-youtube-preview {
+  margin-top: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .vs-player-wrapper {
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+  
+  .vs-seek-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .vs-source-toggle {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

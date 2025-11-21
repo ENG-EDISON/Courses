@@ -1,30 +1,31 @@
 // LessonMeta.jsx
 import React from 'react';
+import '../css/LessonMeta.css';
 
 const LessonMeta = ({ lesson, onDurationChange, onPreviewChange }) => {
   return (
-    <div className="lesson-meta-compact">
-      <div className="meta-compact-group">
-        <div className="meta-compact-field">
-          <label>Duration (min)</label>
+    <div className="lm-compact">
+      <div className="lm-compact-group">
+        <div className="lm-compact-field">
+          <label className="lm-compact-label">Duration (min)</label>
           <input
             type="number"
             value={lesson.duration_minutes || 0}
             onChange={onDurationChange}
             min="0"
-            className="meta-compact-input"
+            className="lm-compact-input"
             placeholder="0"
           />
         </div>
 
-        <div className="meta-compact-checkbox">
-          <label className="compact-checkbox-label">
+        <div className="lm-compact-checkbox">
+          <label className="lm-checkbox-label">
             <input
               type="checkbox"
               checked={lesson.is_preview || false}
               onChange={onPreviewChange}
             />
-            <span className="compact-checkmark"></span>
+            <span className="lm-checkmark"></span>
             Preview Lesson
           </label>
         </div>

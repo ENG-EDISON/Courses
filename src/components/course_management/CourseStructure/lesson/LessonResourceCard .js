@@ -1,7 +1,10 @@
+// LessonResourceCard.jsx
 import React, { useCallback, useState } from 'react';
-import "./css/ResourceEdit.css"
-import { createLessonResource, updateLessonResource, deleteLessonResource  } from '../../../api/LessonResourcesApis';
-const LessonResource = ({ 
+import { createLessonResource, updateLessonResource, deleteLessonResource } from '../../../../api/LessonResourcesApis';
+import '../css/LessonResourceCard.css';
+import '..//css/Shared.css';
+
+const LessonResourceCard = ({ 
   resource, 
   sectionIndex, 
   subsectionIndex, 
@@ -11,10 +14,10 @@ const LessonResource = ({
   setSections, 
   onUpdate,
   isExistingInDatabase,
-  onResourceCreate, // New callback for resource creation
-  onResourceUpdate, // New callback for resource update
-  onResourceDelete, // New callback for resource deletion
-  lessonId // Add lessonId for API calls
+  onResourceCreate,
+  onResourceUpdate,
+  onResourceDelete,
+  lessonId
 }) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -51,7 +54,6 @@ const LessonResource = ({
         resource_type: resource.resource_type || 'document',
         order: resource.order !== undefined ? resource.order : resourceIndex,
         lesson: lessonId,
-        // Only include file if it exists and is a File object
         ...(resource.file instanceof File && { file: resource.file })
       };
 
@@ -98,7 +100,6 @@ const LessonResource = ({
         resource_type: resource.resource_type || 'document',
         order: resource.order !== undefined ? resource.order : resourceIndex,
         lesson: resource.lesson || lessonId,
-        // Only include file if it exists and is a new File object
         ...(resource.file instanceof File && { file: resource.file })
       };
 
@@ -128,7 +129,6 @@ const LessonResource = ({
   // Handle Delete Resource
   const handleDeleteResource = async () => {
     if (!isExistingInDatabase(resource)) {
-      // If it's not in database, use local deletion
       deleteResourceLocal();
       return;
     }
@@ -162,7 +162,7 @@ const LessonResource = ({
     }
   };
 
-  // Local resource deletion (for resources not in database)
+  // Local resource deletion
   const deleteResourceLocal = useCallback(() => {
     const updatedSections = sections.map((section, secIndex) => {
       if (secIndex === sectionIndex) {
@@ -187,7 +187,7 @@ const LessonResource = ({
     onUpdate(updatedSections);
   }, [sectionIndex, subsectionIndex, lessonIndex, resourceIndex, sections, setSections, onUpdate]);
 
-  // Local update function (for immediate UI updates)
+  // Local update function
   const updateResource = useCallback((field, value) => {
     const updatedSections = sections.map((section, secIndex) => {
       if (secIndex === sectionIndex) {
@@ -218,7 +218,6 @@ const LessonResource = ({
     const file = e.target.files[0];
     if (file) {
       updateResource('file', file);
-      // Only set title from filename if title is empty or same as previous file
       if (!resource.title || resource.title === resource.file?.name) {
         updateResource('title', file.name);
       }
@@ -299,16 +298,16 @@ const LessonResource = ({
   const fileInfo = getFileInfo();
 
   return (
-    <div className={`resource-card ${isExistingInDatabase(resource) ? 'existing-resource' : 'new-resource'}`}>
-      <div className="resource-header">
+    <div className={`lrc-card ${isExistingInDatabase(resource) ? 'existing' : 'new'}`}>
+      <div className="lrc-header">
         {/* Order Input for Resource */}
-        <div className="order-input-group">
-          <label>ORDER</label>
+        <div className="lrc-order-group">
+          <label className="lrc-order-label">ORDER</label>
           <input
             type="number"
             value={resource.order !== undefined ? resource.order : resourceIndex}
             onChange={(e) => updateResource('order', parseInt(e.target.value) || 0)}
-            className="order-input"
+            className="lrc-order-input"
             min="0"
           />
         </div>
@@ -318,13 +317,13 @@ const LessonResource = ({
           value={resource.title}
           onChange={handleTitleChange}
           placeholder="Resource title"
-          className="resource-title-input"
+          className="lrc-title-input"
         />
         
         <select
           value={resource.resource_type || 'document'}
           onChange={handleResourceTypeChange}
-          className="resource-type-select"
+          className="lrc-type-select"
         >
           <option value="document">Document</option>
           <option value="presentation">Presentation</option>
@@ -334,8 +333,8 @@ const LessonResource = ({
           <option value="link">External Link</option>
         </select>
         
-        <div className="resource-status">
-          <span className={`status-badge ${isExistingInDatabase(resource) ? 'existing' : 'new'}`}>
+        <div className="lrc-status">
+          <span className={`lrc-status-badge ${isExistingInDatabase(resource) ? 'existing' : 'new'}`}>
             {isExistingInDatabase(resource) ? 'EXISTING' : 'NEW'}
           </span>
           {isCreating && <span className="creating-badge">CREATING...</span>}
@@ -343,7 +342,7 @@ const LessonResource = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="resource-actions">
+        <div className="lrc-actions">
           {getActionButton()}
           <button 
             onClick={handleDeleteResource} 
@@ -356,28 +355,28 @@ const LessonResource = ({
       </div>
 
       {/* File Upload Section */}
-      <div className="file-upload-section">
+      <div className="lrc-file-section">
         {!fileInfo ? (
-          <div className="file-upload-area">
+          <div className="lrc-upload-area">
             <input
               type="file"
               onChange={handleFileUpload}
-              className="file-upload-input"
+              className="lrc-file-input"
               id={`resource-file-${sectionIndex}-${subsectionIndex}-${lessonIndex}-${resourceIndex}`}
             />
             <label 
               htmlFor={`resource-file-${sectionIndex}-${subsectionIndex}-${lessonIndex}-${resourceIndex}`}
-              className="file-upload-label btn-secondary"
+              className="lrc-file-label"
             >
               📁 Choose File
             </label>
           </div>
         ) : (
-          <div className="file-info">
-            <div className="file-name-display">
+          <div className="lrc-file-info">
+            <div className="lrc-file-name">
               <strong>File:</strong> {fileInfo.name}
             </div>
-            <div className="file-details">
+            <div className="lrc-file-details">
               <span className="file-size">Size: {fileInfo.size}</span>
               <span className="file-type">Type: {fileInfo.type}</span>
             </div>
@@ -401,7 +400,7 @@ const LessonResource = ({
 
       {/* Show database indicator for existing resources */}
       {isExistingInDatabase(resource) && (resource.file || resource.file_name) && (
-        <div className="resource-database-indicator">
+        <div className="lrc-database-indicator">
           <span className="database-icon">🗃️</span>
           <small>File stored in database</small>
         </div>
@@ -410,11 +409,10 @@ const LessonResource = ({
   );
 };
 
-// Add default props for optional callbacks
-LessonResource.defaultProps = {
+LessonResourceCard.defaultProps = {
   onResourceCreate: () => {},
   onResourceUpdate: () => {},
   onResourceDelete: () => {}
 };
 
-export default LessonResource;
+export default LessonResourceCard;

@@ -3,8 +3,8 @@ import React, { useCallback, useState } from 'react';
 import LessonHeader from './LessonHeader';
 import VideoSettings from './VideoSettings';
 import LessonMeta from './LessonMeta';
-import LessonResources from './LessonResources';
-import "../css/LessonEdit.css"
+import LessonResourcesSection from './LessonResourcesSection';
+import '../css/Lesson.css';
 
 const Lesson =({
   lesson,
@@ -344,12 +344,12 @@ const Lesson =({
       lessonId: lesson.id, 
       hasResources: lesson.resources?.length || 0,
       canAddResources: canAddResources(),
-      videoDuration: lesson.video_duration // Log video duration
+      videoDuration: lesson.video_duration
     });
   }, [lesson.id, lesson.resources, lesson.video_duration, canAddResources]);
 
   return (
-    <div className={`lesson-main-lesson-card ${isExistingInDatabase(lesson) ? 'existing-lesson' : 'new-lesson'}`}>
+    <div className={`ls-card ${isExistingInDatabase(lesson) ? 'existing' : 'new'}`}>
       <LessonHeader
         lesson={lesson}
         isExpanded={isExpanded}
@@ -373,48 +373,53 @@ const Lesson =({
       />
 
       {isExpanded && (
-        <div className="lesson-main-lesson-content">
-          <label className="lesson-main-section-label">Lesson Content</label>
+        <div className="ls-content">
+          <label className="ls-section-label">Lesson Content</label>
           <textarea
             value={lesson.content}
             onChange={(e) => updateLesson('content', e.target.value)}
             placeholder="Enter lesson content..."
             rows={4}
-            className="lesson-main-lesson-content-textarea"
+            className="ls-textarea"
           />
 
-          <VideoSettings
-            lesson={lesson}
-            videoSource={videoSource}
-            onVideoSourceChange={handleVideoSourceChange}
-            onFileChange={handleFileChange}
-            onVideoUrlChange={(e) => updateLesson('video_url', e.target.value)}
-            onVideoDurationChange={handleVideoDurationChange} // ✅ ADDED: Pass the duration handler
-          />
+          <div className="ls-section">
+            <VideoSettings
+              lesson={lesson}
+              videoSource={videoSource}
+              onVideoSourceChange={handleVideoSourceChange}
+              onFileChange={handleFileChange}
+              onVideoUrlChange={(e) => updateLesson('video_url', e.target.value)}
+              onVideoDurationChange={handleVideoDurationChange}
+            />
+          </div>
 
-          <LessonMeta
-            lesson={lesson}
-            onDurationChange={(e) => updateLesson('duration_minutes', parseInt(e.target.value) || 0)}
-            onPreviewChange={(e) => updateLesson('is_preview', e.target.checked)}
-          />
+          <div className="ls-section">
+            <LessonMeta
+              lesson={lesson}
+              onDurationChange={(e) => updateLesson('duration_minutes', parseInt(e.target.value) || 0)}
+              onPreviewChange={(e) => updateLesson('is_preview', e.target.checked)}
+            />
+          </div>
 
-          <LessonResources
-            lesson={lesson}
-            sectionIndex={sectionIndex}
-            subsectionIndex={subsectionIndex}
-            lessonIndex={lessonIndex}
-            sections={sections}
-            setSections={setSections}
-            onUpdate={onUpdate}
-            isExistingInDatabase={isExistingInDatabase}
-            isAddingResource={isAddingResource}
-            onAddResource={addResource}
-            canAddResources={canAddResources()}
-            // ✅ PASS THE RESOURCE CALLBACKS TO LessonResources
-            onResourceCreate={handleResourceCreate}
-            onResourceUpdate={handleResourceUpdate}
-            onResourceDelete={handleResourceDelete}
-          />
+          <div className="ls-section">
+            <LessonResourcesSection
+              lesson={lesson}
+              sectionIndex={sectionIndex}
+              subsectionIndex={subsectionIndex}
+              lessonIndex={lessonIndex}
+              sections={sections}
+              setSections={setSections}
+              onUpdate={onUpdate}
+              isExistingInDatabase={isExistingInDatabase}
+              isAddingResource={isAddingResource}
+              onAddResource={addResource}
+              canAddResources={canAddResources()}
+              onResourceCreate={handleResourceCreate}
+              onResourceUpdate={handleResourceUpdate}
+              onResourceDelete={handleResourceDelete}
+            />
+          </div>
         </div>
       )}
     </div>
