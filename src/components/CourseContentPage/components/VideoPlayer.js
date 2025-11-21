@@ -11,13 +11,15 @@ const EnhancedVideoPlayer = ({ video, isCompleted = false, onMarkComplete }) => 
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
     const [hasAutoCompleted, setHasAutoCompleted] = useState(false);
+    
+    // ✅ UPDATED: Use video_source from API response
     const videoSource = getVideoSource(video);
 
     // 🔍 ADDED: Debug the video object
     useEffect(() => {
         console.log('🔍 EnhancedVideoPlayer - video object:', video);
+        console.log('🔍 EnhancedVideoPlayer - video_source:', video?.video_source);
         console.log('🔍 EnhancedVideoPlayer - video.id:', video?.id);
-        console.log('🔍 EnhancedVideoPlayer - video.id type:', typeof video?.id);
     }, [video]);
 
     // ✅ MODIFIED: Only track when video is completed
@@ -30,7 +32,7 @@ const EnhancedVideoPlayer = ({ video, isCompleted = false, onMarkComplete }) => 
 
             // 🔍 ADDED: Debug the video ID before tracking
             console.log('🔍 trackProgress - video.id:', video?.id);
-            console.log('🔍 trackProgress - video.id type:', typeof video?.id);
+            console.log('🔍 trackProgress - video_source:', video?.video_source);
             
             if (!video?.id || isNaN(video.id)) {
                 console.error('❌ Cannot track progress: Invalid video ID', video?.id);
@@ -43,6 +45,7 @@ const EnhancedVideoPlayer = ({ video, isCompleted = false, onMarkComplete }) => 
             
             console.log('🎯 Tracking video completion:', { 
                 videoId: video.id,
+                videoSource: video.video_source,
                 trackedTime, 
                 completed, 
                 progressPercentage,
@@ -116,7 +119,6 @@ const EnhancedVideoPlayer = ({ video, isCompleted = false, onMarkComplete }) => 
                 console.log('✅ Auto-completing video');
                 setHasAutoCompleted(true);
                 trackProgress(true); // ✅ Only track completion
-                // ✅ REMOVED: onMarkComplete call here - it's now in trackProgress
             }
         }
     }, [videoSource.canTrack, isCompleted, hasAutoCompleted, trackProgress]);
@@ -127,7 +129,6 @@ const EnhancedVideoPlayer = ({ video, isCompleted = false, onMarkComplete }) => 
         if (videoSource.canTrack && !isCompleted && !hasAutoCompleted) {
             setHasAutoCompleted(true);
             trackProgress(true); // ✅ Only track completion
-            // ✅ REMOVED: onMarkComplete call here - it's now in trackProgress
         }
     }, [videoSource.canTrack, isCompleted, hasAutoCompleted, trackProgress]);
 
@@ -135,25 +136,28 @@ const EnhancedVideoPlayer = ({ video, isCompleted = false, onMarkComplete }) => 
     const handleVideoPause = useCallback(() => {
         const currentVideoTime = videoRef.current?.currentTime;
         console.log('⏸️ Video paused at:', currentVideoTime);
-        // ✅ REMOVED: Progress tracking on pause
     }, []);
 
     // ✅ MODIFIED: Remove progress tracking on seek
     const handleSeek = useCallback(() => {
         const currentVideoTime = videoRef.current?.currentTime;
         console.log('🎯 Video seeked to:', currentVideoTime);
-        // ✅ REMOVED: Progress tracking on seek
     }, []);
 
     useEffect(() => {
         console.log('🎬 EnhancedVideoPlayer mounted - Progress tracking: ONLY ON COMPLETION');
+        console.log('🎬 Video source type:', videoSource.type);
+        console.log('🎬 Video source value:', videoSource.source);
+        // eslint-disable-next-line 
     }, []);
 
+    // ✅ UPDATED: Video source logic based on video_source field
     if (videoSource.type === 'youtube') {
         return <YouTubePlayer source={videoSource.source} title={video.title} />;
     }
 
-    if (videoSource.type === 'uploaded' || videoSource.type === 'self-hosted') {
+    // ✅ UPDATED: Handle uploaded videos (video_source: 'uploaded')
+    if (videoSource.type === 'uploaded') {
         return (
             <SelfHostedVideoPlayer
                 ref={videoRef}
@@ -173,10 +177,18 @@ const EnhancedVideoPlayer = ({ video, isCompleted = false, onMarkComplete }) => 
         );
     }
 
-    if (videoSource.type === 'external') {
+    // ✅ UPDATED: Handle external URL videos (video_source: 'external_url')
+    if (videoSource.type === 'external_url') {
         return <ExternalVideoPlayer source={videoSource.source} />;
     }
 
+    // ✅ UPDATED: Handle no video case (video_source: 'none')
+    if (videoSource.type === 'none') {
+        return <NoVideoContent video={video} />;
+    }
+
+    // Fallback for unknown video source types
+    console.warn('⚠️ Unknown video source type:', videoSource.type);
     return <NoVideoContent video={video} />;
 };
 

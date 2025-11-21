@@ -1,7 +1,11 @@
 export const getVideoSource = (lesson) => {
     if (!lesson) return { type: 'none', source: '', canTrack: false };
 
-    if (lesson.video_file) {
+    // ✅ UPDATED: Use video_source field from API
+    const videoSource = lesson.video_source;
+
+    // Handle uploaded videos
+    if (videoSource === 'uploaded' && lesson.video_file) {
         return {
             type: 'uploaded',
             source: lesson.video_file,
@@ -9,10 +13,41 @@ export const getVideoSource = (lesson) => {
         };
     }
 
-    const videoUrl = lesson.video_url;
-    if (!videoUrl) return { type: 'none', source: '', canTrack: false };
+    // Handle external URLs
+    if (videoSource === 'external_url' && lesson.video_url) {
+        // Check if it's a YouTube URL
+        const youtubeId = getYouTubeVideoId(lesson.video_url);
+        if (youtubeId) {
+            return {
+                type: 'youtube',
+                source: youtubeId,
+                canTrack: false // YouTube doesn't support progress tracking
+            };
+        }
+        
+        // Other external video URLs
+        return {
+            type: 'external',
+            source: lesson.video_url,
+            canTrack: false
+        };
+    }
 
-    // ... rest of the video source detection logic
+    // No video content
+    if (videoSource === 'none') {
+        return {
+            type: 'none',
+            source: '',
+            canTrack: false
+        };
+    }
+
+    // Fallback for legacy data or unknown sources
+    return {
+        type: 'none',
+        source: '',
+        canTrack: false
+    };
 };
 
 export const getVideoSourceBadge = (videoSource) => {
@@ -26,4 +61,12 @@ export const getVideoSourceBadge = (videoSource) => {
 
     const badge = badges[videoSource.type] || badges.none;
     return badge;
+};
+
+// Helper function to extract YouTube video ID
+const getYouTubeVideoId = (url) => {
+    if (!url) return null;
+    // eslint-disable-next-line 
+    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    return match ? match[1] : null;
 };

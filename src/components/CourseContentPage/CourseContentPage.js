@@ -205,13 +205,25 @@ const CourseContentPage = () => {
 
             } catch (err) {
                 console.error('Full error details:', err);
-                setError('Failed to load course content');
+                if (err.response?.status === 404) {
+                    setError('Course not found. Please check the course ID.');
+                } else if (err.response?.status === 500) {
+                    setError('Server error. Please try again later.');
+                } else {
+                    setError('Failed to load course content');
+                }
             } finally {
                 setLoading(false);
             }
         };
 
         if (id) {
+            // ✅ ADDED: Validate course ID before fetching
+            if (!id || id === '-pdO6JrlDkw') {
+                setError('Invalid course ID');
+                setLoading(false);
+                return;
+            }
             fetchCourseContent();
         }
     }, [id]);
@@ -229,6 +241,7 @@ const CourseContentPage = () => {
                 if (subsection.lessons && subsection.lessons.length > 0) {
                     const firstLesson = subsection.lessons[0];
                     console.log("✅ Found first lesson:", firstLesson);
+                    console.log("🔍 First lesson video_source:", firstLesson.video_source);
                     return {
                         ...firstLesson,
                         sectionTitle: section.title,
@@ -252,6 +265,7 @@ const CourseContentPage = () => {
                     const lesson = subsection.lessons.find(l => l.id === lessonId);
                     if (lesson) {
                         console.log("✅ Found lesson:", lesson);
+                        console.log("🔍 Lesson video_source:", lesson.video_source);
                         return {
                             ...lesson,
                             sectionTitle: section.title,
@@ -279,6 +293,7 @@ const CourseContentPage = () => {
     const handleVideoSelect = async (lesson, sectionTitle, subsectionTitle) => {
         console.log("🔍 handleVideoSelect - lesson:", lesson);
         console.log("🔍 handleVideoSelect - lesson.id:", lesson?.id);
+        console.log("🔍 handleVideoSelect - video_source:", lesson?.video_source);
         
         const videoData = {
             ...lesson,
@@ -294,6 +309,9 @@ const CourseContentPage = () => {
         console.log("🔍 activeVideo updated:", activeVideo);
         console.log("🔍 activeVideo.id:", activeVideo?.id);
         console.log("🔍 activeVideo.id type:", typeof activeVideo?.id);
+        console.log("🔍 activeVideo.video_source:", activeVideo?.video_source);
+        console.log("🔍 activeVideo.video_file:", activeVideo?.video_file);
+        console.log("🔍 activeVideo.video_url:", activeVideo?.video_url);
     }, [activeVideo]);
 
     if (loading) return <LoadingState />;
