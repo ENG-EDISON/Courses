@@ -1,6 +1,7 @@
 // ResourcesTab.jsx
 import React from 'react';
 import "../../css/ResourcesTab.css"
+
 const ResourcesTab = ({ course }) => {
     // Helper function to get file type from URL
     const getFileType = (url) => {
@@ -92,14 +93,14 @@ const ResourcesTab = ({ course }) => {
     };
 
     return (
-        <div className="course-resources">
+        <div className="resources-tab-container">
             <h3>Course Resources</h3>
             
             {/* Resource Summary */}
-            <div className="resources-summary">
-                <div className="summary-card">
-                    <div className="summary-icon">📚</div>
-                    <div className="summary-content">
+            <div className="resources-tab-summary">
+                <div className="resources-tab-summary-card">
+                    <div className="resources-tab-summary-icon">📚</div>
+                    <div className="resources-tab-summary-content">
                         <h4>{allResources.length} Resources Available</h4>
                     </div>
                 </div>
@@ -107,27 +108,27 @@ const ResourcesTab = ({ course }) => {
 
             {/* All Resources Grid */}
             {allResources.length > 0 ? (
-                <div className="resources-section">
-                    <div className="resources-grid">
+                <div className="resources-tab-section">
+                    <div className="resources-tab-grid">
                         {allResources.map((resource, index) => (
-                            <div key={resource.id || index} className="resource-card">
-                                <div className="resource-icon">
+                            <div key={resource.id || index} className="resources-tab-card">
+                                <div className="resources-tab-icon">
                                     {getResourceIcon(resource.file)}
                                 </div>
-                                <div className="resource-content">
-                                    <div className="resource-row">
+                                <div className="resources-tab-content">
+                                    <div className="resources-tab-row">
                                         <h5>{resource.title || 'Untitled Resource'}</h5>
-                                        <span className="resource-type">
+                                        <span className="resources-tab-type">
                                             {getFileType(resource.file)}
                                         </span>
                                         {resource.file_size && (
-                                            <span className="resource-size">
+                                            <span className="resources-tab-size">
                                                 {formatFileSize(resource.file_size)}
                                             </span>
                                         )}
                                         <a 
                                             href={getFileUrl(resource.file)} 
-                                            className="resource-download-btn"
+                                            className="resources-tab-download-btn"
                                             target="_blank" 
                                             rel="noopener noreferrer"
                                             download
@@ -140,13 +141,13 @@ const ResourcesTab = ({ course }) => {
                                             Download
                                         </a>
                                     </div>
-                                    <div className="resource-meta">
-                                        <span className="resource-source">
-                                            From: <strong>{resource.lessonTitle}</strong>
-                                        </span>
-                                        <span className="resource-section">
-                                            {resource.sectionTitle} • {resource.subsectionTitle}
-                                        </span>
+                                    <div className="resources-tab-meta">
+                                        <div className="resources-tab-source">
+                                            From: <strong>{resource.lessonTitle} </strong>
+                                        </div>
+                                        <div className="resources-tab-section">
+                                            {resource.sectionTitle} • {resource.subsectionTitle} 
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -154,8 +155,8 @@ const ResourcesTab = ({ course }) => {
                     </div>
                 </div>
             ) : (
-                <div className="no-resources">
-                    <div className="no-resources-icon">📭</div>
+                <div className="resources-tab-empty">
+                    <div className="resources-tab-empty-icon">📭</div>
                     <h4>No Resources Available</h4>
                     <p>This course doesn't have any downloadable resources yet.</p>
                 </div>

@@ -1,16 +1,17 @@
 /* Resources Tab Styles */
-.course-resources h3 {
+
+.resources-tab-container h3 {
     font-size: 1.75rem;
     font-weight: 700;
     color: #1e293b;
     margin-bottom: 2rem;
 }
 
-.resources-summary {
+.resources-tab-summary {
     margin-bottom: 2rem;
 }
 
-.summary-card {
+.resources-tab-summary-card {
     display: flex;
     align-items: center;
     padding: 0.5rem;
@@ -20,23 +21,24 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.summary-icon {
+.resources-tab-summary-icon {
     font-size: 2.5rem;
     margin-right: 1rem;
 }
 
-.summary-content h4 {
+.resources-tab-summary-content h4 {
     margin: 0 0 0.5rem 0;
     font-size: 1.25rem;
 }
 
-.resources-grid {
+/* Default: 2-column grid for desktop */
+.resources-tab-grid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
 }
 
-.resource-card {
+.resources-tab-card {
     background: white;
     border: 1px solid #e8ecef;
     border-radius: 8px;
@@ -46,32 +48,33 @@
     display: flex;
     gap: 0.875rem;
     align-items: center;
+    height: fit-content;
 }
 
-.resource-card:hover {
+.resources-tab-card:hover {
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     border-color: #d0d7e2;
 }
 
-.resource-icon {
+.resources-tab-icon {
     font-size: 1.25rem;
     flex-shrink: 0;
 }
 
-.resource-content {
+.resources-tab-content {
     flex: 1;
     min-width: 0;
 }
 
-.resource-row {
+.resources-tab-row {
     display: flex;
     align-items: center;
     gap: 1rem;
     margin-bottom: 0.375rem;
 }
 
-.resource-row h5 {
+.resources-tab-row h5 {
     margin: 0;
     font-size: 0.9375rem;
     font-weight: 600;
@@ -84,7 +87,7 @@
     text-overflow: ellipsis;
 }
 
-.resource-type {
+.resources-tab-type {
     font-size: 0.75rem;
     padding: 0.25rem 0.5rem;
     background: #f8fafc;
@@ -95,14 +98,14 @@
     white-space: nowrap;
 }
 
-.resource-size {
+.resources-tab-size {
     font-size: 0.75rem;
     color: #64748b;
     font-weight: 500;
     white-space: nowrap;
 }
 
-.resource-download-btn {
+.resources-tab-download-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
@@ -121,187 +124,286 @@
     flex-shrink: 0;
 }
 
-.resource-download-btn:hover {
+.resources-tab-download-btn:hover {
     background: #4338ca;
     transform: translateY(-0.5px);
     box-shadow: 0 1px 4px rgba(79, 70, 229, 0.25);
 }
 
-.resource-meta {
+.resources-tab-meta {
     display: flex;
-    gap: 1rem;
     align-items: center;
+    gap: 1rem;
+    flex-wrap: nowrap;
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
-.resource-source,
-.resource-section {
+.resources-tab-source, .resources-tab-section {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.resources-tab-source {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    flex-shrink: 0;
+    color: #374151;
+}
+
+.resources-tab-source::before {
+    content: "📚";
+    font-size: 0.75rem;
+}
+
+.resources-tab-section {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6b7280;
+    flex: 1;
+    min-width: 0;
+}
+
+.resources-tab-section::before {
+    content: "▶";
+    font-size: 0.625rem;
+    color: #9ca3af;
+}
+
+.resources-tab-source strong,
+.resources-tab-section span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.resources-tab-source,
+.resources-tab-section {
     font-size: 0.75rem;
     color: #64748b;
     line-height: 1.3;
 }
 
-.resource-source strong {
+.resources-tab-source strong {
     color: #374151;
     font-weight: 500;
 }
 
-.resource-section {
+.resources-tab-section {
     color: #94a3b8;
 }
 
-.no-resources {
+.resources-tab-empty {
     text-align: center;
     padding: 3rem 2rem;
     color: #64748b;
 }
 
-.no-resources-icon {
+.resources-tab-empty-icon {
     font-size: 4rem;
     margin-bottom: 1rem;
     opacity: 0.5;
 }
 
-.no-resources h4 {
+.resources-tab-empty h4 {
     color: #475569;
     margin-bottom: 0.5rem;
 }
 
-.no-resources p {
+.resources-tab-empty p {
     margin: 0;
     font-size: 1rem;
 }
 
 /* Responsive Styles for ResourcesTab */
 
+/* Large tablets and small laptops (max-width: 1024px) */
+@media (max-width: 1024px) {
+    .resources-tab-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.875rem;
+    }
+}
+
 /* Tablet screens (max-width: 768px) */
 @media (max-width: 768px) {
-    .resources-grid {
+    .resources-tab-grid {
         grid-template-columns: 1fr;
+        gap: 0.75rem;
     }
     
-    .summary-card {
+    .resources-tab-summary-card {
         flex-direction: column;
         text-align: center;
     }
     
-    .summary-icon {
+    .resources-tab-summary-icon {
         margin-right: 0;
         margin-bottom: 1rem;
     }
     
-    .resource-card {
+    .resources-tab-card {
         flex-direction: column;
         text-align: center;
         padding: 1.25rem;
     }
     
-    .resource-row {
+    .resources-tab-row {
         flex-direction: column;
         gap: 0.75rem;
         align-items: center;
     }
     
-    .resource-row h5 {
+    .resources-tab-row h5 {
         text-align: center;
         white-space: normal;
         overflow: visible;
         text-overflow: clip;
     }
     
-    .resource-meta {
+    .resources-tab-meta {
         flex-direction: column;
         gap: 0.5rem;
         align-items: center;
     }
 }
 
+/* Medium mobile screens (max-width: 640px) */
+@media (max-width: 640px) {
+    .resources-tab-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .resources-tab-card {
+        padding: 1rem;
+    }
+}
+
 /* Mobile screens (max-width: 480px) */
 @media (max-width: 480px) {
-    .course-resources h3 {
+    .resources-tab-container h3 {
         font-size: 1.5rem;
         margin-bottom: 1.5rem;
     }
     
-    .resources-summary {
+    .resources-tab-summary {
         margin-bottom: 1.5rem;
     }
     
-    .summary-card {
+    .resources-tab-summary-card {
         padding: 1.5rem;
     }
     
-    .summary-icon {
+    .resources-tab-summary-icon {
         font-size: 2rem;
     }
     
-    .summary-content h4 {
+    .resources-tab-summary-content h4 {
         font-size: 1.125rem;
     }
     
-    .resource-card {
+    .resources-tab-card {
         padding: 1rem;
     }
     
-    .resource-icon {
+    .resources-tab-icon {
         font-size: 1.5rem;
         margin-bottom: 0.5rem;
     }
     
-    .resource-row {
+    .resources-tab-row {
         gap: 0.5rem;
     }
     
-    .resource-download-btn {
+    .resources-tab-download-btn {
         width: 100%;
         justify-content: center;
         padding: 0.75rem 1rem;
     }
     
-    .no-resources {
+    .resources-tab-empty {
         padding: 2rem 1rem;
     }
     
-    .no-resources-icon {
+    .resources-tab-empty-icon {
         font-size: 3rem;
     }
 }
 
 /* Small mobile screens (max-width: 360px) */
 @media (max-width: 360px) {
-    .course-resources h3 {
+    .resources-tab-container h3 {
         font-size: 1.375rem;
     }
     
-    .resource-card {
+    .resources-tab-card {
         padding: 0.875rem;
     }
     
-    .resource-type,
-    .resource-size {
+    .resources-tab-type,
+    .resources-tab-size {
         font-size: 0.7rem;
     }
     
-    .resource-source,
-    .resource-section {
+    .resources-tab-source,
+    .resources-tab-section {
         font-size: 0.7rem;
+    }
+    
+    .resources-tab-download-btn {
+        padding: 0.625rem 0.75rem;
+        font-size: 0.7rem;
+    }
+}
+
+/* Very small mobile screens (max-width: 320px) */
+@media (max-width: 320px) {
+    .resources-tab-grid {
+        gap: 0.5rem;
+    }
+    
+    .resources-tab-card {
+        padding: 0.75rem;
+    }
+    
+    .resources-tab-row {
+        gap: 0.375rem;
+    }
+    
+    .resources-tab-download-btn {
+        padding: 0.5rem 0.625rem;
     }
 }
 
 /* Large screens (min-width: 1200px) */
 @media (min-width: 1200px) {
-    .resources-grid {
-        grid-template-columns: 1fr;
+    .resources-tab-grid {
+        grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
     }
     
-    .resource-card {
+    .resources-tab-card {
         padding: 1.25rem;
     }
 }
 
 /* Extra large screens (min-width: 1400px) */
 @media (min-width: 1400px) {
-    .resources-grid {
-        grid-template-columns: 1fr;
+    .resources-tab-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+}
+
+/* Ultra wide screens (min-width: 1920px) */
+@media (min-width: 1920px) {
+    .resources-tab-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
     }
 }
