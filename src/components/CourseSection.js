@@ -3,6 +3,7 @@ import "../static/CourseSection.css";
 import { getAllPublishedCardView } from "../api/CoursesApi";
 import UdemyStylePopup from "./common/UdemyStylePopup";
 import CourseCard from "./common/CourseCard";
+
 function CourseSection() {
   const [searchQuery, setSearchQuery] = useState("");
   const [courses, setCourses] = useState([]);
@@ -121,55 +122,55 @@ function CourseSection() {
   }
 
   return (
-  <section className="courses">
-    <div className="container">
-      <h2>Popular Courses</h2>
-      <p>Explore our top courses and start learning today.</p>
+    <section className="courses-section">
+      <div className="courses-section__container">
+        <h2>Popular Courses</h2>
+        <p>Explore our top courses and start learning today.</p>
 
-      <input
-        type="text"
-        placeholder="Search courses..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="course-search"
-      />
+        <input
+          type="text"
+          placeholder="Search courses..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="courses-section__search"
+        />
 
-      {/* Buttons outside the courses-wrapper */}
-      <button className="scroll-btn left" onClick={() => scroll("left")}>&lt;</button>
-      
-      <div className="courses-wrapper">
-        <div className="course-cards" ref={scrollRef}>
-          {filteredCourses.length > 0 ? (
-            filteredCourses.map(course => (
-              <CourseCard 
-                key={course.id}
-                course={course}
-                onMouseEnter={(e) => handleMouseEnter(course, e)}
-                onMouseLeave={handleMouseLeave}
-                showCategory={false}
-                layout="vertical"
-              />
-            ))
-          ) : (
-            <div className="no-courses">
-              <p>No courses found matching your search.</p>
-            </div>
-          )}
+        {/* Buttons outside the courses-wrapper */}
+        <button className="courses-section__scroll-btn courses-section__scroll-btn--left" onClick={() => scroll("left")}>&lt;</button>
+        
+        <div className="courses-section__wrapper">
+          <div className="courses-section__cards" ref={scrollRef}>
+            {filteredCourses.length > 0 ? (
+              filteredCourses.map(course => (
+                <CourseCard 
+                  key={course.id}
+                  course={course}
+                  onMouseEnter={(e) => handleMouseEnter(course, e)}
+                  onMouseLeave={handleMouseLeave}
+                  showCategory={false}
+                  layout="vertical"
+                />
+              ))
+            ) : (
+              <div className="courses-section__no-courses">
+                <p>No courses found matching your search.</p>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-      
-      <button className="scroll-btn right" onClick={() => scroll("right")}>&gt;</button>
+        
+        <button className="courses-section__scroll-btn courses-section__scroll-btn--right" onClick={() => scroll("right")}>&gt;</button>
 
-      <UdemyStylePopup
-        course={hoveredCourse}
-        isVisible={isPopupVisible && !!hoveredCourse}
-        position={popupPosition}
-        onMouseEnter={handlePopupMouseEnter}
-        onMouseLeave={handlePopupMouseLeave}
-      />
-    </div>
-  </section>
-);
+        <UdemyStylePopup
+          course={hoveredCourse}
+          isVisible={isPopupVisible && !!hoveredCourse}
+          position={popupPosition}
+          onMouseEnter={handlePopupMouseEnter}
+          onMouseLeave={handlePopupMouseLeave}
+        />
+      </div>
+    </section>
+  );
 }
 
 export default CourseSection;

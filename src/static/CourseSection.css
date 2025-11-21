@@ -1,17 +1,17 @@
-.courses {
+.courses-section {
   padding: 40px 0;
   text-align: center;
   position: relative; /* Added for absolute positioning context */
 }
 
-.container {
+.courses-section__container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 60px; /* Increased padding to make space for outside buttons */
   position: relative;
 }
 
-.courses-wrapper {
+.courses-section__wrapper {
   display: flex;
   align-items: center;
   margin-top: 20px;
@@ -19,7 +19,7 @@
 }
 
 /* This is the key container - hidden overflow and horizontal scrolling */
-.course-cards {
+.courses-section__cards {
   display: flex;
   gap: 20px;
   overflow-x: auto; /* Enable horizontal scrolling */
@@ -32,12 +32,12 @@
   flex-wrap: nowrap; /* Prevent wrapping */
 }
 
-.course-cards::-webkit-scrollbar {
+.courses-section__cards::-webkit-scrollbar {
   display: none; /* Chrome, Safari and Opera */
 }
 
 /* Scroll buttons - POSITIONED OUTSIDE THE COURSES-WRAPPER */
-.scroll-btn {
+.courses-section__scroll-btn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -57,32 +57,32 @@
 }
 
 /* Position left button outside the container on the left */
-.scroll-btn.left {
+.courses-section__scroll-btn--left {
   left: 10px; /* Position at left edge of container */
 }
 
 /* Position right button outside the container on the right */
-.scroll-btn.right {
+.courses-section__scroll-btn--right {
   right: 10px; /* Position at right edge of container */
 }
 
-.scroll-btn:hover {
+.courses-section__scroll-btn:hover {
   background-color: rgba(0, 0, 0, 0.9);
   transform: translateY(-50%) scale(1.05);
 }
 
-.scroll-btn:disabled {
+.courses-section__scroll-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.scroll-btn:disabled:hover {
+.courses-section__scroll-btn:disabled:hover {
   transform: translateY(-50%) scale(1);
   background-color: rgba(0, 0, 0, 0.7);
 }
 
 /* Search bar */
-.course-search {
+.courses-section__search {
   width: 100%;
   max-width: 400px;
   padding: 12px 16px;
@@ -94,13 +94,13 @@
   transition: border-color 0.3s ease;
 }
 
-.course-search:focus {
+.courses-section__search:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.no-courses {
+.courses-section__no-courses {
   padding: 40px;
   color: #666;
   text-align: center;
@@ -110,24 +110,24 @@
 
 /* Mobile First Responsive Design */
 @media (max-width: 768px) {
-  .courses {
+  .courses-section {
     padding: 20px 0;
   }
   
-  .container {
+  .courses-section__container {
     padding: 0 20px; /* Reduced padding on mobile */
   }
   
-  .course-cards {
+  .courses-section__cards {
     gap: 15px;
     padding: 15px 0;
   }
   
-  .scroll-btn {
+  .courses-section__scroll-btn {
     display: none; /* Hide scroll buttons on mobile */
   }
   
-  .course-search {
+  .courses-section__search {
     max-width: 90%;
     margin: 15px auto;
     padding: 10px 14px;
@@ -135,27 +135,27 @@
 }
 
 @media (max-width: 480px) {
-  .courses {
+  .courses-section {
     padding: 15px 0;
   }
   
-  .container {
+  .courses-section__container {
     padding: 0 15px;
   }
   
-  .course-cards {
+  .courses-section__cards {
     gap: 12px;
     padding: 12px 0;
   }
   
-  .course-search {
+  .courses-section__search {
     max-width: 95%;
     margin: 10px auto;
     padding: 8px 12px;
     font-size: 0.9rem;
   }
   
-  .no-courses {
+  .courses-section__no-courses {
     padding: 30px 20px;
     font-size: 0.9rem;
   }
@@ -163,70 +163,70 @@
 
 /* Desktop enhancements */
 @media (min-width: 769px) {
-  .scroll-btn {
+  .courses-section__scroll-btn {
     display: flex;
   }
 }
 
 /* Large desktop screens */
 @media (min-width: 1200px) {
-  .container {
+  .courses-section__container {
     padding: 0 70px; /* Even more padding for very large screens */
   }
   
-  .scroll-btn.left {
+  .courses-section__scroll-btn--left {
     left: 15px;
   }
   
-  .scroll-btn.right {
+  .courses-section__scroll-btn--right {
     right: 15px;
   }
 }
 
 /* Extra large screens */
 @media (min-width: 1400px) {
-  .container {
+  .courses-section__container {
     max-width: 1300px;
     padding: 0 80px;
   }
   
-  .scroll-btn {
+  .courses-section__scroll-btn {
     width: 45px;
     height: 55px;
     font-size: 1.3rem;
   }
   
-  .scroll-btn.left {
+  .courses-section__scroll-btn--left {
     left: 20px;
   }
   
-  .scroll-btn.right {
+  .courses-section__scroll-btn--right {
     right: 20px;
   }
 }
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-  .scroll-btn {
+  .courses-section__scroll-btn {
     border: 2px solid #000;
   }
   
-  .scroll-btn:hover {
+  .courses-section__scroll-btn:hover {
     border: 2px solid #fff;
   }
 }
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-  .course-cards {
+  .courses-section__cards {
     scroll-behavior: auto;
   }
   
-  .scroll-btn {
+  .courses-section__scroll-btn {
     transition: none;
   }
   
-  .scroll-btn:hover {
+  .courses-section__scroll-btn:hover {
     transform: translateY(-50%);
   }
 }
