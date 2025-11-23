@@ -161,7 +161,7 @@ function CourseCard({
   ]);
 
   return (
-    <div className="coursecard-wrapper">
+    <div className="coursecard-wrapper" >
       <article
         className={`coursecard ${layout} ${className}`}
         onMouseEnter={onMouseEnter}
@@ -170,9 +170,9 @@ function CourseCard({
         role="button"
         {...props}
       >
-        <Link to={`/course/${validatedCourse.id}`} className="coursecard-link">
+        <Link to={`/course/${validatedCourse.id}`} className="coursecard-link" >
           {/* IMAGE */}
-          <div className="coursecard-image-container">
+          <div className="coursecard-image-container" >
             <CourseThumbnail
               src={validatedCourse.thumbnail}
               alt={validatedCourse.title}
