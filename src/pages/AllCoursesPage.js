@@ -129,10 +129,6 @@ function AllCoursesPage() {
             console.log('Trying client-side search as fallback...');
             const clientSideResults = performClientSideSearch(searchQuery);
             setSearchResults(clientSideResults);
-            
-            if (clientSideResults.length === 0) {
-                setError('Search failed. Showing all courses instead.');
-            }
         } finally {
             setSearchLoading(false);
         }
@@ -375,14 +371,6 @@ function AllCoursesPage() {
                                         <span className="allcourses-course-count">
                                             {categoryData.courses.length} course{categoryData.courses.length !== 1 ? 's' : ''}
                                         </span>
-                                        {categoryData.courses.length > 0 && (
-                                            <div className="allcourses-category-actions">
-                                                <button className="allcourses-view-all-btn">
-                                                    View All
-                                                    <i className="fas fa-arrow-right"></i>
-                                                </button>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                                 

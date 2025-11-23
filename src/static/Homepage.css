@@ -1,25 +1,87 @@
-/* Homepage Enterprise Sleek Design - White Background */
+/* ===== HOMEPAGE ENTERPRISE DESIGN SYSTEM ===== */
 .homepage {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+  width: 100%;
 }
 
-/* Homepage General Container */
+/* ===== CONTAINER SYSTEM ===== */
 .homepage-container {
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 32px;
 }
 
-/* Homepage Hero Section - Enterprise Style with White Background */
+/* ===== BUTTON SYSTEM ===== */
+.homepage-btn {
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.95rem;
+  border: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  justify-content: center;
+  min-height: 48px;
+  box-sizing: border-box;
+}
+
+.homepage-btn-primary {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: white;
+  box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.3);
+}
+
+.homepage-btn-primary:hover {
+  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+}
+
+.homepage-btn-outline {
+  border: 2px solid #4f46e5;
+  color: #4f46e5;
+  background: transparent;
+}
+
+.homepage-btn-outline:hover {
+  background: #4f46e5;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.2);
+}
+
+.homepage-btn-cta {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: white;
+  box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.3);
+  position: relative;
+  z-index: 2;
+  min-height: 52px;
+  padding: 16px 32px;
+  font-size: 1rem;
+}
+
+.homepage-btn-cta:hover {
+  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+}
+
+/* ===== HERO SECTION ===== */
 .homepage-hero {
   background: #ffffff;
   padding: 120px 0 100px;
   position: relative;
   overflow: hidden;
-  /* Add top padding to account for fixed navbar */
-  padding-top: calc(120px + 80px); /* Original padding + navbar height */
+  padding-top: calc(120px + 80px);
 }
-
 
 .homepage-hero-content {
   display: flex;
@@ -55,47 +117,9 @@
 
 .homepage-hero-buttons {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   flex-wrap: wrap;
-}
-
-.homepage-btn {
-  padding: 16px 32px;
-  border-radius: 12px;
-  font-weight: 600;
-  text-decoration: none;
-  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 1rem;
-  border: 2px solid transparent;
-  cursor: pointer;
-}
-
-.homepage-btn-primary {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  color: white;
-  box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.3);
-}
-
-.homepage-btn-primary:hover {
-  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
-}
-
-.homepage-btn-outline {
-  border: 2px solid #4f46e5;
-  color: #4f46e5;
-  background: transparent;
-}
-
-.homepage-btn-outline:hover {
-  background: #4f46e5;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.2);
 }
 
 .homepage-hero-image {
@@ -130,11 +154,12 @@
   transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
 }
 
-/* Homepage Features Section - Enterprise Style with White Background */
+/* ===== FEATURES SECTION ===== */
 .homepage-features {
   background: #f8fafc;
   padding: 100px 0;
   position: relative;
+  scroll-margin-top: 80px;
 }
 
 .homepage-features::before {
@@ -213,11 +238,12 @@
   line-height: 1.6;
 }
 
-/* Homepage Testimonials Section - Enterprise Style with White Background */
+/* ===== TESTIMONIALS SECTION ===== */
 .homepage-testimonials {
   background: white;
   padding: 100px 0;
   position: relative;
+  scroll-margin-top: 80px;
 }
 
 .homepage-testimonials::before {
@@ -287,7 +313,7 @@
   margin: 0;
 }
 
-/* Homepage Call to Action - Enterprise Style with White Background */
+/* ===== CALL TO ACTION SECTION ===== */
 .homepage-cta {
   background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
   color: #111827;
@@ -296,6 +322,7 @@
   position: relative;
   overflow: hidden;
   border-top: 1px solid #f1f5f9;
+  scroll-margin-top: 80px;
 }
 
 .homepage-cta::before {
@@ -333,22 +360,43 @@
   z-index: 2;
 }
 
-.homepage-btn-cta {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  color: white;
-  box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.3);
-  position: relative;
-  z-index: 2;
+/* ===== RESPONSIVE DESIGN SYSTEM ===== */
+
+/* Large Tablets (769px - 1024px) */
+@media (max-width: 1024px) {
+  .homepage-container {
+    padding: 0 28px;
+  }
+  
+  .homepage-hero-text h1 {
+    font-size: 3rem;
+  }
+  
+  .homepage-features h2,
+  .homepage-testimonials h2 {
+    font-size: 2.5rem;
+  }
+  
+  .homepage-cta h2 {
+    font-size: 3rem;
+  }
+  
+  .homepage-hero-buttons {
+    gap: 14px;
+  }
+  
+  .homepage-btn {
+    padding: 13px 26px;
+    font-size: 0.93rem;
+  }
+  
+  .homepage-btn-cta {
+    padding: 15px 30px;
+    font-size: 0.98rem;
+  }
 }
 
-.homepage-btn-cta:hover {
-  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
-}
-
-/* Responsive Design */
-/* Responsive Design - Fix mobile issues */
+/* Tablets (601px - 768px) */
 @media (max-width: 768px) {
   .homepage-container {
     padding: 0 20px;
@@ -356,13 +404,17 @@
   
   .homepage-hero {
     padding: 80px 0 60px;
-    /* Adjust top padding for mobile navbar */
-    padding-top: calc(80px + 70px); /* Reduced padding + mobile navbar height */
+    padding-top: calc(80px + 70px);
+  }
+  
+  .homepage-hero-content {
+    gap: 40px;
+    flex-direction: column;
+    text-align: center;
   }
   
   .homepage-hero-text h1 {
     font-size: 2.5rem;
-    margin-top: 0; /* Ensure no extra margin */
   }
   
   .homepage-hero-text p {
@@ -370,96 +422,236 @@
   }
   
   .homepage-hero-buttons {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .homepage-hero-content {
-    gap: 40px; /* Reduce gap on mobile */
-  }
-  
-  /* Ensure hero content doesn't overlap with navbar */
-  .homepage-hero-text,
-  .homepage-hero-image {
-    position: relative;
-    z-index: 1;
-  }
-}
-
-@media (max-width: 480px) {
-  .homepage-hero {
-    padding: 60px 0 40px;
-    /* Further reduce padding for very small screens */
-    padding-top: calc(60px + 60px);
-  }
-  
-  .homepage-hero-text h1 {
-    font-size: 2rem;
-    margin-bottom: 16px;
-  }
-  
-  .homepage-hero-text p {
-    font-size: 1rem;
-    margin-bottom: 30px;
-  }
-  
-  .homepage-hero-buttons {
+    flex-direction: row;
+    justify-content: center;
     gap: 12px;
   }
   
   .homepage-btn {
     padding: 12px 24px;
     font-size: 0.9rem;
-    width: 100%; /* Full width buttons on mobile */
-    justify-content: center;
+    min-width: 140px;
+    flex: 1;
+    max-width: 200px;
   }
   
-  .homepage-hero-content {
-    gap: 30px;
+  .homepage-btn-cta {
+    padding: 14px 28px;
+    font-size: 0.95rem;
+    min-width: 160px;
   }
   
   .homepage-hero-image::before {
-    display: none; /* Remove decorative element on very small screens */
+    top: -15px;
+    left: -15px;
+    right: 15px;
+    bottom: 15px;
   }
   
   .homepage-hero-image img {
-    transform: none; /* Remove 3D effect on very small screens */
+    transform: none;
+  }
+  
+  .homepage-features,
+  .homepage-testimonials {
+    padding: 80px 0;
+  }
+  
+  .homepage-features h2,
+  .homepage-testimonials h2 {
+    font-size: 2.25rem;
+  }
+  
+  .homepage-features p {
+    margin-bottom: 40px;
+    font-size: 1.0625rem;
+  }
+  
+  .homepage-feature-cards,
+  .homepage-testimonial-cards {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .homepage-feature-card {
+    padding: 40px 24px;
+  }
+  
+  .homepage-testimonial-card {
+    padding: 32px 24px;
+  }
+  
+  .homepage-cta {
+    padding: 80px 20px;
+  }
+  
+  .homepage-cta h2 {
+    font-size: 2.5rem;
+  }
+  
+  .homepage-cta p {
+    font-size: 1.125rem;
+    margin-bottom: 40px;
   }
 }
 
-/* Extra small devices (phones under 375px) */
-@media (max-width: 375px) {
-  .homepage-hero {
-    padding: 40px 0 30px;
-    padding-top: calc(40px + 50px);
-  }
-  
+/* Mobile (480px and below) */
+@media (max-width: 480px) {
   .homepage-container {
     padding: 0 16px;
+  }
+  
+  .homepage-hero {
+    padding: 50px 0 30px;
+    padding-top: calc(50px + 50px);
+  }
+  
+  .homepage-hero-text h1 {
+    font-size: 2rem;
+  }
+  
+  .homepage-hero-text p {
+    font-size: 1rem;
+  }
+  
+  .homepage-hero-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .homepage-btn {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    width: 100%;
+    max-width: none;
+    min-width: auto;
+  }
+  
+  .homepage-btn-cta {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    width: 100%;
+    max-width: 280px;
+  }
+  
+  .homepage-hero-image::before {
+    display: none;
+  }
+  
+  .homepage-features,
+  .homepage-testimonials {
+    padding: 50px 0;
+  }
+  
+  .homepage-features h2,
+  .homepage-testimonials h2 {
+    font-size: 1.875rem;
+  }
+  
+  .homepage-feature-cards,
+  .homepage-testimonial-cards {
+    gap: 16px;
+  }
+  
+  .homepage-feature-card {
+    padding: 28px 16px;
+  }
+  
+  .homepage-testimonial-card {
+    padding: 24px 16px;
+  }
+  
+  .homepage-cta {
+    padding: 50px 12px;
+  }
+  
+  .homepage-cta h2 {
+    font-size: 2rem;
+  }
+  
+  .homepage-cta p {
+    font-size: 1rem;
+  }
+}
+
+/* Extra Small Mobile (under 375px) */
+@media (max-width: 374px) {
+  .homepage-container {
+    padding: 0 12px;
+  }
+  
+  .homepage-hero {
+    padding: 40px 0 20px;
   }
   
   .homepage-hero-text h1 {
     font-size: 1.75rem;
   }
   
-  .homepage-hero-text p {
-    font-size: 0.9rem;
+  .homepage-btn,
+  .homepage-btn-cta {
+    padding: 10px 16px;
+    font-size: 0.875rem;
   }
   
-  .homepage-hero-buttons {
-    gap: 8px;
+  .homepage-features,
+  .homepage-testimonials {
+    padding: 40px 0;
+  }
+  
+  .homepage-cta {
+    padding: 40px 8px;
   }
 }
 
-/* Ensure other sections also account for fixed navbar */
-.homepage-features,
-.homepage-testimonials,
-.homepage-cta {
-  scroll-margin-top: 80px; /* This helps with anchor links accounting for fixed navbar */
+/* ===== BUTTON PROTECTION ===== */
+.homepage-btn span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Fix for very small screens - prevent horizontal overflow */
-.homepage {
-  overflow-x: hidden;
-  width: 100%;
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+  .homepage-hero-image img,
+  .homepage-feature-card,
+  .homepage-testimonial-card,
+  .homepage-btn {
+    transition: none;
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .homepage-hero-text h1,
+  .homepage-cta h2 {
+    background: none;
+    -webkit-text-fill-color: #111827;
+  }
+  
+  .homepage-feature-card,
+  .homepage-testimonial-card {
+    border: 2px solid #111827;
+  }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .homepage-hero-image::before,
+  .homepage-cta::before,
+  .homepage-features::before,
+  .homepage-testimonials::before {
+    display: none;
+  }
+  
+  .homepage-hero-image img {
+    transform: none;
+    box-shadow: none;
+  }
+  
+  .homepage-btn {
+    border: 1px solid #000 !important;
+    color: #000 !important;
+    background: none !important;
+  }
 }
