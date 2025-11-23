@@ -92,6 +92,7 @@
   border-radius: 8px;
   display: block;
   transition: border-color 0.3s ease;
+  box-sizing: border-box; /* Add this to include padding in width calculation */
 }
 
 .courses-section__search:focus {
@@ -158,6 +159,47 @@
   .courses-section__no-courses {
     padding: 30px 20px;
     font-size: 0.9rem;
+  }
+}
+
+/* NEW: Extra small screens below 390px */
+@media (max-width: 390px) {
+  .courses-section {
+    padding: 10px 0 !important; /* Force minimal padding */
+  }
+  
+  .courses-section__container {
+    padding: 0 10px !important; /* Drastically reduce container padding */
+  }
+  
+  .courses-section__wrapper {
+    margin-top: 10px; /* Reduce top margin */
+  }
+  
+  .courses-section__cards {
+    gap: 8px !important; /* Minimal gap between cards */
+    padding: 8px 0 !important; /* Minimal vertical padding */
+    margin: 0 -5px; /* Negative margin to utilize full width */
+  }
+  
+  .courses-section__search {
+    max-width: 100% !important; /* Full width search */
+    margin: 8px auto !important; /* Reduced margin */
+    padding: 6px 10px !important; /* Smaller padding */
+    font-size: 0.85rem !important; /* Smaller font */
+    border-radius: 6px; /* Slightly smaller radius */
+  }
+  
+  .courses-section__no-courses {
+    padding: 20px 10px !important; /* Minimal padding */
+    font-size: 0.85rem !important; /* Smaller font */
+  }
+  
+  /* Ensure course cards don't have excessive padding/margin */
+  .course-card {
+    margin: 0 !important;
+    padding: 0 !important;
+    min-width: 280px !important; /* Ensure cards are not too wide */
   }
 }
 
