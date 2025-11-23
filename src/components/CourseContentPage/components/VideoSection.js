@@ -1,5 +1,6 @@
 import VideoPlayer from './VideoPlayer';
 import VideoHeader from './VideoHeader';
+import "../css/VideoSection.css"
 
 const VideoSection = ({ activeVideo, completionStatus, onMarkComplete }) => (
     <div className="video-section">

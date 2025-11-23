@@ -1,3 +1,5 @@
+import "../css/ProgressCard.css"
+
 const ProgressCard = ({ progressPercentage, completedLessons, totalLessons, progressSummary }) => {
     const formatTimeSpent = (seconds) => {
         if (!seconds) return '0m';

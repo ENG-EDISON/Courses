@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import "../css/Breadcrumb.css"
 
 const Breadcrumb = ({ courseTitle }) => (
     <div className="course-content__breadcrumb">

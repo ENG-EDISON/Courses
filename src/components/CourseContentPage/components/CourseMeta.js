@@ -1,3 +1,5 @@
+import "../css/CourseMeta.css"
+
 const CourseMeta = ({ course, progressSummary }) => {
     const formatTimeSpent = (seconds) => {
         if (!seconds) return '0m';

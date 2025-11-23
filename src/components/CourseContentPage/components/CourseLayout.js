@@ -14,13 +14,11 @@ const CourseLayout = ({
 }) => (
     <div className="course-content__layout">
         <div className="course-content__main">
-            <VideoSection 
+            <VideoSection
                 activeVideo={activeVideo}
                 completionStatus={completionStatus}
                 onMarkComplete={onMarkComplete}
             />
-            
-            <CourseDetails course={course} />
         </div>
 
         <div className="course-content__sidebar">
@@ -35,6 +33,7 @@ const CourseLayout = ({
                 progressSummary={progressSummary}
             />
         </div>
+        <CourseDetails course={course} />
     </div>
 );
 
