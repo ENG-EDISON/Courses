@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import AdminMessagesList from "./AdminMessagesList";
 import "../static/AdminDashboard.css";
+import UserManagement from "./Admin/UserManagement";
 
 const menuItems = [
   { id: "overview", label: "Overview", icon: "📊" },
@@ -24,24 +25,6 @@ const AdminOverview = () => (
         <div className="content-card">
           <h3>Recent Activity</h3>
           <p>Monitor recent user and course activities.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-const UsersManagement = () => (
-  <div className="admin-page">
-    <div className="content-section">
-      <h2>👤 Users Management</h2>
-      <div className="content-grid">
-        <div className="content-card">
-          <h3>User Accounts</h3>
-          <p>Manage all user accounts and permissions.</p>
-        </div>
-        <div className="content-card">
-          <h3>Roles & Permissions</h3>
-          <p>Configure user roles and access levels.</p>
         </div>
       </div>
     </div>
@@ -107,7 +90,7 @@ const renderPage = (page) => {
     case "overview":
       return <AdminOverview />;
     case "users":
-      return <UsersManagement />;
+      return <UserManagement />;
     case "courses":
       return <CoursesManagement />;
     case "analytics":

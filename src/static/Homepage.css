@@ -76,11 +76,10 @@
 
 /* ===== HERO SECTION ===== */
 .homepage-hero {
+  margin-top: 60px;
   background: #ffffff;
-  padding: 120px 0 100px;
   position: relative;
   overflow: hidden;
-  padding-top: calc(120px + 80px);
 }
 
 .homepage-hero-content {
