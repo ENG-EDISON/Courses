@@ -1,5 +1,5 @@
 import LessonItem from './LessonItem';
-
+import "../css/Subsection.css";
 const Subsection = ({ 
     subsection, 
     sectionTitle, 
@@ -9,9 +9,9 @@ const Subsection = ({
     onMarkComplete 
 }) => {
     return (
-        <div className="subsection">
+        <div className="ss-subsection">
             {subsection.lessons && (
-                <div className="subsection__lessons">
+                <div className="ss-subsection__lessons">
                     {subsection.lessons.map(lesson => (
                         <LessonItem
                             key={lesson.id}

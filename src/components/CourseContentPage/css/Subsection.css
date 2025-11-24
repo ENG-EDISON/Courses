@@ -1,0 +1,13 @@
+.ss-subsection {
+    margin-bottom: 16px;
+}
+
+.ss-subsection:last-child {
+    margin-bottom: 0;
+}
+
+.ss-subsection__lessons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}

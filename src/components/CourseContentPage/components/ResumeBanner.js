@@ -1,3 +1,4 @@
+import "../css/ResumeBanner.css"
 const ResumeBanner = ({ lastPlayed, onResume }) => (
     <div className="resume-banner">
         <div className="resume-content">

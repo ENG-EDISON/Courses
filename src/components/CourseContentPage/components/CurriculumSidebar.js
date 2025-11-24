@@ -1,5 +1,6 @@
 import SectionAccordion from './SectionAccordion';
 import '../css/CurriculumSidebar.css';
+
 const CurriculumSidebar = ({
     course,
     expandedSections,
@@ -26,14 +27,14 @@ const CurriculumSidebar = ({
     };
 
     return (
-        <div className="curriculum-sidebar">
+        <div className="cs-sidebar">
             <SidebarHeader 
                 sectionCount={course.sections ? course.sections.length : 0}
                 lessonCount={getTotalLessons()}
                 progressPercentage={getProgressPercentage()}
             />
             
-            <div className="curriculum-sections">
+            <div className="cs-curriculum-sections">
                 {course.sections && course.sections.map(section => (
                     <SectionAccordion
                         key={section.id}
@@ -52,9 +53,9 @@ const CurriculumSidebar = ({
 };
 
 const SidebarHeader = ({ sectionCount, lessonCount, progressPercentage }) => (
-    <div className="sidebar-header">
+    <div className="cs-sidebar-header">
         <h3>Course Curriculum</h3>
-        <div className="curriculum-stats">
+        <div className="cs-curriculum-stats">
             <span>{sectionCount} sections</span>
             <span>•</span>
             <span>{lessonCount} lessons</span>

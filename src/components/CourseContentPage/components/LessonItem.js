@@ -1,4 +1,5 @@
 import { getVideoSource } from '../utils/videoUtils';
+import "../css/LessonItem.css";
 
 const LessonItem = ({ 
     lesson, 
@@ -22,7 +23,7 @@ const LessonItem = ({
     };
 
     const handleLessonClick = (e) => {
-        if (e.target.closest('.lesson-mark-complete')) {
+        if (e.target.closest('.ls-item-mark-complete')) {
             return;
         }
         onSelect(lesson, sectionTitle, subsectionTitle);
@@ -35,36 +36,36 @@ const LessonItem = ({
 
     return (
         <div
-            className={`lesson-item ${isActive ? 'lesson-item--active' : ''} ${isCompleted ? 'lesson-item--completed' : ''}`}
+            className={`ls-item ${isActive ? 'ls-item--active' : ''} ${isCompleted ? 'ls-item--completed' : ''}`}
             onClick={handleLessonClick}
         >
-            <div className="lesson-item__status">
+            <div className="ls-item__status">
                 {isCompleted ? (
-                    <div className="status-completed">
+                    <div className="ls-item-status-completed">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                             <path d="M13.3334 4L6.00008 11.3333L2.66675 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                     </div>
                 ) : (
-                    <div className="status-pending">
-                        <div className="status-circle"></div>
+                    <div className="ls-item-status-pending">
+                        <div className="ls-item-status-circle"></div>
                     </div>
                 )}
             </div>
 
-            <div className="lesson-item__icon">
-                <span className="video-source-icon">{getVideoIcon()}</span>
+            <div className="ls-item__icon">
+                <span className="ls-item-video-source-icon">{getVideoIcon()}</span>
             </div>
 
-            <div className="lesson-item__content">
-                <h6 className="lesson-item__title">
+            <div className="ls-item__content">
+                <h6 className="ls-item__title">
                     {lesson.title}
                 </h6>
             </div>
 
             {!isCompleted && (
                 <button
-                    className="lesson-mark-complete"
+                    className="ls-item-mark-complete"
                     onClick={handleMarkComplete}
                     title="Mark as completed"
                 >
@@ -75,8 +76,8 @@ const LessonItem = ({
             )}
 
             {isActive && (
-                <div className="lesson-item__playing">
-                    <div className="playing-indicator"></div>
+                <div className="ls-item__playing">
+                    <div className="ls-item-playing-indicator"></div>
                 </div>
             )}
         </div>
