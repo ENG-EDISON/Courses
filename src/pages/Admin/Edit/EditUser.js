@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { updateUser, deactivateUser, activateUser } from "../../../api/UsersApi";
+import "../css/EditUser.css";
 
 const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
   const [formData, setFormData] = useState({
@@ -12,19 +13,14 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
     bio: "",
     is_staff: false,
     is_superuser: false,
-    is_active: true, // ADDED THIS FIELD
+    is_active: true,
   });
   const [loading, setLoading] = useState(false);
-  const [statusLoading, setStatusLoading] = useState(false); // ADDED FOR STATUS TOGGLE
+  const [statusLoading, setStatusLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Initialize form when user prop changes
   useEffect(() => {
-    console.log("🔍 [EditUser] Component mounted with user:", user);
-    console.log("🔍 [EditUser] User ID:", user?.id);
-    
     if (user) {
-      console.log("🔍 [EditUser] Initializing form with user data:", user);
       setFormData({
         username: user.username || "",
         email: user.email || "",
@@ -35,7 +31,7 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
         bio: user.bio || "",
         is_staff: user.is_staff || false,
         is_superuser: user.is_superuser || false,
-        is_active: user.is_active !== false, // Handle undefined as true
+        is_active: user.is_active !== false,
       });
     }
   }, [user]);
@@ -46,16 +42,15 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+    if (error) setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    // Validate that user ID exists
     if (!user || !user.id) {
       const errorMsg = `Cannot update user: User ID is ${user?.id}`;
-      console.error("❌ [EditUser]", errorMsg);
       setError(errorMsg);
       return;
     }
@@ -72,31 +67,20 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
         bio: formData.bio,
         is_staff: formData.is_staff,
         is_superuser: formData.is_superuser,
-        is_active: formData.is_active, // INCLUDED ACTIVE STATUS
+        is_active: formData.is_active,
       };
 
-      // Remove empty fields but preserve booleans and zeros
       Object.keys(updatedData).forEach(key => {
         if (updatedData[key] === "" || updatedData[key] === null) {
           delete updatedData[key];
         }
       });
 
-      console.log("🔍 [EditUser] Sending update data to API:", updatedData);
-      console.log("🔍 [EditUser] Updating user ID:", user.id);
-      
       const response = await updateUser(user.id, updatedData);
       
-      console.log("✅ [EditUser] API Response:", response);
-      console.log("✅ [EditUser] Response data:", response.data);
-      
-      // Call the callback to notify parent
       if (onSave) {
-        console.log("🔍 [EditUser] Calling onSave callback with:", user.id, response.data);
         onSave(user.id, response.data);
       }
-      
-      console.log("✅ [EditUser] User updated successfully!");
       
     } catch (err) {
       console.error("❌ [EditUser] Error updating user:", err);
@@ -131,25 +115,23 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
     }
   };
 
-  // NEW: Handle activation/deactivation toggle
   const handleStatusToggle = async () => {
     if (!user?.id) return;
     
     setStatusLoading(true);
     try {
-      let response;
       if (formData.is_active) {
-        response = await deactivateUser(user.id);
+        await deactivateUser(user.id);
         setFormData(prev => ({ ...prev, is_active: false }));
+        if (onStatusChange) {
+          onStatusChange(user.id, false);
+        }
       } else {
-        response = await activateUser(user.id);
+        await activateUser(user.id);
         setFormData(prev => ({ ...prev, is_active: true }));
-      }
-      
-      console.log("✅ [EditUser] Status change successful:", response.data);
-      
-      if (onStatusChange) {
-        onStatusChange(user.id, !formData.is_active);
+        if (onStatusChange) {
+          onStatusChange(user.id, true);
+        }
       }
       
     } catch (err) {
@@ -161,22 +143,16 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
   };
 
   if (!user) {
-    console.log("❌ [EditUser] No user provided to edit");
     return null;
   }
 
   if (!user.id) {
-    console.log("❌ [EditUser] User object missing ID:", user);
     return (
       <div className="um-edit-form-overlay">
         <div className="um-edit-form">
           <div className="um-error-message">
             <strong>Error:</strong> Cannot edit user - User ID is missing or undefined
-            <button 
-              type="button"
-              onClick={onCancel} 
-              className="um-close-error"
-            >
+            <button type="button" onClick={onCancel} className="um-close-error">
               ×
             </button>
           </div>
@@ -186,10 +162,10 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
   }
 
   return (
-    <div className="um-edit-form-overlay">
-      <div className="um-edit-form">
+    <div className="um-edit-form-overlay" onClick={onCancel}>
+      <div className="um-edit-form" onClick={(e) => e.stopPropagation()}>
         <h3>
-          Edit User: {user.username} (ID: {user.id})
+          Edit User: {user.username} 
           <span className={`um-status-badge ${formData.is_active ? 'active' : 'inactive'}`}>
             {formData.is_active ? 'Active' : 'Inactive'}
           </span>
@@ -200,180 +176,202 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
             <div className="error-content">
               <strong>Update Error:</strong>
               <div className="error-message-text">{error}</div>
-              <div className="error-debug-info">
-                <small>Attempting to update User ID: {user.id}</small>
-              </div>
             </div>
-            <button 
-              type="button"
-              onClick={() => setError("")} 
-              className="um-close-error"
-            >
+            <button type="button" onClick={() => setError("")} className="um-close-error">
               ×
             </button>
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
-          <div className="um-form-group">
-            <label>Username:</label>
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              required
-              disabled={loading}
-            />
-          </div>
-          
-          <div className="um-form-group">
-            <label>Email:</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              disabled={loading}
-            />
-          </div>
+          <div className="um-form-sections-container">
+            {/* Basic Information - 3 Column Layout */}
+            <div className="um-form-section">
+              <h4>Basic Information</h4>
+              <div className="um-form-grid">
+                {/* Row 1 */}
+                <div className="um-form-group">
+                  <label>Username <span className="field-required">*</span></label>
+                  <input
+                    type="text"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleChange}
+                    required
+                    disabled={loading}
+                  />
+                </div>
+                
+                <div className="um-form-group">
+                  <label>Email <span className="field-required">*</span></label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    disabled={loading}
+                  />
+                </div>
 
-          <div className="um-form-row">
-            <div className="um-form-group">
-              <label>First Name:</label>
-              <input
-                type="text"
-                name="first_name"
-                value={formData.first_name}
-                onChange={handleChange}
-                disabled={loading}
-              />
-            </div>
-            
-            <div className="um-form-group">
-              <label>Last Name:</label>
-              <input
-                type="text"
-                name="last_name"
-                value={formData.last_name}
-                onChange={handleChange}
-                disabled={loading}
-              />
-            </div>
-          </div>
+                <div className="um-form-group">
+                  <label>User Type <span className="field-required">*</span></label>
+                  <select
+                    name="user_type"
+                    value={formData.user_type}
+                    onChange={handleChange}
+                    required
+                    disabled={loading}
+                  >
+                    <option value="student">Student</option>
+                    <option value="instructor">Instructor</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
 
-          <div className="um-form-group">
-            <label>User Type:</label>
-            <select
-              name="user_type"
-              value={formData.user_type}
-              onChange={handleChange}
-              disabled={loading}
-            >
-              <option value="student">Student</option>
-              <option value="instructor">Instructor</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
+                {/* Row 2 */}
+                <div className="um-form-group">
+                  <label>First Name</label>
+                  <input
+                    type="text"
+                    name="first_name"
+                    value={formData.first_name}
+                    onChange={handleChange}
+                    disabled={loading}
+                  />
+                </div>
+                
+                <div className="um-form-group">
+                  <label>Last Name</label>
+                  <input
+                    type="text"
+                    name="last_name"
+                    value={formData.last_name}
+                    onChange={handleChange}
+                    disabled={loading}
+                  />
+                </div>
 
-          <div className="um-form-group">
-            <label>Phone Number:</label>
-            <input
-              type="tel"
-              name="phone_number"
-              value={formData.phone_number}
-              onChange={handleChange}
-              disabled={loading}
-            />
-          </div>
+                <div className="um-form-group">
+                  <label>Phone Number</label>
+                  <input
+                    type="tel"
+                    name="phone_number"
+                    value={formData.phone_number}
+                    onChange={handleChange}
+                    disabled={loading}
+                  />
+                </div>
 
-          <div className="um-form-group">
-            <label>Bio:</label>
-            <textarea
-              name="bio"
-              value={formData.bio}
-              onChange={handleChange}
-              rows="3"
-              disabled={loading}
-            />
-          </div>
-
-          {/* Admin Permissions Section */}
-          <div className="um-admin-permissions">
-            <h4>Admin Permissions</h4>
-            
-            <div className="um-form-group">
-              <label className="um-checkbox-label">
-                <input
-                  type="checkbox"
-                  name="is_staff"
-                  checked={formData.is_staff}
-                  onChange={handleChange}
-                  disabled={loading}
-                />
-                <span>Staff Member</span>
-              </label>
-              <small className="um-checkbox-description">
-                Can access the admin site and manage content
-              </small>
+                {/* Row 3 - Bio spans all 3 columns */}
+                <div className="um-form-group full-width">
+                  <label>Bio</label>
+                  <textarea
+                    name="bio"
+                    value={formData.bio}
+                    onChange={handleChange}
+                    rows="3"
+                    disabled={loading}
+                    placeholder="Enter user bio..."
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="um-form-group">
-              <label className="um-checkbox-label">
-                <input
-                  type="checkbox"
-                  name="is_superuser"
-                  checked={formData.is_superuser}
-                  onChange={handleChange}
-                  disabled={loading}
-                />
-                <span>Super Admin</span>
-              </label>
-              <small className="um-checkbox-description">
-                Has all permissions without explicitly assigning them
-              </small>
-            </div>
+            {/* Admin Permissions Section - 3 Column Layout */}
+            <div className="um-admin-permissions">
+              <h4>Administrative Permissions</h4>
+              <div className="um-form-grid">
+                <div className="um-form-group">
+                  <label className="um-checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="is_staff"
+                      checked={formData.is_staff}
+                      onChange={handleChange}
+                      disabled={loading || formData.is_superuser}
+                    />
+                    <span>Staff Member</span>
+                  </label>
+                  <small className="um-checkbox-description">
+                    Access to admin dashboard
+                  </small>
+                </div>
 
-            {/* NEW: Active Status Checkbox */}
-            <div className="um-form-group">
-              <label className="um-checkbox-label">
-                <input
-                  type="checkbox"
-                  name="is_active"
-                  checked={formData.is_active}
-                  onChange={handleChange}
-                  disabled={loading}
-                />
-                <span>Active User</span>
-              </label>
-              <small className="um-checkbox-description">
-                User can login and access the system
-              </small>
-            </div>
+                <div className="um-form-group">
+                  <label className="um-checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="is_superuser"
+                      checked={formData.is_superuser}
+                      onChange={handleChange}
+                      disabled={loading}
+                    />
+                    <span>Super Admin</span>
+                  </label>
+                  <small className="um-checkbox-description">
+                    Full system access
+                  </small>
+                </div>
 
-            {/* NEW: Quick Status Toggle Button */}
-            <div className="um-status-actions">
-              <button
-                type="button"
-                onClick={handleStatusToggle}
-                disabled={statusLoading || loading}
-                className={`um-status-btn ${formData.is_active ? 'deactivate' : 'activate'}`}
-              >
-                {statusLoading ? 'Processing...' : formData.is_active ? 'Deactivate User' : 'Activate User'}
-              </button>
-              <small className="um-status-hint">
-                {formData.is_active 
-                  ? 'User can currently login and use the system' 
-                  : 'User cannot login or access the system'
-                }
-              </small>
+                <div className="um-form-group">
+                  <label className="um-checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="is_active"
+                      checked={formData.is_active}
+                      onChange={handleChange}
+                      disabled={loading}
+                    />
+                    <span>Active Status</span>
+                  </label>
+                  <small className="um-checkbox-description">
+                    User can login
+                  </small>
+                </div>
+
+                {/* Status Toggle Button - Full Width */}
+                <div className="um-form-group full-width">
+                  <div className="um-status-actions">
+                    <button
+                      type="button"
+                      onClick={handleStatusToggle}
+                      disabled={statusLoading || loading}
+                      className={`um-status-btn ${formData.is_active ? 'deactivate' : 'activate'}`}
+                    >
+                      {statusLoading ? (
+                        <>
+                          <span className="loading-spinner"></span>
+                          Processing...
+                        </>
+                      ) : formData.is_active ? (
+                        "Deactivate User"
+                      ) : (
+                        "Activate User"
+                      )}
+                    </button>
+                    <small className="um-status-hint">
+                      {formData.is_active 
+                        ? 'User can currently login and use the system' 
+                        : 'User cannot login or access the system'
+                      }
+                    </small>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           <div className="um-form-actions">
             <button type="submit" className="um-btn-primary" disabled={loading}>
-              {loading ? "Saving..." : "Save Changes"}
+              {loading ? (
+                <>
+                  <span className="loading-spinner"></span>
+                  Saving Changes...
+                </>
+              ) : (
+                "Save Changes"
+              )}
             </button>
             <button type="button" onClick={onCancel} className="um-btn-secondary" disabled={loading}>
               Cancel

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getAllUsers, deactivateUser, activateUser } from "../../api/UsersApi";
-import AddUser from "./AddUser";
+import AddUser from "./Edit/AddUser";
 import EditUser from "./Edit/EditUser";
 import DeleteUser from "./Edit/DeleteUser"; // Import the new component
 import "./css/UserManagement.css";
@@ -189,7 +189,7 @@ const UserManagement = () => {
           </div>
 
           {/* Users Table */}
-          <div className="content-card">
+          <div className="ad-content-card">
             <h3>User Accounts ({filteredUsers.length})</h3>
             
             {loading ? (
@@ -287,7 +287,7 @@ const UserManagement = () => {
 
           {/* User Statistics */}
           <div className="content-grid">
-            <div className="content-card">
+            <div className="ad-content-card">
               <h3>User Statistics</h3>
               <div className="um-stats-grid">
                 <div className="um-stat-item">

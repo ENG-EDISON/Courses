@@ -1,6 +1,8 @@
-/* User Management Styles */
+/* User Management Styles - Enhanced Mobile Responsiveness */
 .um-user-management {
   padding: 0;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .um-content-header {
@@ -10,18 +12,23 @@
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid #e9ecef;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .um-content-header h2 {
   margin: 0;
   color: #2c3e50;
   font-size: 1.75rem;
+  flex: 1;
+  min-width: 200px;
 }
 
 .um-header-actions {
   display: flex;
   gap: 1rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .um-btn-add-user {
@@ -37,6 +44,8 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  white-space: nowrap;
+  min-height: 40px;
 }
 
 .um-btn-add-user:hover {
@@ -58,6 +67,8 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  white-space: nowrap;
+  min-height: 40px;
 }
 
 .um-btn-refresh:hover:not(:disabled) {
@@ -81,8 +92,10 @@
   border: 1px solid #ffcdd2;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   box-shadow: 0 2px 4px rgba(231, 76, 60, 0.1);
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .um-close-error {
@@ -99,6 +112,7 @@
   justify-content: center;
   border-radius: 50%;
   transition: background-color 0.2s ease;
+  flex-shrink: 0;
 }
 
 .um-close-error:hover {
@@ -126,6 +140,7 @@
   border-radius: 8px;
   font-size: 0.875rem;
   transition: border-color 0.2s ease;
+  box-sizing: border-box;
 }
 
 .um-search-box input:focus {
@@ -138,12 +153,15 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  flex: 1;
+  min-width: 150px;
 }
 
 .um-filter-group label {
   font-size: 0.875rem;
   font-weight: 500;
   color: #2c3e50;
+  white-space: nowrap;
 }
 
 .um-filter-group select {
@@ -153,7 +171,8 @@
   background: white;
   font-size: 0.875rem;
   transition: border-color 0.2s ease;
-  min-width: 150px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .um-filter-group select:focus {
@@ -169,32 +188,38 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   margin-bottom: 2rem;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .um-users-table {
   width: 100%;
   border-collapse: collapse;
   margin: 0;
+  min-width: 800px; /* Minimum width for table to maintain readability */
 }
 
 .um-users-table th {
   background: #f8f9fa;
-  padding: 1rem 0.75rem;
+  padding: 1rem 0.5rem;
   text-align: left;
   font-weight: 600;
   color: #2c3e50;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-bottom: 2px solid #e9ecef;
+  white-space: nowrap;
 }
 
 .um-users-table td {
-  padding: 1rem 0.75rem;
+  padding: 0.75rem 0.5rem;
   text-align: left;
   border-bottom: 1px solid #f1f3f4;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   vertical-align: middle;
+  white-space: nowrap;
 }
 
 .um-users-table tr:hover {
@@ -209,20 +234,22 @@
 .um-user-info {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .um-user-avatar {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #e9ecef;
+  flex-shrink: 0;
 }
 
 .um-user-avatar-placeholder {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: #3498db;
   display: flex;
@@ -230,17 +257,25 @@
   justify-content: center;
   color: white;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   border: 2px solid #e9ecef;
+  flex-shrink: 0;
+}
+
+.um-admin-badge {
+  font-size: 0.75rem;
+  flex-shrink: 0;
 }
 
 /* Badges */
 .um-user-type-badge {
-  padding: 0.375rem 0.75rem;
+  padding: 0.25rem 0.5rem;
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: capitalize;
+  display: inline-block;
+  white-space: nowrap;
 }
 
 .um-user-type-badge.instructor {
@@ -256,11 +291,13 @@
 }
 
 .um-status-badge {
-  padding: 0.375rem 0.75rem;
+  padding: 0.25rem 0.5rem;
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: capitalize;
+  display: inline-block;
+  white-space: nowrap;
 }
 
 .um-status-badge.active {
@@ -275,22 +312,47 @@
   border: 1px solid #ffcdd2;
 }
 
+.um-role-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.um-role-badge.admin {
+  background: #fff3e0;
+  color: #ef6c00;
+  border: 1px solid #ffe0b2;
+}
+
+.um-role-badge.user {
+  background: #f5f5f5;
+  color: #616161;
+  border: 1px solid #e0e0e0;
+}
+
 /* Action Buttons */
 .um-action-buttons {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.25rem;
   flex-wrap: wrap;
+  justify-content: flex-start;
 }
 
 .um-action-buttons button {
-  padding: 0.5rem 0.75rem;
+  padding: 0.375rem 0.5rem;
   border: none;
-  border-radius: 6px;
-  font-size: 0.75rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-width: 80px;
+  min-width: 60px;
+  white-space: nowrap;
+  flex: 1;
+  text-align: center;
 }
 
 .um-btn-edit {
@@ -340,15 +402,15 @@
 /* Stats Grid */
 .um-stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
   margin-top: 1.5rem;
 }
 
 .um-stat-item {
   background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
+  padding: 1rem;
+  border-radius: 8px;
   text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid #e9ecef;
@@ -362,14 +424,14 @@
 
 .um-stat-number {
   display: block;
-  font-size: 2.5rem;
+  font-size: 1.75rem;
   font-weight: bold;
   color: #3498db;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .um-stat-label {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: #7f8c8d;
   font-weight: 500;
   text-transform: uppercase;
@@ -379,30 +441,30 @@
 /* Loading and Empty States */
 .um-loading {
   text-align: center;
-  padding: 3rem;
+  padding: 2rem;
   color: #7f8c8d;
-  font-size: 1rem;
+  font-size: 0.875rem;
 }
 
 .um-no-data {
   text-align: center;
-  padding: 3rem;
+  padding: 2rem;
   color: #bdc3c7;
-  font-size: 1rem;
+  font-size: 0.875rem;
 }
 
 .um-loading::before {
   content: "⏳";
   display: block;
-  font-size: 2rem;
-  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .um-no-data::before {
   content: "📭";
   display: block;
-  font-size: 2rem;
-  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 /* Checkbox Label */
@@ -419,7 +481,7 @@
   margin: 0;
 }
 
-/* Responsive Design */
+/* Enhanced Responsive Design */
 @media (max-width: 768px) {
   .um-content-header {
     flex-direction: column;
@@ -429,6 +491,7 @@
   
   .um-header-actions {
     justify-content: space-between;
+    gap: 0.5rem;
   }
   
   .um-user-filters {
@@ -438,40 +501,229 @@
   
   .um-search-box {
     min-width: auto;
+    width: 100%;
+  }
+  
+  .um-filter-group {
+    width: 100%;
   }
   
   .um-action-buttons {
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
   }
   
   .um-action-buttons button {
     min-width: auto;
+    flex: 1;
+    margin: 0 0.125rem;
   }
   
   .um-users-table-container {
     border-radius: 8px;
-    margin: 0 -1rem;
-    width: calc(100% + 2rem);
+    margin: 0 -0.5rem;
+    width: calc(100% + 1rem);
   }
   
   .um-stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  .um-stat-item {
+    padding: 0.75rem;
+  }
+  
+  .um-stat-number {
+    font-size: 1.5rem;
   }
 }
 
 @media (max-width: 480px) {
   .um-user-management {
-    padding: 0.5rem;
+    padding: 0.25rem;
+  }
+  
+  .um-content-header h2 {
+    font-size: 1.5rem;
+    text-align: center;
   }
   
   .um-header-actions {
     flex-direction: column;
     gap: 0.5rem;
+    width: 100%;
   }
   
   .um-btn-add-user,
   .um-btn-refresh {
     width: 100%;
     justify-content: center;
+    min-height: 44px; /* Better touch targets */
+  }
+  
+  .um-user-filters {
+    margin-bottom: 1rem;
+  }
+  
+  .um-search-box input,
+  .um-filter-group select {
+    padding: 0.875rem; /* Larger touch targets */
+    font-size: 1rem; /* Prevent zoom on iOS */
+  }
+  
+  .um-users-table-container {
+    margin: 0 -0.25rem;
+    width: calc(100% + 0.5rem);
+    border-radius: 6px;
+  }
+  
+  .um-users-table {
+    min-width: 700px; /* Slightly smaller minimum width */
+  }
+  
+  .um-users-table th,
+  .um-users-table td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.7rem;
+  }
+  
+  .um-user-info {
+    gap: 0.25rem;
+  }
+  
+  .um-user-avatar,
+  .um-user-avatar-placeholder {
+    width: 28px;
+    height: 28px;
+    font-size: 0.7rem;
+  }
+  
+  .um-action-buttons {
+    gap: 0.125rem;
+  }
+  
+  .um-action-buttons button {
+    padding: 0.25rem 0.375rem;
+    font-size: 0.65rem;
+    min-width: 55px;
+  }
+  
+  .um-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+}
+
+/* Extra Small Devices (390px and below) */
+@media (max-width: 390px) {
+  .um-user-management {
+    padding: 0.125rem;
+  }
+  
+  .um-content-header h2 {
+    font-size: 1.25rem;
+    min-width: auto;
+  }
+  
+  .um-btn-add-user,
+  .um-btn-refresh {
+    font-size: 0.8rem;
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .um-error-message {
+    padding: 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  .um-user-filters {
+    gap: 0.75rem;
+  }
+  
+  .um-search-box input {
+    font-size: 0.9rem; /* Prevent zoom */
+  }
+  
+  .um-filter-group label {
+    font-size: 0.8rem;
+  }
+  
+  .um-filter-group select {
+    font-size: 0.9rem; /* Prevent zoom */
+  }
+  
+  .um-users-table {
+    min-width: 650px; /* Further reduced for very small screens */
+  }
+  
+  .um-users-table th {
+    font-size: 0.65rem;
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .um-users-table td {
+    font-size: 0.65rem;
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .um-user-avatar,
+  .um-user-avatar-placeholder {
+    width: 24px;
+    height: 24px;
+    font-size: 0.65rem;
+  }
+  
+  .um-user-type-badge,
+  .um-status-badge,
+  .um-role-badge {
+    font-size: 0.6rem;
+    padding: 0.2rem 0.4rem;
+  }
+  
+  .um-action-buttons button {
+    font-size: 0.6rem;
+    padding: 0.25rem 0.3rem;
+    min-width: 50px;
+  }
+  
+  .um-stat-item {
+    padding: 0.5rem;
+  }
+  
+  .um-stat-number {
+    font-size: 1.25rem;
+  }
+  
+  .um-stat-label {
+    font-size: 0.7rem;
+  }
+  
+  .um-loading,
+  .um-no-data {
+    padding: 1.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .um-loading::before,
+  .um-no-data::before {
+    font-size: 1.25rem;
+  }
+}
+
+/* Fix for very small screens in landscape */
+@media (max-width: 390px) and (orientation: landscape) {
+  .um-users-table-container {
+    max-height: 300px;
+  }
+  
+  .um-header-actions {
+    flex-direction: row;
+  }
+  
+  .um-btn-add-user,
+  .um-btn-refresh {
+    width: auto;
+    flex: 1;
   }
 }
