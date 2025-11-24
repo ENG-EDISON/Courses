@@ -28,6 +28,7 @@ apiClient.interceptors.response.use(
 
     // Handle 401 Unauthorized
     if (error.response?.status === 401) {
+      // Prevent infinite loops - check if this is already a retry
       if (!originalRequest._retry) {
         originalRequest._retry = true;
 
@@ -39,8 +40,9 @@ apiClient.interceptors.response.use(
               process.env.REACT_APP_API_PROD_URL ||
               'http://127.0.0.1:8000';
 
+            // FIX: Add leading slash to URL
             const response = await axios.post(
-              `${baseUrl}api/token/refresh/`,
+              `${baseUrl}/api/token/refresh/`,  // Added leading slash
               { refresh: refreshToken }
             );
 

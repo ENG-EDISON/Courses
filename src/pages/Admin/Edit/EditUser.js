@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { updateUser } from "../../../api/UsersApi";
+import { updateUser, deactivateUser, activateUser } from "../../../api/UsersApi";
 
-const EditUser = ({ user, onSave, onCancel }) => {
+const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -12,8 +12,10 @@ const EditUser = ({ user, onSave, onCancel }) => {
     bio: "",
     is_staff: false,
     is_superuser: false,
+    is_active: true, // ADDED THIS FIELD
   });
   const [loading, setLoading] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(false); // ADDED FOR STATUS TOGGLE
   const [error, setError] = useState("");
 
   // Initialize form when user prop changes
@@ -33,6 +35,7 @@ const EditUser = ({ user, onSave, onCancel }) => {
         bio: user.bio || "",
         is_staff: user.is_staff || false,
         is_superuser: user.is_superuser || false,
+        is_active: user.is_active !== false, // Handle undefined as true
       });
     }
   }, [user]);
@@ -69,9 +72,10 @@ const EditUser = ({ user, onSave, onCancel }) => {
         bio: formData.bio,
         is_staff: formData.is_staff,
         is_superuser: formData.is_superuser,
+        is_active: formData.is_active, // INCLUDED ACTIVE STATUS
       };
 
-      // Remove empty fields
+      // Remove empty fields but preserve booleans and zeros
       Object.keys(updatedData).forEach(key => {
         if (updatedData[key] === "" || updatedData[key] === null) {
           delete updatedData[key];
@@ -80,13 +84,11 @@ const EditUser = ({ user, onSave, onCancel }) => {
 
       console.log("🔍 [EditUser] Sending update data to API:", updatedData);
       console.log("🔍 [EditUser] Updating user ID:", user.id);
-      console.log("🔍 [EditUser] API endpoint will be: PATCH /api/user/", user.id, "/");
       
       const response = await updateUser(user.id, updatedData);
       
       console.log("✅ [EditUser] API Response:", response);
       console.log("✅ [EditUser] Response data:", response.data);
-      console.log("✅ [EditUser] Response status:", response.status);
       
       // Call the callback to notify parent
       if (onSave) {
@@ -98,16 +100,13 @@ const EditUser = ({ user, onSave, onCancel }) => {
       
     } catch (err) {
       console.error("❌ [EditUser] Error updating user:", err);
-      console.error("❌ [EditUser] Error response:", err.response);
-      console.error("❌ [EditUser] Error data:", err.response?.data);
-      console.error("❌ [EditUser] Error status:", err.response?.status);
-      console.error("❌ [EditUser] Error config:", err.config);
-      console.error("❌ [EditUser] Error URL:", err.config?.url);
       
       let errorMessage = "Unknown error occurred";
       
-      if (err.response?.status === 404) {
-        errorMessage = `User with ID ${user.id} not found at ${err.config?.url}. Please check if the user exists and you have permission to update it.`;
+      if (err.response?.status === 403) {
+        errorMessage = "Permission denied. You need admin privileges to update users.";
+      } else if (err.response?.status === 404) {
+        errorMessage = `User with ID ${user.id} not found.`;
       } else if (err.response?.data) {
         if (err.response.data.detail) {
           errorMessage = err.response.data.detail;
@@ -132,6 +131,35 @@ const EditUser = ({ user, onSave, onCancel }) => {
     }
   };
 
+  // NEW: Handle activation/deactivation toggle
+  const handleStatusToggle = async () => {
+    if (!user?.id) return;
+    
+    setStatusLoading(true);
+    try {
+      let response;
+      if (formData.is_active) {
+        response = await deactivateUser(user.id);
+        setFormData(prev => ({ ...prev, is_active: false }));
+      } else {
+        response = await activateUser(user.id);
+        setFormData(prev => ({ ...prev, is_active: true }));
+      }
+      
+      console.log("✅ [EditUser] Status change successful:", response.data);
+      
+      if (onStatusChange) {
+        onStatusChange(user.id, !formData.is_active);
+      }
+      
+    } catch (err) {
+      console.error("❌ [EditUser] Error changing user status:", err);
+      setError(`Failed to change user status: ${err.response?.data?.detail || err.message}`);
+    } finally {
+      setStatusLoading(false);
+    }
+  };
+
   if (!user) {
     console.log("❌ [EditUser] No user provided to edit");
     return null;
@@ -144,7 +172,6 @@ const EditUser = ({ user, onSave, onCancel }) => {
         <div className="um-edit-form">
           <div className="um-error-message">
             <strong>Error:</strong> Cannot edit user - User ID is missing or undefined
-            <div>User object: {JSON.stringify(user)}</div>
             <button 
               type="button"
               onClick={onCancel} 
@@ -161,7 +188,12 @@ const EditUser = ({ user, onSave, onCancel }) => {
   return (
     <div className="um-edit-form-overlay">
       <div className="um-edit-form">
-        <h3>Edit User: {user.username} (ID: {user.id})</h3>
+        <h3>
+          Edit User: {user.username} (ID: {user.id})
+          <span className={`um-status-badge ${formData.is_active ? 'active' : 'inactive'}`}>
+            {formData.is_active ? 'Active' : 'Inactive'}
+          </span>
+        </h3>
         
         {error && (
           <div className="um-error-message">
@@ -241,6 +273,7 @@ const EditUser = ({ user, onSave, onCancel }) => {
             >
               <option value="student">Student</option>
               <option value="instructor">Instructor</option>
+              <option value="admin">Admin</option>
             </select>
           </div>
 
@@ -299,6 +332,41 @@ const EditUser = ({ user, onSave, onCancel }) => {
               </label>
               <small className="um-checkbox-description">
                 Has all permissions without explicitly assigning them
+              </small>
+            </div>
+
+            {/* NEW: Active Status Checkbox */}
+            <div className="um-form-group">
+              <label className="um-checkbox-label">
+                <input
+                  type="checkbox"
+                  name="is_active"
+                  checked={formData.is_active}
+                  onChange={handleChange}
+                  disabled={loading}
+                />
+                <span>Active User</span>
+              </label>
+              <small className="um-checkbox-description">
+                User can login and access the system
+              </small>
+            </div>
+
+            {/* NEW: Quick Status Toggle Button */}
+            <div className="um-status-actions">
+              <button
+                type="button"
+                onClick={handleStatusToggle}
+                disabled={statusLoading || loading}
+                className={`um-status-btn ${formData.is_active ? 'deactivate' : 'activate'}`}
+              >
+                {statusLoading ? 'Processing...' : formData.is_active ? 'Deactivate User' : 'Activate User'}
+              </button>
+              <small className="um-status-hint">
+                {formData.is_active 
+                  ? 'User can currently login and use the system' 
+                  : 'User cannot login or access the system'
+                }
               </small>
             </div>
           </div>

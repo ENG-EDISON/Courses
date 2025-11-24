@@ -147,3 +147,212 @@
     text-align: center;
   }
 }
+
+/* Add these styles to your existing Login.css */
+
+/* Enhanced Error Messages */
+.error-message {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  animation: slideIn 0.3s ease-out;
+}
+
+.error-invalid_credentials {
+  background: #fffbeb;
+  border-color: #fed7aa;
+}
+
+.error-inactive_account {
+  background: #f0f9ff;
+  border-color: #bae6fd;
+}
+
+.error-rate_limit {
+  background: #faf5ff;
+  border-color: #ddd6fe;
+}
+
+.error-server_error {
+  background: #fef7ff;
+  border-color: #f5d0fe;
+}
+
+.error-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.error-icon {
+  font-size: 1.5rem;
+}
+
+.error-title {
+  margin: 0;
+  color: #dc2626;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.error-invalid_credentials .error-title {
+  color: #d97706;
+}
+
+.error-inactive_account .error-title {
+  color: #0369a1;
+}
+
+.error-rate_limit .error-title {
+  color: #7c3aed;
+}
+
+.error-server_error .error-title {
+  color: #a21caf;
+}
+
+.error-description {
+  margin: 0 0 16px 0;
+  color: #57534e;
+  line-height: 1.5;
+}
+
+.error-suggestions {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.suggestions-title {
+  font-weight: 600;
+  color: #44403c;
+  margin: 0 0 8px 0;
+  font-size: 0.9rem;
+}
+
+.suggestions-list {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+  color: #57534e;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.suggestion-bullet {
+  color: #dc2626;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.error-invalid_credentials .suggestion-bullet {
+  color: #d97706;
+}
+
+.error-inactive_account .suggestion-bullet {
+  color: #0369a1;
+}
+
+.error-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.error-action-btn {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.error-action-btn:hover {
+  background: #b91c1c;
+}
+
+.error-invalid_credentials .error-action-btn {
+  background: #d97706;
+}
+
+.error-invalid_credentials .error-action-btn:hover {
+  background: #b45309;
+}
+
+.error-action-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.error-action-link:hover {
+  text-decoration: underline;
+}
+
+/* Input error state */
+.input-error {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+}
+
+/* Loading spinner */
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .error-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .error-action-btn {
+    order: 2;
+  }
+  
+  .error-action-link {
+    order: 1;
+    text-align: center;
+  }
+}
