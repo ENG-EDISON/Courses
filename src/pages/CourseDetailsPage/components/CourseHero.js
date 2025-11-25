@@ -9,11 +9,10 @@ function CourseHero({ course }) {
 
         if (hasValidDiscount) {
             return (
-                <div className="coursehero-discount-price-group">
+                <div className="coursehero-pricing-group">
                     <span className="coursehero-original-price">${course.price}</span>
                     <span className="coursehero-current-price">${course.discount_price}</span>
-                    <span className="coursehero-discount-tag">
-                        <i className="fas fa-bolt"></i>
+                    <span className="coursehero-discount-badge">
                         Save {Math.round(((regularPrice - discountPrice) / regularPrice) * 100)}%
                     </span>
                 </div>
@@ -23,124 +22,62 @@ function CourseHero({ course }) {
     };
 
     return (
-        <div className="coursehero-enterprise-hero">
-            <div className="coursehero-hero-background">
-                <div className="coursehero-gradient-overlay"></div>
-                <div className="coursehero-floating-shapes">
-                    <div className="coursehero-shape coursehero-shape-1"></div>
-                    <div className="coursehero-shape coursehero-shape-2"></div>
-                    <div className="coursehero-shape coursehero-shape-3"></div>
-                </div>
-            </div>
-            
+        <div className="coursehero-compact-hero">
             <div className="coursehero-hero-content">
-                <div className="coursehero-course-breadcrumb">
-                    <Link to="/all-courses" className="coursehero-breadcrumb-link">
+                <div className="coursehero-breadcrumb">
+                    <Link to="/all-courses" className="coursehero-back-link">
                         <i className="fas fa-arrow-left"></i>
-                        Back to Courses
+                        All Courses
                     </Link>
                     <span className="coursehero-breadcrumb-divider">/</span>
-                    <span className="coursehero-breadcrumb-category">{course.category || 'Development'}</span>
-                    <span className="coursehero-breadcrumb-divider">/</span>
-                    <span className="coursehero-current-course">{course.title}</span>
+                    <span className="coursehero-category">{course.category || 'Development'}</span>
                 </div>
 
-                <div className="coursehero-hero-main">
-                    <div className="coursehero-hero-text">
-                        <div className="coursehero-title-section">
-                            <div className="coursehero-course-badge">
-                                <i className="fas fa-star"></i>
-                                Featured Course
+                <div className="coursehero-main-content">
+                    <div className="coursehero-text-content">
+                        <h1 className="coursehero-title">{course.title}</h1>
+                        <p className="coursehero-description">{course.short_description}</p>
+                        
+                        <div className="coursehero-meta-info">
+                            <div className="coursehero-meta-item">
+                                <i className="fas fa-signal"></i>
+                                <span>{course.level ? course.level.charAt(0).toUpperCase() + course.level.slice(1) : 'Beginner'}</span>
                             </div>
-                            <h1 className="coursehero-course-title">{course.title}</h1>
-                            <p className="coursehero-course-subtitle">{course.short_description}</p>
+                            <div className="coursehero-meta-item">
+                                <i className="fas fa-clock"></i>
+                                <span>{course.duration_hours || '0'}h</span>
+                            </div>
+                            <div className="coursehero-meta-item">
+                                <i className="fas fa-play-circle"></i>
+                                <span>{course.total_lessons || '0'} lessons</span>
+                            </div>
+                            {course.certificate_available && (
+                                <div className="coursehero-meta-item">
+                                    <i className="fas fa-award"></i>
+                                    <span>Certificate</span>
+                                </div>
+                            )}
                         </div>
-
-                        <div className="coursehero-hero-meta-grid">
-                            <div className="coursehero-meta-card">
-                                <div className="coursehero-meta-icon">
-                                    <i className="fas fa-signal"></i>
-                                </div>
-                                <div className="coursehero-meta-content">
-                                    <span className="coursehero-meta-label">Level</span>
-                                    <span className="coursehero-meta-value coursehero-level-badge">
-                                        {course.level ? course.level.charAt(0).toUpperCase() + course.level.slice(1) : 'Beginner'}
-                                    </span>
-                                </div>
-                            </div>
-                            
-                            <div className="coursehero-meta-card">
-                                <div className="coursehero-meta-icon">
-                                    <i className="fas fa-clock"></i>
-                                </div>
-                                <div className="coursehero-meta-content">
-                                    <span className="coursehero-meta-label">Duration</span>
-                                    <span className="coursehero-meta-value">{course.duration_hours || '0'} hours</span>
-                                </div>
-                            </div>
-                            
-                            <div className="coursehero-meta-card">
-                                <div className="coursehero-meta-icon">
-                                    <i className="fas fa-play-circle"></i>
-                                </div>
-                                <div className="coursehero-meta-content">
-                                    <span className="coursehero-meta-label">Lessons</span>
-                                    <span className="coursehero-meta-value">{course.total_lessons || '0'}</span>
-                                </div>
-                            </div>
-                            
-                            <div className="coursehero-meta-card">
-                                <div className="coursehero-meta-icon">
-                                    <i className="fas fa-globe"></i>
-                                </div>
-                                <div className="coursehero-meta-content">
-                                    <span className="coursehero-meta-label">Language</span>
-                                    <span className="coursehero-meta-value">{course.language ? course.language.charAt(0).toUpperCase() + course.language.slice(1) : 'English'}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {course.certificate_available && (
-                            <div className="coursehero-certificate-banner">
-                                <i className="fas fa-award"></i>
-                                <span>Certificate of Completion Included</span>
-                            </div>
-                        )}
                     </div>
 
-                    <div className="coursehero-hero-actions">
-                        <div className="coursehero-enterprise-pricing">
-                            <div className="coursehero-pricing-header">
-                                <h3>Enroll in this Course</h3>
-                                <div className="coursehero-pricing-badge">
-                                    <i className="fas fa-crown"></i>
-                                    Premium
-                                </div>
+                    <div className="coursehero-action-card">
+                        <div className="coursehero-pricing-section">
+                            {renderPricing()}
+                        </div>
+                        
+                        <button className="coursehero-enroll-btn">
+                            Enroll Now
+                            <i className="fas fa-arrow-right"></i>
+                        </button>
+                        
+                        <div className="coursehero-features">
+                            <div className="coursehero-feature">
+                                <i className="fas fa-check"></i>
+                                Lifetime Access
                             </div>
-                            
-                            <div className="coursehero-price-display">
-                                {renderPricing()}
-                            </div>
-                            
-                            <button className="coursehero-enterprise-enroll">
-                                <i className="fas fa-rocket"></i>
-                                Start Learning Now
-                                <span className="coursehero-btn-arrow">→</span>
-                            </button>
-                            
-                            <div className="coursehero-feature-list">
-                                <div className="coursehero-feature">
-                                    <i className="fas fa-check"></i>
-                                    Lifetime Access
-                                </div>
-                                <div className="coursehero-feature">
-                                    <i className="fas fa-check"></i>
-                                    Project Files
-                                </div>
-                                <div className="coursehero-feature">
-                                    <i className="fas fa-check"></i>
-                                    Q&A Support
-                                </div>
+                            <div className="coursehero-feature">
+                                <i className="fas fa-check"></i>
+                                Project Files
                             </div>
                         </div>
                     </div>

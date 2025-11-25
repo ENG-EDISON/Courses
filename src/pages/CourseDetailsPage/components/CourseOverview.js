@@ -3,38 +3,38 @@ import "../css/CourseOverview.css"
 // components/course/CourseOverview.js
 function CourseOverview({ description }) {
     return (
-        <section className="content-section enterprise-overview">
-            <div className="section-header enterprise-header">
-                <div className="header-icon-container">
+        <section className="co-content-section">
+            <div className="co-section-header">
+                <div className="co-header-icon-container">
                     <i className="fas fa-info-circle"></i>
                 </div>
-                <div className="header-content">
+                <div className="co-header-content">
                     <h2>Course Overview</h2>
-                    <p className="header-subtitle">What you'll learn and achieve</p>
+                    <p className="co-header-subtitle">What you'll learn and achieve</p>
                 </div>
-                <div className="header-decoration">
-                    <div className="decoration-line"></div>
+                <div className="co-header-decoration">
+                    <div className="co-decoration-line"></div>
                 </div>
             </div>
-            <div className="section-content enterprise-content">
-                <div className="description-container">
-                    <div className="description-icon">
+            <div className="co-section-content">
+                <div className="co-description-container">
+                    <div className="co-description-icon">
                         <i className="fas fa-graduation-cap"></i>
                     </div>
-                    <div className="description-content">
-                        <p className="course-description">{description}</p>
+                    <div className="co-description-content">
+                        <p className="co-course-description">{description}</p>
                     </div>
                 </div>
-                <div className="overview-features">
-                    <div className="feature-item">
+                <div className="co-overview-features">
+                    <div className="co-feature-item">
                         <i className="fas fa-rocket"></i>
                         <span>Hands-on Projects</span>
                     </div>
-                    <div className="feature-item">
+                    <div className="co-feature-item">
                         <i className="fas fa-code"></i>
                         <span>Real-world Skills</span>
                     </div>
-                    <div className="feature-item">
+                    <div className="co-feature-item">
                         <i className="fas fa-certificate"></i>
                         <span>Industry Recognized</span>
                     </div>

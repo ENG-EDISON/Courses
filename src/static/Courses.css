@@ -53,6 +53,7 @@
 
 /* ===== BASE STYLES ===== */
 .enterprise-course {
+     margin-top: 60px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     line-height: 1.6;
     color: var(--text-primary);

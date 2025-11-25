@@ -1,5 +1,6 @@
 // components/CourseCurriculum.js
 import CurriculumSection from "./CurriculumSection";
+import "../css/CourseCurriculum.css";
 
 function CourseCurriculum({ 
     course, 
@@ -20,17 +21,17 @@ function CourseCurriculum({
     ) || 0;
 
     return (
-        <section className="content-section">
-            <div className="section-header">
+        <section className="cc-content-section">
+            <div className="cc-section-header">
                 <i className="fas fa-book-open"></i>
                 <h2>Course Curriculum</h2>
-                <span className="section-count">
+                <span className="cc-section-count">
                     {totalSections} sections • {totalSubsections} subsections • {totalLessons} lessons
                 </span>
             </div>
-            <div className="section-content">
+            <div className="cc-section-content">
                 {course.sections && course.sections.length > 0 ? (
-                    <div className="curriculum-enterprise">
+                    <div className="cc-curriculum-enterprise">
                         {course.sections.map((section, sectionIndex) => (
                             <CurriculumSection
                                 key={section.id}
@@ -45,7 +46,7 @@ function CourseCurriculum({
                         ))}
                     </div>
                 ) : (
-                    <div className="empty-state">
+                    <div className="cc-empty-state">
                         <i className="fas fa-book"></i>
                         <h4>Curriculum Coming Soon</h4>
                         <p>The course content is being prepared by the instructor.</p>
