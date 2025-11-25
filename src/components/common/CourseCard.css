@@ -153,32 +153,37 @@
   color: #3b82f6;
 }
 
+
+
+
 /* Image Container */
+/* Replace the existing image container styles with: */
 .coursecard-image-container {
   position: relative;
   overflow: hidden;
   background: #f8fafc;
   flex-shrink: 0;
+  aspect-ratio: 16 / 9; /* Add this */
 }
 
 .coursecard.vertical .coursecard-image-container {
-  height: 200px;
+  /* Remove height: 200px; */
+  aspect-ratio: 16 / 9; /* Add this */
 }
 
 .coursecard.horizontal .coursecard-image-container {
-  width: 200px;
-  height: 200px;
-  flex-shrink: 0;
+  /* Remove width: 200px; height: 200px; */
+  aspect-ratio: 1 / 1; /* Square for horizontal layout */
+  width: 40%; /* Adjust based on your design */
 }
 
 .coursecard-thumbnail {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover; /* This is crucial */
+  object-position: center;
   transition: transform 0.3s ease;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  transform: translateZ(0);
-  will-change: transform;
 }
 
 .coursecard:hover .coursecard-thumbnail {

@@ -188,43 +188,6 @@
 
 
 
-/* ===== LEARNING OBJECTIVES COMPONENT ===== */
-.objectives-tight-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
-}
-
-.objective-tight {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 8px;
-    background: var(--background-secondary);
-    border-radius: 6px;
-    border: 1px solid var(--border-light);
-    transition: all 0.2s ease;
-}
-
-.objective-tight:hover {
-    background: var(--background-tertiary);
-    border-color: var(--primary-color);
-    transform: translateY(-1px);
-}
-
-.icon-tight {
-    font-size: 0.9rem;
-    flex-shrink: 0;
-    color: var(--success-color);
-}
-
-.text-tight {
-    color: var(--text-primary);
-    font-weight: 500;
-    font-size: 0.85rem;
-    line-height: 1.2;
-}
-
 /* ===== COURSE SIDEBAR COMPONENT ===== */
 .course-sidebar {
     display: flex;
