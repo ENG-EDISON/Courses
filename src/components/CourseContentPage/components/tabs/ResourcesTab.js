@@ -88,14 +88,14 @@ const ResourcesTab = ({ course }) => {
     const getFileUrl = (filePath) => {
         if (!filePath) return '';
         if (filePath.startsWith('http')) return filePath;
-        const baseUrl = process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_API_PROD_URL || 'http://127.0.0.1:8000';
+        const baseUrl = process.env.REACT_APP_API_PROD_URL || process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000';
         return `${baseUrl}${filePath.startsWith('/') ? '' : '/'}${filePath}`;
     };
 
     return (
         <div className="resources-tab-container">
             <h3>Course Resources</h3>
-            
+
             {/* Resource Summary */}
             <div className="resources-tab-summary">
                 <div className="resources-tab-summary-card">
@@ -126,17 +126,17 @@ const ResourcesTab = ({ course }) => {
                                                 {formatFileSize(resource.file_size)}
                                             </span>
                                         )}
-                                        <a 
-                                            href={getFileUrl(resource.file)} 
+                                        <a
+                                            href={getFileUrl(resource.file)}
                                             className="resources-tab-download-btn"
-                                            target="_blank" 
+                                            target="_blank"
                                             rel="noopener noreferrer"
                                             download
                                         >
                                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                                <path d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                                <path d="M4.66675 6.66667L8.00008 10L11.3334 6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                                <path d="M8 10V2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                                <path d="M4.66675 6.66667L8.00008 10L11.3334 6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                                <path d="M8 10V2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                             </svg>
                                             Download
                                         </a>
@@ -146,7 +146,7 @@ const ResourcesTab = ({ course }) => {
                                             From: <strong>{resource.lessonTitle} </strong>
                                         </div>
                                         <div className="resources-tab-section">
-                                            {resource.sectionTitle} • {resource.subsectionTitle} 
+                                            {resource.sectionTitle} • {resource.subsectionTitle}
                                         </div>
                                     </div>
                                 </div>

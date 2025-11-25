@@ -147,7 +147,6 @@ const VideoUpload = ({ videoFile, onFileChange }) => {
             }}
             onError={handleVideoError}
             preload="auto"
-            crossOrigin="anonymous"
             key={videoSrc}
           >
             Your browser does not support the video tag.
