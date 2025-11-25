@@ -17,8 +17,8 @@ function Requirements({ requirements }) {
             if (/^\d+\.\s/.test(trimmedLine)) {
                 inNumberedList = false;
                 return (
-                    <div key={index} className="requirement-section">
-                        <h4 className="requirement-heading">{trimmedLine}</h4>
+                    <div key={index} className="req-requirement-section">
+                        <h4 className="req-requirement-heading">{trimmedLine}</h4>
                     </div>
                 );
             }
@@ -27,8 +27,8 @@ function Requirements({ requirements }) {
             if (/^\d+\./.test(trimmedLine)) {
                 inNumberedList = true;
                 return (
-                    <div key={index} className="requirement-numbered-item">
-                        <span className="requirement-number">{trimmedLine}</span>
+                    <div key={index} className="req-requirement-numbered-item">
+                        <span className="req-requirement-number">{trimmedLine}</span>
                     </div>
                 );
             }
@@ -36,8 +36,8 @@ function Requirements({ requirements }) {
             // Check if line starts with arrow (>)
             if (trimmedLine.startsWith('>')) {
                 return (
-                    <div key={index} className="requirement-arrow-item">
-                        <i className="fas fa-chevron-right requirement-arrow-icon"></i>
+                    <div key={index} className="req-requirement-arrow-item">
+                        <i className="fas fa-chevron-right req-requirement-arrow-icon"></i>
                         <span>{trimmedLine.substring(1).trim()}</span>
                     </div>
                 );
@@ -46,8 +46,8 @@ function Requirements({ requirements }) {
             // Check if line is indented (sub-items)
             if (indented && !inNumberedList) {
                 return (
-                    <div key={index} className="requirement-subitem">
-                        <span className="subitem-bullet">•</span>
+                    <div key={index} className="req-requirement-subitem">
+                        <span className="req-subitem-bullet">•</span>
                         <span>{trimmedLine}</span>
                     </div>
                 );
@@ -58,7 +58,7 @@ function Requirements({ requirements }) {
                 const parts = trimmedLine.split(':');
                 if (parts.length >= 2) {
                     return (
-                        <div key={index} className="requirement-definition">
+                        <div key={index} className="req-requirement-definition">
                             <strong>{parts[0].trim()}:</strong>
                             <span>{parts.slice(1).join(':').trim()}</span>
                         </div>
@@ -69,8 +69,8 @@ function Requirements({ requirements }) {
             // Check for parenthetical notes
             if (trimmedLine.startsWith('(') && trimmedLine.endsWith(')')) {
                 return (
-                    <div key={index} className="requirement-note">
-                        <i className="fas fa-info-circle note-icon"></i>
+                    <div key={index} className="req-requirement-note">
+                        <i className="fas fa-info-circle req-note-icon"></i>
                         <span>{trimmedLine}</span>
                     </div>
                 );
@@ -83,7 +83,7 @@ function Requirements({ requirements }) {
             
             if (isLikelyHeading) {
                 return (
-                    <div key={index} className="requirement-subheading-plain">
+                    <div key={index} className="req-requirement-subheading-plain">
                         <h5>{trimmedLine}</h5>
                     </div>
                 );
@@ -91,7 +91,7 @@ function Requirements({ requirements }) {
             
             // Regular paragraph
             return (
-                <p key={index} className="requirement-paragraph">
+                <p key={index} className="req-requirement-paragraph">
                     {trimmedLine}
                 </p>
             );
@@ -99,13 +99,13 @@ function Requirements({ requirements }) {
     };
 
     return (
-        <section className="content-section">
-            <div className="section-header">
+        <section className="req-content-section">
+            <div className="req-section-header">
                 <i className="fas fa-tools"></i>
                 <h2>Requirements</h2>
             </div>
-            <div className="section-content">
-                <div className="requirements-content">
+            <div className="req-section-content">
+                <div className="req-requirements-content">
                     {formatRequirements(requirements)}
                 </div>
             </div>
