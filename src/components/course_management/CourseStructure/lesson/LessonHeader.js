@@ -27,9 +27,11 @@ const LessonHeader = ({
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Handle Create New Lesson
+  // Handle Create New Lesson
+  // Handle Create New Lesson
   const handleCreateLesson = async (e) => {
     e.stopPropagation();
-    
+
     if (isExistingInDatabase(lesson)) {
       alert('This lesson already exists in the database. Use Update instead.');
       return;
@@ -37,11 +39,11 @@ const LessonHeader = ({
 
     // Enhanced validation
     const validationErrors = [];
-    
+
     if (!lesson.title?.trim()) {
       validationErrors.push('Lesson title is required');
     }
-    
+
     if (!courseId) {
       validationErrors.push('Course ID is missing. Please check your course structure.');
     }
@@ -57,6 +59,20 @@ const LessonHeader = ({
 
     setIsCreating(true);
     try {
+      // ✅ FIX: Determine video_source based on actual content
+      const determineVideoSource = () => {
+        // If there's a video file, it's uploaded
+        if (lesson.video_file instanceof File) {
+          return 'uploaded';
+        }
+        // If there's a video URL, it's external
+        if (lesson.video_url) {
+          return 'external_url';
+        }
+        // Default to none if no video content
+        return 'none';
+      };
+
       // Prepare the data for creation
       const lessonData = {
         title: lesson.title.trim(),
@@ -68,6 +84,7 @@ const LessonHeader = ({
         course: courseId,
         video_url: lesson.video_url || '',
         video_duration: lesson.video_duration || 0,
+        video_source: determineVideoSource(), // ✅ Use the smart determination
       };
 
       // Add video file if it exists and is a File object
@@ -77,7 +94,8 @@ const LessonHeader = ({
 
       console.log('Creating lesson with data:', {
         ...lessonData,
-        video_file: lessonData.video_file ? `File: ${lessonData.video_file.name}` : 'No file'
+        video_file: lessonData.video_file ? `File: ${lessonData.video_file.name}` : 'No file',
+        video_source: lessonData.video_source
       });
 
       // Create the lesson using your API
@@ -101,7 +119,7 @@ const LessonHeader = ({
   // Handle Update Lesson
   const handleUpdateLesson = async (e) => {
     e.stopPropagation();
-    
+
     if (!isExistingInDatabase(lesson)) {
       alert('Cannot update a lesson that is not saved in the database. Please save the lesson first.');
       return;
@@ -114,6 +132,17 @@ const LessonHeader = ({
 
     setIsUpdating(true);
     try {
+      // ✅ FIX: Same logic for update
+      const determineVideoSource = () => {
+        if (lesson.video_file instanceof File) {
+          return 'uploaded';
+        }
+        if (lesson.video_url) {
+          return 'external_url';
+        }
+        return 'none';
+      };
+
       // Prepare the data for update
       const updateData = {
         title: lesson.title,
@@ -124,12 +153,19 @@ const LessonHeader = ({
         subsection: lesson.subsection || subsectionId,
         video_url: lesson.video_url || '',
         video_duration: lesson.video_duration || 0,
+        video_source: determineVideoSource(), // ✅ Use the smart determination
       };
 
       // Add video file if it exists and is a File object
       if (lesson.video_file instanceof File) {
         updateData.video_file = lesson.video_file;
       }
+
+      console.log('Updating lesson with data:', {
+        ...updateData,
+        video_file: updateData.video_file ? `File: ${updateData.video_file.name}` : 'No file',
+        video_source: updateData.video_source
+      });
 
       // Update the lesson using your API
       const response = await updateLesson(lesson.id, updateData);
@@ -151,7 +187,7 @@ const LessonHeader = ({
   // Handle Delete Lesson
   const handleDeleteLesson = async (e) => {
     e.stopPropagation();
-    
+
     if (!isExistingInDatabase(lesson)) {
       // If it's not in database, use the existing onDelete function for local deletion
       if (onDelete) {
@@ -173,12 +209,12 @@ const LessonHeader = ({
     try {
       // Delete the lesson using your API
       await deleteLesson(lesson.id);
-      
+
       // Call the parent callback if provided
       if (onLessonDelete) {
         onLessonDelete(lesson.id, sectionIndex, subsectionIndex, lessonIndex);
       }
-      
+
       alert('Lesson deleted successfully!');
     } catch (error) {
       console.error('Error deleting lesson:', error);
@@ -216,7 +252,7 @@ const LessonHeader = ({
   };
 
   return (
-    <div 
+    <div
       className={`lh-header ${isExpanded ? 'expanded' : ''}`}
       onClick={() => onToggle(sectionIndex, subsectionIndex, lessonIndex)}
     >
@@ -230,7 +266,7 @@ const LessonHeader = ({
         {isExpanded ? '▼' : '▶'}
       </button>
 
-      <LhOrderInput 
+      <LhOrderInput
         value={lesson.order !== undefined ? lesson.order : lessonIndex}
         onChange={onOrderChange}
       />
@@ -244,7 +280,7 @@ const LessonHeader = ({
         onClick={(e) => e.stopPropagation()}
       />
 
-      <LhLessonStatus 
+      <LhLessonStatus
         isExisting={isExistingInDatabase(lesson)}
         hasVideoFile={!!lesson.video_file}
         lessonType={lesson.lesson_type}
@@ -253,7 +289,7 @@ const LessonHeader = ({
         isUpdating={isUpdating}
       />
 
-      <LhLessonActions 
+      <LhLessonActions
         onAddResource={onAddResource}
         onDelete={handleDeleteLesson}
         isAddingResource={isAddingResource}
@@ -294,10 +330,10 @@ const LhLessonStatus = ({ isExisting, hasVideoFile, lessonType, isPreview, isCre
   </div>
 );
 
-const LhLessonActions = ({ 
-  onAddResource, 
-  onDelete, 
-  isAddingResource, 
+const LhLessonActions = ({
+  onAddResource,
+  onDelete,
+  isAddingResource,
   isDeleting,
   isExisting,
   getActionButton

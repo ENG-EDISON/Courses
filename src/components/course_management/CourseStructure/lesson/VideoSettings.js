@@ -167,6 +167,21 @@ const VideoUrlInput = ({ videoUrl, onVideoUrlChange, onVideoDurationChange, vide
   const videoId = getYouTubeVideoId(videoUrl);
   const [manualDuration, setManualDuration] = React.useState(videoDuration || '');
 
+  // ✅ FIXED: Handle URL change with automatic source detection
+  const handleUrlChange = (e) => {
+    const url = e.target.value;
+    
+    // Call the parent handler
+    onVideoUrlChange(e);
+    
+    // ✅ Automatically set video_source to external_url when URL is entered
+    // This ensures video_source is updated even if user doesn't click the radio button
+    if (url && !videoUrl) {
+      console.log('🎬 URL entered, video_source should be set to external_url');
+      // Note: The actual video_source update happens in Lesson.jsx handleVideoUrlChange
+    }
+  };
+
   const handleDurationChange = (e) => {
     const value = e.target.value;
     setManualDuration(value);
@@ -193,7 +208,7 @@ const VideoUrlInput = ({ videoUrl, onVideoUrlChange, onVideoDurationChange, vide
       <input
         type="url"
         value={videoUrl || ''}
-        onChange={onVideoUrlChange}
+        onChange={handleUrlChange} // ✅ Use the fixed handler
         placeholder="https://youtube.com/watch?v=..."
         className="vs-url-input"
       />

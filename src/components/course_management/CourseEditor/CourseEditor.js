@@ -32,7 +32,6 @@ const CourseEditor = () => {
       const myCourses = coursesResponse.data.filter(course => course.instructor === userId);
       setCourses(myCourses);
     } catch (error) {
-      console.error('Error loading courses:', error);
       alert('Error loading courses: ' + error.message);
     } finally {
       setIsLoading(false);
@@ -56,7 +55,6 @@ const CourseEditor = () => {
       ));
       alert('Course updated successfully!');
     } catch (error) {
-      console.error('Error updating course:', error);
       alert('Error updating course: ' + (error.response?.data?.message || error.message));
     } finally {
       setIsLoading(false);
@@ -118,12 +116,13 @@ const CourseEditor = () => {
     }
   };
 
-  const handleStructureUpdate = (sections) => {
-    console.log('Course structure updated:', sections);
-  };
+const handleStructureUpdate = (sections) => {
+  // intentionally empty
+};
+
 
   const handleStructureSave = (saveResult) => {
-    console.log('Course structure saved:', saveResult);
+
   };
 
   // Navigation functions

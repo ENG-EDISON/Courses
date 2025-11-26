@@ -55,6 +55,7 @@ export const useCourseDataLoader = ({
         const lessonPromises = allSubsections.map(async (subsection) => {
           try {
             const lessonsResponse = await getLessonBySubsectionId(subsection.id);
+            console.log("lessonsResponselessonsResponselessonsResponselessonsResponselessonsResponselessonsResponselessonsResponse",lessonsResponse.data)
             if (lessonsResponse?.data) {
               const subsectionLessons = lessonsResponse.data.map(lesson => ({
                 ...lesson,

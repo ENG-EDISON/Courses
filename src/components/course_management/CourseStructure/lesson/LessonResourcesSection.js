@@ -22,16 +22,6 @@ const LessonResourcesSection =({
 }) => {
   const [isResourcesExpanded, setIsResourcesExpanded] = useState(true);
 
-  React.useEffect(() => {
-    console.log('📚 LessonResourcesSection props:', {
-      lessonId: lesson.id,
-      resourceCount: lesson.resources?.length || 0,
-      hasCreateCallback: !!onResourceCreate,
-      hasUpdateCallback: !!onResourceUpdate,
-      hasDeleteCallback: !!onResourceDelete
-    });
-  }, [lesson.id, lesson.resources, onResourceCreate, onResourceUpdate, onResourceDelete]);
-
   const toggleResources = () => {
     setIsResourcesExpanded(!isResourcesExpanded);
   };
