@@ -30,12 +30,10 @@ export const useCourseDataLoader = ({
       setIsLoading(true);
 
       try {
-        console.log("=== DEBUG: Loading course structure ===");
 
         // 1️⃣ Load all sections
         const sectionsResponse = await getCourseSections(courseId);
         const sectionsData = sectionsResponse.data;
-        console.log("Sections loaded:", sectionsData);
 
         if (!sectionsData.length) {
           setSections([]);
@@ -48,14 +46,12 @@ export const useCourseDataLoader = ({
           ...sub,
           isExisting: true,
         }));
-        console.log("All subsections loaded:", allSubsections);
 
         // 3️⃣ Load all lessons
         const allLessons = [];
         const lessonPromises = allSubsections.map(async (subsection) => {
           try {
             const lessonsResponse = await getLessonBySubsectionId(subsection.id);
-            console.log("lessonsResponselessonsResponselessonsResponselessonsResponselessonsResponselessonsResponselessonsResponse",lessonsResponse.data)
             if (lessonsResponse?.data) {
               const subsectionLessons = lessonsResponse.data.map(lesson => ({
                 ...lesson,
@@ -72,7 +68,6 @@ export const useCourseDataLoader = ({
         });
 
         await Promise.all(lessonPromises);
-        console.log("All lessons loaded:", allLessons);
 
         // 4️⃣ Build structure
         const loadedSections = sectionsData.map(section => {
@@ -98,7 +93,6 @@ export const useCourseDataLoader = ({
           };
         });
 
-        console.log("Final structure built:", loadedSections);
         setSections(loadedSections);
 
         // ✅ Only expand once per load

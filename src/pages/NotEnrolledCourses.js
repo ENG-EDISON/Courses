@@ -25,9 +25,6 @@ function NotEnrolledCourses({ userId }) {
       setError(null);
       try {
         const response = await getUserNotEnrolledCourses(userId);
-        console.log('Full API response:', response);
-        console.log('Response data:', response.data);
-        
         // FIX: Handle different possible response structures
         let coursesData = [];
         
@@ -41,7 +38,6 @@ function NotEnrolledCourses({ userId }) {
           coursesData = response.data.results;
         }
         
-        console.log('Extracted courses:', coursesData);
         setCourses(coursesData);
         setHasLoaded(true);
       } catch (err) {

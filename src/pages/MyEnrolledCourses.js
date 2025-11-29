@@ -18,9 +18,7 @@ function MyEnrolledCourses() {
     const fetchMyCourses = async () => {
       try {
         const response = await getMyEnrolledCourses();
-        const coursesData = response.data;
-        console.log('Courses API Response:', coursesData); // Debug log
-        
+        const coursesData = response.data;        
         // ADDED: Extract user ID from response
         if (coursesData?.user_id) {
           setCurrentUserId(coursesData.user_id);

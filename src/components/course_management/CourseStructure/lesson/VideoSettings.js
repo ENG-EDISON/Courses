@@ -177,7 +177,7 @@ const VideoUrlInput = ({ videoUrl, onVideoUrlChange, onVideoDurationChange, vide
     // ✅ Automatically set video_source to external_url when URL is entered
     // This ensures video_source is updated even if user doesn't click the radio button
     if (url && !videoUrl) {
-      console.log('🎬 URL entered, video_source should be set to external_url');
+
       // Note: The actual video_source update happens in Lesson.jsx handleVideoUrlChange
     }
   };

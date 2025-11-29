@@ -8,7 +8,6 @@ export const updateBulkLessonProgress = (courseId, progressData) => {
     course_id: courseId,
     progress: progressData
   };
-  console.log("Sending bulk update payload:", payload);
   return apiClient.put(`/api/lesson-progress/bulk-update/`, payload);
 };
 
@@ -31,7 +30,6 @@ export const trackLessonProgress = (lessonId, data) => {
     progress_percentage: data.progress_percentage || 0
   };
   
-  console.log('📡 Sending progress payload:', payload);
   return apiClient.post(`/api/lesson-progress/track/`, payload);
 };
 

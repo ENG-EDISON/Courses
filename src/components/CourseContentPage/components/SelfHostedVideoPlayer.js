@@ -16,7 +16,6 @@ const SelfHostedVideoPlayer = forwardRef(({
     
     // ✅ MODIFIED: Handle seek events without triggering progress updates
     const handleSeeked = () => {
-        console.log('🎯 Video seeked (progress tracking disabled during seeking)');
         onSeek && onSeek();
     };
 

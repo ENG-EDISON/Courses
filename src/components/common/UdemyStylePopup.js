@@ -8,11 +8,9 @@ function UdemyStylePopup({ course, isVisible, position, onMouseEnter, onMouseLea
 
   // Handle positioning and visibility
   useEffect(() => {
-    console.log('Popup effect running:', { isVisible, position, course: !!course });
     
     if (isVisible && popupRef.current && course) {
       const popup = popupRef.current;
-      console.log('Popup dimensions:', popup.offsetWidth, popup.offsetHeight);
       
       const offsetX = -30;
       const offsetY = -200;
@@ -27,9 +25,7 @@ function UdemyStylePopup({ course, isVisible, position, onMouseEnter, onMouseLea
         x: Math.max(20, Math.min(adjustedX, maxX)),
         y: Math.max(20, Math.min(adjustedY, maxY))
       };
-      
-      console.log('Final position:', finalPosition);
-      
+            
       popup.style.left = `${finalPosition.x}px`;
       popup.style.top = `${finalPosition.y}px`;
       popup.style.display = 'block';
@@ -58,10 +54,7 @@ function UdemyStylePopup({ course, isVisible, position, onMouseEnter, onMouseLea
     onMouseEnter();
   };
 
-  console.log('Popup render:', { isVisible, course: !!course });
-
   if (!isVisible || !course) {
-    console.log('Popup not rendering - condition not met');
     return null;
   }
 

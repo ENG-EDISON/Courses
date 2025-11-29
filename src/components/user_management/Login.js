@@ -20,21 +20,12 @@ function EnterpriseLogin() {
         password: password
       };
 
-      console.log('Sending credentials:', credentials);
-
-      const response = await login(credentials);
-      
-      console.log('Login response:', response.data);
-      
+      const response = await login(credentials);      
       // Store tokens in localStorage
       if (response.data.access && response.data.refresh) {
         localStorage.setItem('access_token', response.data.access);
         localStorage.setItem('refresh_token', response.data.refresh);
-        
-        console.log('Tokens stored successfully');
-        console.log('Access Token:', response.data.access);
-        console.log('Refresh Token:', response.data.refresh);
-        
+      
         // Redirect to dashboard
         window.location.href = '/';
       } else {

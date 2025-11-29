@@ -109,10 +109,6 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
     };
 
     const handleObjectivesChange = (updatedObjectives) => {
-        console.log('=== DEBUG: OBJECTIVES CHANGED ===');
-        console.log('Updated objectives:', updatedObjectives);
-        console.log('Number of objectives:', updatedObjectives.length);
-
         setFormData(prev => ({
             ...prev,
             learning_objectives: updatedObjectives
@@ -120,46 +116,6 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
     };
 
     const showCompleteStructure = () => {
-        console.log('=== DEBUG: COMPLETE COURSE STRUCTURE PREVIEW ===');
-        console.log('COURSE ID:', course?.id);
-        console.log('COURSE TITLE:', formData.title);
-        console.log('--- BASIC INFORMATION ---');
-        console.log('Description:', formData.description);
-        console.log('Short Description:', formData.short_description);
-        console.log('Level:', formData.level);
-        console.log('Language:', formData.language);
-        console.log('Duration (seconds):', formData.duration_seconds);
-
-        console.log('--- PRICING ---');
-        console.log('Price:', formData.price);
-        console.log('Discount Price:', formData.discount_price);
-
-        console.log('--- MEDIA ---');
-        console.log('Thumbnail:', formData.thumbnail ? 'New file selected' : (course?.thumbnail || 'No thumbnail'));
-        console.log('Promotional Video:', formData.promotional_video);
-
-        console.log('--- CATEGORY & REQUIREMENTS ---');
-        console.log('Category ID:', formData.category);
-        console.log('Requirements:', formData.requirements);
-
-        console.log('--- SETTINGS ---');
-        console.log('Certificate Available:', formData.certificate_available);
-        console.log('Is Featured:', formData.is_featured);
-        console.log('Status:', formData.status);
-
-        console.log('--- LEARNING OBJECTIVES ---');
-        console.log('Total Objectives:', formData.learning_objectives.length);
-        formData.learning_objectives.forEach((obj, index) => {
-            console.log(`  Objective ${index + 1}:`, {
-                id: obj.id,
-                icon: obj.icon,
-                objective: obj.objective,
-                order: obj.order,
-                course: obj.course
-            });
-        });
-
-        console.log('=== DEBUG: PREVIEW COMPLETE ===');
         setShowPreview(true);
     };
 
@@ -168,16 +124,10 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
 
         Object.keys(formData).forEach(key => {
             if (key === 'learning_objectives') {
-                console.log('=== DEBUG: PROCESSING LEARNING OBJECTIVES ===');
-                console.log('Raw objectives:', formData[key]);
-                console.log('Objectives length:', formData[key].length);
-
                 const validObjectives = Array.isArray(formData[key]) ? formData[key] : [];
                 const nonEmptyObjectives = validObjectives.filter(obj => 
                     obj.objective && obj.objective.trim() !== ''
                 );
-
-                console.log('After filtering empty objectives:', nonEmptyObjectives.length);
 
                 const formattedObjectives = nonEmptyObjectives.map((obj, index) => {
                     const formatted = {
@@ -187,16 +137,13 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                         icon: obj.icon || (index + 1).toString(),
                         course: course.id
                     };
-                    console.log(`Objective ${index}:`, formatted);
                     return formatted;
                 });
 
-                console.log('Final formatted objectives:', formattedObjectives);
                 
                 if (formattedObjectives.length > 0) {
                     submitData.append(key, JSON.stringify(formattedObjectives));
                 } else {
-                    console.log('No valid learning objectives to send');
                     submitData.append(key, JSON.stringify([]));
                 }
 
@@ -238,13 +185,6 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
         if (course?.instructor) {
             submitData.append('instructor', course.instructor.toString());
         }
-
-        // Debug: Log what's actually in FormData
-        console.log('=== DEBUG: FINAL FORMDATA CONTENTS ===');
-        for (let pair of submitData.entries()) {
-            console.log(`${pair[0]}:`, pair[1]);
-        }
-
         return submitData;
     };
 
@@ -260,12 +200,8 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
 
         setIsSubmitting(true);
         try {
-            console.log('=== DEBUG: STARTING COURSE UPDATE ===');
-
             const submitData = createFormData();
 
-            // Log the final data being sent to API
-            console.log('=== DEBUG: DATA BEING SENT TO API ===');
             const formDataObj = {};
             for (let pair of submitData.entries()) {
                 if (pair[0] === 'thumbnail' && pair[1] instanceof File) {
@@ -276,23 +212,15 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                     formDataObj[pair[0]] = pair[1];
                 }
             }
-            console.log('API Payload:', formDataObj);
-
-            console.log('=== DEBUG: CALLING updateCourse API ===');
-            console.log('Endpoint:', `/api/course/${course.id}/`);
 
             // Call update API
             const response = await updateCourse(course.id, submitData);
-
-            console.log('=== DEBUG: API RESPONSE ===');
-            console.log('Response Status:', response.status);
-            console.log('Response Data:', response.data);
 
             if (onUpdate) {
                 onUpdate(response.data);
             }
 
-            console.log('=== DEBUG: COURSE UPDATE SUCCESSFUL ===');
+
             setShowPreview(false);
 
         } catch (error) {

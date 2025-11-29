@@ -140,12 +140,6 @@ const AdminDashboard = () => {
 
   const handlePageChange = (pageId) => {
     setActivePage(pageId);
-    
-    // Optional: Track page views in analytics
-    console.log(`Admin navigated to: ${pageId}`);
-    
-    // Optional: Send to analytics service
-    // trackPageView(`admin_${pageId}`);
   };
 
   return (

@@ -33,17 +33,13 @@ const CourseContentPage = () => {
     const markLessonAsCompleted = async (lesson) => {
         try {
             // 🔍 Debug: Check what we're receiving
-            console.log("🔍 markLessonAsCompleted - received:", lesson);
-            console.log("🔍 markLessonAsCompleted - lesson type:", typeof lesson);
             
             // ✅ Get lesson ID from either object or direct ID
             let lessonId;
             if (typeof lesson === 'object' && lesson !== null) {
                 lessonId = lesson.id;
-                console.log("🔍 Extracted lessonId from object:", lessonId);
             } else {
                 lessonId = lesson;
-                console.log("🔍 Using lesson as ID:", lessonId);
             }
 
             // ✅ Validate lessonId
@@ -56,11 +52,8 @@ const CourseContentPage = () => {
             
             // ✅ Check if already completed
             if (completionStatus[numericLessonId]) {
-                console.log('✅ Lesson already completed, skipping');
                 return;
             }
-
-            console.log("🎯 Marking lesson as completed:", numericLessonId);
 
             // ✅ Update local state immediately for better UX
             setCompletionStatus(prev => ({
@@ -71,12 +64,6 @@ const CourseContentPage = () => {
             // ✅ Get video duration from activeVideo or the lesson object
             const videoDuration = activeVideo?.video_duration || lesson?.video_duration || 0;
             
-            console.log("📊 Tracking completion with:", {
-                lessonId: numericLessonId,
-                videoDuration: videoDuration,
-                currentTime: videoDuration // Use full duration for completion
-            });
-
             // ✅ Track as completed
             await trackLessonPlay(numericLessonId, {
                 current_time: Math.floor(videoDuration),
@@ -99,8 +86,6 @@ const CourseContentPage = () => {
             const summaryResponse = await getCourseProgressSummary(id);
             setProgressSummary(summaryResponse.data);
 
-            console.log("✅ Successfully marked lesson as completed");
-
         } catch (error) {
             console.error('❌ Error updating lesson progress:', error);
             console.error('❌ Error details:', error.response?.data);
@@ -118,8 +103,6 @@ const CourseContentPage = () => {
     // ✅ FIXED: Updated trackLessonPlay to accept data object
     const trackLessonPlay = async (lessonId, data) => {
         try {
-            console.log('🔍 trackLessonPlay - lessonId:', lessonId, 'type:', typeof lessonId);
-            console.log('🔍 trackLessonPlay - data:', data);
             
             // ✅ Validate lessonId
             if (!lessonId || isNaN(Number(lessonId))) {
@@ -135,7 +118,6 @@ const CourseContentPage = () => {
                 total_duration: data.total_duration || 0
             });
             
-            console.log('✅ trackLessonPlay completed successfully');
         } catch (error) {
             console.error('❌ Error in trackLessonPlay:', error);
             throw error; // Re-throw to handle in calling function
@@ -145,8 +127,6 @@ const CourseContentPage = () => {
     useEffect(() => {
         const fetchCourseContent = async () => {
             try {
-                console.log("Fetching course content for course ID:", id);
-
                 const [courseResponse, progressResponse, summaryResponse, lastPlayedResponse] = await Promise.all([
                     getCourseFullStructure(id),
                     getCourseLessonProgress(id),
@@ -165,7 +145,6 @@ const CourseContentPage = () => {
                     progressData.forEach(progress => {
                         // ✅ Get lesson ID from various possible field names
                         const lessonId = progress.lesson || progress.lesson_id || progress.id;
-                        console.log("🔍 Progress item:", progress, "Lesson ID:", lessonId);
                         
                         if (progress.completed && lessonId) {
                             completedLessons[lessonId] = true;
@@ -173,13 +152,11 @@ const CourseContentPage = () => {
                     });
                 }
 
-                console.log("✅ Completed lessons found:", completedLessons);
                 setCompletionStatus(completedLessons);
 
                 // ✅ Handle last played lesson
                 if (lastPlayedResponse.data && lastPlayedResponse.data.lesson_id) {
                     setLastPlayed(lastPlayedResponse.data);
-                    console.log("✅ Last played lesson:", lastPlayedResponse.data);
                 }
 
                 // ✅ Set active video
@@ -188,13 +165,11 @@ const CourseContentPage = () => {
                     activeVideoToSet = findLessonInCourse(courseResponse.data, lastPlayedResponse.data.lesson_id);
                     if (activeVideoToSet) {
                         activeVideoToSet.lastPlayedTime = lastPlayedResponse.data.current_time;
-                        console.log("✅ Setting active video from last played:", activeVideoToSet);
                     }
                 }
 
                 if (!activeVideoToSet) {
                     activeVideoToSet = findFirstVideo(courseResponse.data);
-                    console.log("✅ Setting active video from first video:", activeVideoToSet);
                 }
 
                 setActiveVideo(activeVideoToSet);
@@ -233,16 +208,11 @@ const CourseContentPage = () => {
 
     const findFirstVideo = (courseData) => {
         if (!courseData.sections) return null;
-        console.log("🔍 Finding first video in course structure...");
         
         for (const section of courseData.sections) {
-            console.log("🔍 Checking section:", section.title);
             for (const subsection of section.subsections) {
-                console.log("🔍 Checking subsection:", subsection.title);
                 if (subsection.lessons && subsection.lessons.length > 0) {
                     const firstLesson = subsection.lessons[0];
-                    console.log("✅ Found first lesson:", firstLesson);
-                    console.log("🔍 First lesson video_source:", firstLesson.video_source);
                     return {
                         ...firstLesson,
                         sectionTitle: section.title,
@@ -252,21 +222,17 @@ const CourseContentPage = () => {
                 }
             }
         }
-        console.log("❌ No lessons found in course");
         return null;
     };
 
     const findLessonInCourse = (courseData, lessonId) => {
         if (!courseData.sections) return null;
-        console.log("🔍 Searching for lesson ID:", lessonId, "in course...");
         
         for (const section of courseData.sections) {
             for (const subsection of section.subsections) {
                 if (subsection.lessons) {
                     const lesson = subsection.lessons.find(l => l.id === lessonId);
                     if (lesson) {
-                        console.log("✅ Found lesson:", lesson);
-                        console.log("🔍 Lesson video_source:", lesson.video_source);
                         return {
                             ...lesson,
                             sectionTitle: section.title,
@@ -277,7 +243,6 @@ const CourseContentPage = () => {
                 }
             }
         }
-        console.log("❌ Lesson not found in course structure");
         return null;
     };
 
@@ -292,9 +257,6 @@ const CourseContentPage = () => {
     };
 
     const handleVideoSelect = async (lesson, sectionTitle, subsectionTitle) => {
-        console.log("🔍 handleVideoSelect - lesson:", lesson);
-        console.log("🔍 handleVideoSelect - lesson.id:", lesson?.id);
-        console.log("🔍 handleVideoSelect - video_source:", lesson?.video_source);
         
         const videoData = {
             ...lesson,
@@ -304,17 +266,6 @@ const CourseContentPage = () => {
         };
         setActiveVideo(videoData);
     };
-
-    // 🔍 Debug activeVideo changes
-    useEffect(() => {
-        console.log("🔍 activeVideo updated:", activeVideo);
-        console.log("🔍 activeVideo.id:", activeVideo?.id);
-        console.log("🔍 activeVideo.id type:", typeof activeVideo?.id);
-        console.log("🔍 activeVideo.video_source:", activeVideo?.video_source);
-        console.log("🔍 activeVideo.video_file:", activeVideo?.video_file);
-        console.log("🔍 activeVideo.video_url:", activeVideo?.video_url);
-    }, [activeVideo]);
-
     if (loading) return <LoadingState />;
     if (error || !course) return <ErrorState error={error} navigate={navigate} />;
 

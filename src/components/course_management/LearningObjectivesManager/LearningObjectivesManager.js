@@ -17,12 +17,6 @@ const LearningObjectivesManager = ({
   const handleAddObjective = () => {
     if (!newObjective.trim() || !courseId) return;
 
-    console.log('=== DEBUG: Adding New Objective ===');
-    console.log('Current objectives count:', learningObjectives.length);
-    console.log('New objective text:', newObjective.trim());
-    console.log('Selected icon:', newIcon);
-    console.log('Course ID:', courseId);
-
     const newObjectiveObj = {
       id: Date.now(), // Temporary ID for new objectives
       objective: newObjective.trim(),
@@ -31,26 +25,16 @@ const LearningObjectivesManager = ({
       course: courseId
     };
 
-    console.log('Created objective object:', newObjectiveObj);
 
     const updatedObjectives = [...learningObjectives, newObjectiveObj];
-    console.log('Updated objectives array:', updatedObjectives);
 
     onObjectivesChange(updatedObjectives);
     setNewObjective('');
     setNewIcon('🎯'); // Reset to default icon
-
-    console.log('=== DEBUG: Objective Added Successfully ===');
   };
 
   const handleUpdateObjective = (objectiveId, newObjectiveText, newIcon) => {
     if (!newObjectiveText.trim()) return;
-
-    console.log('=== DEBUG: Updating Objective ===');
-    console.log('Objective ID:', objectiveId);
-    console.log('New text:', newObjectiveText.trim());
-    console.log('New icon:', newIcon);
-
     const updatedObjectives = learningObjectives.map(obj => 
       obj.id === objectiveId 
         ? { 
@@ -61,13 +45,11 @@ const LearningObjectivesManager = ({
         : obj
     );
 
-    console.log('Updated objectives:', updatedObjectives);
     onObjectivesChange(updatedObjectives);
     setEditingObjectiveId(null);
     setEditingObjectiveText('');
     setEditingIcon('');
 
-    console.log('=== DEBUG: Objective Updated Successfully ===');
   };
 
   const handleDeleteObjective = (objectiveId) => {
@@ -75,76 +57,43 @@ const LearningObjectivesManager = ({
       return;
     }
 
-    console.log('=== DEBUG: Deleting Objective ===');
-    console.log('Objective ID to delete:', objectiveId);
 
     const updatedObjectives = learningObjectives.filter(obj => obj.id !== objectiveId);
-    console.log('Objectives after deletion:', updatedObjectives);
-    
-    onObjectivesChange(updatedObjectives);
 
-    console.log('=== DEBUG: Objective Deleted Successfully ===');
+    onObjectivesChange(updatedObjectives);
   };
 
   const handleUpdateIconOnly = (objectiveId, newIcon) => {
-    console.log('=== DEBUG: Updating Objective Icon Only ===');
-    console.log('Objective ID:', objectiveId);
-    console.log('New icon:', newIcon);
-
     const updatedObjectives = learningObjectives.map(obj => 
       obj.id === objectiveId 
         ? { ...obj, icon: newIcon }
         : obj
     );
 
-    console.log('Objectives after icon update:', updatedObjectives);
     onObjectivesChange(updatedObjectives);
-
-    console.log('=== DEBUG: Icon Updated Successfully ===');
   };
 
-  const startEditingObjective = (objective) => {
-    console.log('=== DEBUG: Starting Objective Edit ===');
-    console.log('Editing objective:', objective);
-    
+  const startEditingObjective = (objective) => {    
     setEditingObjectiveId(objective.id);
     setEditingObjectiveText(objective.objective);
     setEditingIcon(objective.icon || '🎯');
-
-    console.log('=== DEBUG: Edit Mode Activated ===');
   };
 
-  const cancelEditingObjective = () => {
-    console.log('=== DEBUG: Canceling Objective Edit ===');
-    
+  const cancelEditingObjective = () => {    
     setEditingObjectiveId(null);
     setEditingObjectiveText('');
     setEditingIcon('');
-
-    console.log('=== DEBUG: Edit Mode Canceled ===');
   };
 
   const handleKeyPress = (e, action) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      console.log('=== DEBUG: Enter Key Pressed - Triggering Action ===');
       action();
     }
   };
 
   // Debug current state
   useEffect(() => {
-    console.log('=== DEBUG: LearningObjectivesManager State Update ===');
-    console.log('Course ID:', courseId);
-    console.log('Course Title:', courseTitle);
-    console.log('Current Objectives:', learningObjectives);
-    console.log('Objectives Count:', learningObjectives.length);
-    console.log('New Objective Input:', newObjective);
-    console.log('New Icon Input:', newIcon);
-    console.log('Editing Objective ID:', editingObjectiveId);
-    console.log('Editing Objective Text:', editingObjectiveText);
-    console.log('Editing Icon:', editingIcon);
-    console.log('=== DEBUG: State Update Complete ===');
   }, [learningObjectives, newObjective, newIcon, editingObjectiveId, editingObjectiveText, editingIcon, courseId, courseTitle]);
 
   if (!courseId) {
@@ -175,8 +124,6 @@ const LearningObjectivesManager = ({
                 type="text"
                 value={newIcon}
                 onChange={(e) => {
-                  console.log('=== DEBUG: New Icon Input Change ===');
-                  console.log('New icon value:', e.target.value);
                   setNewIcon(e.target.value);
                 }}
                 placeholder="🎯"
@@ -190,8 +137,6 @@ const LearningObjectivesManager = ({
                 type="text"
                 value={newObjective}
                 onChange={(e) => {
-                  console.log('=== DEBUG: Objective Input Change ===');
-                  console.log('New objective value:', e.target.value);
                   setNewObjective(e.target.value);
                 }}
                 placeholder="Add a new learning objective..."
@@ -202,8 +147,6 @@ const LearningObjectivesManager = ({
           </div>
           <button 
             onClick={() => {
-              console.log('=== DEBUG: Add Objective Button Clicked ===');
-              console.log('Button enabled:', !newObjective.trim());
               handleAddObjective();
             }}
             disabled={!newObjective.trim()}
@@ -237,8 +180,6 @@ const LearningObjectivesManager = ({
                         type="text"
                         value={editingIcon}
                         onChange={(e) => {
-                          console.log('=== DEBUG: Edit Icon Input Change ===');
-                          console.log('New edit icon value:', e.target.value);
                           setEditingIcon(e.target.value);
                         }}
                         className="icon-input"
@@ -251,8 +192,6 @@ const LearningObjectivesManager = ({
                         type="text"
                         value={editingObjectiveText}
                         onChange={(e) => {
-                          console.log('=== DEBUG: Edit Input Change ===');
-                          console.log('New edit value:', e.target.value);
                           setEditingObjectiveText(e.target.value);
                         }}
                         onKeyPress={(e) => handleKeyPress(e, () => handleUpdateObjective(objective.id, editingObjectiveText, editingIcon))}
@@ -264,7 +203,6 @@ const LearningObjectivesManager = ({
                   <div className="edit-actions">
                     <button 
                       onClick={() => {
-                        console.log('=== DEBUG: Save Edit Button Clicked ===');
                         handleUpdateObjective(objective.id, editingObjectiveText, editingIcon);
                       }}
                       disabled={!editingObjectiveText.trim()}
@@ -274,7 +212,6 @@ const LearningObjectivesManager = ({
                     </button>
                     <button 
                       onClick={() => {
-                        console.log('=== DEBUG: Cancel Edit Button Clicked ===');
                         cancelEditingObjective();
                       }}
                       className="btn-cancel"
@@ -295,8 +232,6 @@ const LearningObjectivesManager = ({
                         type="text"
                         value={objective.icon || ''}
                         onChange={(e) => {
-                          console.log('=== DEBUG: Quick Icon Edit ===');
-                          console.log('New quick icon:', e.target.value);
                           handleUpdateIconOnly(objective.id, e.target.value);
                         }}
                         placeholder="🎯"
@@ -308,7 +243,6 @@ const LearningObjectivesManager = ({
                   <div className="objective-actions">
                     <button
                       onClick={() => {
-                        console.log('=== DEBUG: Edit Button Clicked ===');
                         startEditingObjective(objective);
                       }}
                       className="btn-edit"
@@ -318,7 +252,6 @@ const LearningObjectivesManager = ({
                     </button>
                     <button
                       onClick={() => {
-                        console.log('=== DEBUG: Delete Button Clicked ===');
                         handleDeleteObjective(objective.id);
                       }}
                       className="btn-delete"

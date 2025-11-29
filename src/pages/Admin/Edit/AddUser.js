@@ -81,13 +81,8 @@ const AddUser = ({ onUserAdded, onCancel }) => {
           }
         }
       });
-
-      console.log("🔍 [AddUser] Sending user data to API:", userData);
       
       const response = await createUser(userData);
-      
-      console.log("✅ [AddUser] User created successfully!");
-      
       setSuccess(true);
       
       setFormData({

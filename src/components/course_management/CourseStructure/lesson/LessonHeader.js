@@ -91,13 +91,6 @@ const LessonHeader = ({
       if (lesson.video_file instanceof File) {
         lessonData.video_file = lesson.video_file;
       }
-
-      console.log('Creating lesson with data:', {
-        ...lessonData,
-        video_file: lessonData.video_file ? `File: ${lessonData.video_file.name}` : 'No file',
-        video_source: lessonData.video_source
-      });
-
       // Create the lesson using your API
       const response = await createLesson(lessonData);
 
@@ -212,26 +205,6 @@ const handleUpdateLesson = async (e) => {
     };
 
     handleFileTransitions();
-
-    // Log the transition for debugging
-    console.log('🎬 Video Transition:', {
-      from: lesson.video_source || 'undefined (setting to none)',
-      to: updateData.video_source,
-      changes: {
-        file: lesson.video_file instanceof File ? 'New file added' : lesson.video_file === null ? 'File cleared' : 'No file change',
-        url: lesson.video_url ? 'URL present' : 'No URL',
-        duration: lesson.video_duration || 'No duration'
-      }
-    });
-
-    console.log('Updating lesson with data:', {
-      ...updateData,
-      video_file: updateData.video_file 
-        ? (updateData.video_file instanceof File ? `New File: ${updateData.video_file.name}` : 'File cleared')
-        : 'No file change',
-      video_source: updateData.video_source // ✅ This will never be undefined
-    });
-
     // Update the lesson using your API
     const response = await updateLesson(lesson.id, updateData);
 

@@ -19,7 +19,6 @@ function CourseSection() {
     const fetchCourses = async () => {
       try {
         const response = await getAllPublishedCardView();
-        console.log('Courses API response:', response.data);
         setCourses(response.data);
         setHasLoaded(true);
       } catch (err) {

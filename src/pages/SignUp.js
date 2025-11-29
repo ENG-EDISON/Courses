@@ -197,8 +197,6 @@ const SignUp = () => {
                 window.location.href = '/login';
             }
         } catch (error) {
-            console.log('Error response:', error.response); // Debug log
-
             if (error.response?.data) {
                 // Direct Django validation errors
                 setErrors(error.response.data);

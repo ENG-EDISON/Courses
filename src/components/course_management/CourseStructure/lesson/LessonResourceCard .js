@@ -56,12 +56,6 @@ const LessonResourceCard = ({
         lesson: lessonId,
         ...(resource.file instanceof File && { file: resource.file })
       };
-
-      console.log('Creating resource with data:', {
-        ...resourceData,
-        file: resourceData.file ? `File: ${resourceData.file.name}` : 'No file'
-      });
-
       // Create the resource using your API
       const response = await createLessonResource(resourceData);
 
@@ -102,12 +96,6 @@ const LessonResourceCard = ({
         lesson: resource.lesson || lessonId,
         ...(resource.file instanceof File && { file: resource.file })
       };
-
-      console.log('Updating resource with data:', {
-        ...updateData,
-        file: updateData.file ? `File: ${updateData.file.name}` : 'No file'
-      });
-
       // Update the resource using your API
       const response = await updateLessonResource(resource.id, updateData);
 

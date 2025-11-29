@@ -155,9 +155,6 @@ const CourseCreator = ({ onCourseCreated, existingCourses = [] }) => {
         category: formData.category || null,
         short_description: formData.short_description.trim()
       };
-
-      console.log('Creating course with data:', courseData);
-
       const response = await createCourse(courseData);
       alert('Course created successfully!');
       

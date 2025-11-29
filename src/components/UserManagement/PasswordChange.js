@@ -72,9 +72,6 @@ const PasswordChange = ({ onCancel, onSuccess }) => {
         old_password: formData.old_password,
         new_password: formData.new_password
       };
-
-      console.log('Changing password with data:', passwordData);
-
       await changePassword(passwordData);
       setSuccess('Password changed successfully!');
       

@@ -29,7 +29,6 @@ export const AuthProvider = ({ children }) => {
     try {
       // ✅ FIXED: Use the same keys as Http.js
       const token = localStorage.getItem('access_token');
-      console.log('🔍 Auth check - token found:', !!token);
       
       if (!token) {
         throw new Error('No token found');
@@ -37,7 +36,6 @@ export const AuthProvider = ({ children }) => {
       
       const response = await getMyProfile();
       if (response.status === 200) {
-        console.log('✅ Auth check successful');
         setIsLoggedIn(true);
         setUser(response.data);
       }
@@ -54,7 +52,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = (userData, tokens) => {
-    console.log('🔍 Login called with tokens:', tokens);
     setIsLoggedIn(true);
     setUser(userData);
     
@@ -62,12 +59,10 @@ export const AuthProvider = ({ children }) => {
       // ✅ FIXED: Use consistent keys
       localStorage.setItem('access_token', tokens.access);
       localStorage.setItem('refresh_token', tokens.refresh);
-      console.log('✅ Tokens stored in localStorage');
     }
   };
 
   const logout = () => {
-    console.log('🔍 Logout called');
     // ✅ FIXED: Use consistent keys
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');

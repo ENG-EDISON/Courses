@@ -58,18 +58,15 @@ apiClient.interceptors.response.use(
             redirectToLogin();
           }
         } catch (refreshError) {
-          console.log('Token refresh failed, redirecting to login');
           redirectToLogin();
         }
       } else {
-        console.log('Token refresh already attempted, redirecting to login');
         redirectToLogin();
       }
     }
 
     // Handle 403 Forbidden
     if (error.response?.status === 403) {
-      console.log('Access forbidden, redirecting to login');
       redirectToLogin();
     }
 

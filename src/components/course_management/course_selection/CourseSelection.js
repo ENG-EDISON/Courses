@@ -77,13 +77,6 @@ const CourseSelection = ({ category, courses, onSelect, onCreateCourse, onBack, 
       setFormErrors(errors);
       return;
     }
-    console.log("📂 Category Object:", category);
-    console.log("📊 Category Details:", {
-      id: category?.id,
-      name: category?.name,
-      description: category?.description,
-      fullObject: category
-    });
     setCreatingCourse(true);
     try {
       // Prepare complete course data matching backend expectations
@@ -106,10 +99,7 @@ const CourseSelection = ({ category, courses, onSelect, onCreateCourse, onBack, 
         status: newCourse.status,
         is_featured: newCourse.is_featured,
         thumbnail: null, // Explicitly set thumbnail as null
-      };
-      
-      console.log("📝 Creating new course with complete data:", courseData);
-      
+      };      
       // Call the parent component's onCreateCourse function
       await onCreateCourse(courseData);
       setShowCreateForm(false);

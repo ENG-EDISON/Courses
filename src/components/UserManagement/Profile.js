@@ -19,7 +19,6 @@ function Profile() {
                 setError("");
                 const response = await getMyProfile();
                 setProfile(response.data);
-                console.log("response",response.data)
             } catch (error) {
                 setError('Failed to load profile. Please try again.');
                 console.error('Profile fetch error:', error);

@@ -32,7 +32,6 @@ function CourseHero({ course, skipEnrollmentCheck = false }) {
                     setEnrollmentLoading(true);
                     setEnrollmentError(null);
                     const response = await checkEnrollment(course.id);
-                    console.log('Enrollment check response:', response.data);
                     setEnrollmentData(response.data);
                 } catch (error) {
                     console.error('Error checking enrollment:', error);

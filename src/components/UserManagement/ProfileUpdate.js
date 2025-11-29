@@ -117,9 +117,6 @@ const ProfileUpdate = ({ onProfileUpdated, onCancel }) => {
       if (profilePicture) {
         updateData.append('profile_picture', profilePicture);
       }
-
-      console.log('Updating profile with data:', Object.fromEntries(updateData));
-
       const response = await updateProfile(updateData);
       setProfile(response.data);
       setSuccess('Profile updated successfully!');

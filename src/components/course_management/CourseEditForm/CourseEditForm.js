@@ -136,12 +136,6 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
           submitData.append(key, formData[key]);
         }
       });
-
-      console.log('Submitting course update:', {
-        courseId: course.id,
-        data: Object.fromEntries(submitData)
-      });
-
       // Call update API
       if (onUpdate) {
         await onUpdate(submitData);

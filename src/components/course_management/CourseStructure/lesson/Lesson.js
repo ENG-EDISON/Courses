@@ -42,13 +42,11 @@ const Lesson =({
 
   // ✅ ADDED: Video duration handler
   const handleVideoDurationChange = (duration) => {
-    console.log('🎬 Video duration received in Lesson component:', duration);
     updateLesson('video_duration', duration);
   };
 
   // ✅ ADD MISSING RESOURCE API CALLBACKS
   const handleResourceCreate = useCallback((newResourceData, sectionIndex, subsectionIndex, lessonIndex, resourceIndex) => {
-    console.log('🔄 Creating resource in state:', { newResourceData, sectionIndex, subsectionIndex, lessonIndex, resourceIndex });
     
     const updatedSections = sections.map((section, secIndex) => {
       if (secIndex === sectionIndex) {
@@ -78,7 +76,6 @@ const Lesson =({
       return section;
     });
     
-    console.log('🔄 Setting updated sections after resource creation');
     setSections(updatedSections);
     if (onUpdate) {
       onUpdate(updatedSections);
@@ -86,7 +83,6 @@ const Lesson =({
   }, [sections, setSections, onUpdate]);
 
   const handleResourceUpdate = useCallback((resourceId, updatedData) => {
-    console.log('🔄 Updating resource in state:', { resourceId, updatedData });
     
     const updatedSections = sections.map(section => ({
       ...section,
@@ -104,7 +100,6 @@ const Lesson =({
       }))
     }));
     
-    console.log('🔄 Setting updated sections after resource update');
     setSections(updatedSections);
     if (onUpdate) {
       onUpdate(updatedSections);
@@ -112,7 +107,6 @@ const Lesson =({
   }, [sections, setSections, onUpdate]);
 
   const handleResourceDelete = useCallback((resourceId, sectionIndex, subsectionIndex, lessonIndex, resourceIndex) => {
-    console.log('🔄 Deleting resource from state:', { resourceId, sectionIndex, subsectionIndex, lessonIndex, resourceIndex });
     
     const updatedSections = sections.map((section, secIndex) => {
       if (secIndex === sectionIndex) {
@@ -134,7 +128,6 @@ const Lesson =({
       return section;
     });
     
-    console.log('🔄 Setting updated sections after resource deletion');
     setSections(updatedSections);
     if (onUpdate) {
       onUpdate(updatedSections);
@@ -235,7 +228,6 @@ const Lesson =({
 
     if (lessonToDelete?.id) {
       if (window.confirm('This lesson exists in the database. Do you want to delete it permanently?')) {
-        console.log('Should delete existing lesson from database:', lessonToDelete.id);
         return;
       } else {
         return;
@@ -337,16 +329,6 @@ const Lesson =({
       updateLesson('video_file', null);
     }
   };
-
-  // ✅ Debug: log when lesson changes
-  React.useEffect(() => {
-    console.log('📝 Lesson component updated:', { 
-      lessonId: lesson.id, 
-      hasResources: lesson.resources?.length || 0,
-      canAddResources: canAddResources(),
-      videoDuration: lesson.video_duration
-    });
-  }, [lesson.id, lesson.resources, lesson.video_duration, canAddResources]);
 
   return (
     <div className={`ls-card ${isExistingInDatabase(lesson) ? 'existing' : 'new'}`}>

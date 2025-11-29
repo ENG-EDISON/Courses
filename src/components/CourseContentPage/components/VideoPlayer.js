@@ -15,25 +15,12 @@ const EnhancedVideoPlayer = ({ video, isCompleted = false, onMarkComplete }) => 
     // ✅ UPDATED: Use video_source from API response
     const videoSource = getVideoSource(video);
 
-    // 🔍 ADDED: Debug the video object
-    useEffect(() => {
-        console.log('🔍 EnhancedVideoPlayer - video object:', video);
-        console.log('🔍 EnhancedVideoPlayer - video_source:', video?.video_source);
-        console.log('🔍 EnhancedVideoPlayer - video.id:', video?.id);
-    }, [video]);
-
     // ✅ MODIFIED: Only track when video is completed
     const trackProgress = useCallback(async (completed) => {
         try {
             if (!completed) {
-                console.log('⏸️ Progress tracking skipped - video not completed');
                 return;
-            }
-
-            // 🔍 ADDED: Debug the video ID before tracking
-            console.log('🔍 trackProgress - video.id:', video?.id);
-            console.log('🔍 trackProgress - video_source:', video?.video_source);
-            
+            }            
             if (!video?.id || isNaN(video.id)) {
                 console.error('❌ Cannot track progress: Invalid video ID', video?.id);
                 return;
@@ -43,15 +30,6 @@ const EnhancedVideoPlayer = ({ video, isCompleted = false, onMarkComplete }) => 
             const trackedTime = Math.floor(duration);
             const progressPercentage = 100; // Always 100% when completed
             
-            console.log('🎯 Tracking video completion:', { 
-                videoId: video.id,
-                videoSource: video.video_source,
-                trackedTime, 
-                completed, 
-                progressPercentage,
-                duration 
-            });
-            
             await trackLessonProgress(video.id, {
                 tracked_time: trackedTime,
                 completed: true, // Always true for completion tracking
@@ -59,11 +37,8 @@ const EnhancedVideoPlayer = ({ video, isCompleted = false, onMarkComplete }) => 
                 total_duration: Math.round(duration) || video?.video_duration || 0
             });
             
-            console.log('✅ Progress tracked successfully');
-            
             // ✅ FIXED: Pass the video object to onMarkComplete
             if (onMarkComplete) {
-                console.log('🔍 Calling onMarkComplete with video:', video);
                 onMarkComplete(video); // Pass the full video object
             }
         } catch (error) {
@@ -73,12 +48,10 @@ const EnhancedVideoPlayer = ({ video, isCompleted = false, onMarkComplete }) => 
 
     // Set initial time
     useEffect(() => {
-        console.log('🎯 Setting initial time:', video.lastPlayedTime);
         if (videoRef.current && video.lastPlayedTime && video.lastPlayedTime > 0) {
             const checkVideoReady = () => {
                 if (videoRef.current && videoRef.current.readyState > 0) {
                     videoRef.current.currentTime = video.lastPlayedTime;
-                    console.log('✅ Initial time set to:', video.lastPlayedTime);
                 } else {
                     setTimeout(checkVideoReady, 100);
                 }
@@ -98,7 +71,6 @@ const EnhancedVideoPlayer = ({ video, isCompleted = false, onMarkComplete }) => 
         if (videoRef.current) {
             const videoDuration = videoRef.current.duration;
             setDuration(videoDuration);
-            console.log('📊 Video metadata loaded - Duration:', videoDuration);
         }
     }, []);
 
@@ -116,7 +88,6 @@ const EnhancedVideoPlayer = ({ video, isCompleted = false, onMarkComplete }) => 
                 !hasAutoCompleted &&
                 videoSource.canTrack) {
                 
-                console.log('✅ Auto-completing video');
                 setHasAutoCompleted(true);
                 trackProgress(true); // ✅ Only track completion
             }
@@ -125,7 +96,6 @@ const EnhancedVideoPlayer = ({ video, isCompleted = false, onMarkComplete }) => 
 
     // ✅ MODIFIED: Only track on video end
     const handleVideoEnd = useCallback(() => {
-        console.log('🏁 Video ended');
         if (videoSource.canTrack && !isCompleted && !hasAutoCompleted) {
             setHasAutoCompleted(true);
             trackProgress(true); // ✅ Only track completion
@@ -134,21 +104,12 @@ const EnhancedVideoPlayer = ({ video, isCompleted = false, onMarkComplete }) => 
 
     // ✅ MODIFIED: Remove progress tracking on pause
     const handleVideoPause = useCallback(() => {
-        const currentVideoTime = videoRef.current?.currentTime;
-        console.log('⏸️ Video paused at:', currentVideoTime);
+        // Pause handler available for future use
     }, []);
 
     // ✅ MODIFIED: Remove progress tracking on seek
     const handleSeek = useCallback(() => {
-        const currentVideoTime = videoRef.current?.currentTime;
-        console.log('🎯 Video seeked to:', currentVideoTime);
-    }, []);
-
-    useEffect(() => {
-        console.log('🎬 EnhancedVideoPlayer mounted - Progress tracking: ONLY ON COMPLETION');
-        console.log('🎬 Video source type:', videoSource.type);
-        console.log('🎬 Video source value:', videoSource.source);
-        // eslint-disable-next-line 
+        // Seek handler available for future use
     }, []);
 
     // ✅ UPDATED: Video source logic based on video_source field
@@ -188,7 +149,6 @@ const EnhancedVideoPlayer = ({ video, isCompleted = false, onMarkComplete }) => 
     }
 
     // Fallback for unknown video source types
-    console.warn('⚠️ Unknown video source type:', videoSource.type);
     return <NoVideoContent video={video} />;
 };
 

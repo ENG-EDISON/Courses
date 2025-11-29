@@ -27,7 +27,6 @@ function EnrollmentRouteGuard({ children }) {
                 const response = await checkEnrollment(courseId);
                 if (response.data.is_enrolled) {
                     // Immediate redirect - don't show details page at all
-                    console.log('User enrolled, redirecting to course content');
                     navigate(`/course-content/${courseId}`, { replace: true });
                     return;
                 }

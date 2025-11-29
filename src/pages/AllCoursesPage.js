@@ -28,7 +28,6 @@ function AllCoursesPage() {
             try {
                 setLoading(true);
                 const response = await getAllPublishedCardView();
-                console.log('Courses data:', response.data);
                 setCourses(response.data);
                 groupCoursesByCategory(response.data);
             } catch (err) {
@@ -102,11 +101,8 @@ function AllCoursesPage() {
 
     // Handle search
     const handleSearch = async (e) => {
-        e.preventDefault();
-        console.log('Search triggered with query:', searchQuery);
-        
+        e.preventDefault();        
         if (!searchQuery.trim()) {
-            console.log('Empty search query, clearing results');
             setSearchResults(null);
             return;
         }
@@ -114,12 +110,7 @@ function AllCoursesPage() {
         try {
             setSearchLoading(true);
             setError("");
-            console.log('Making API call to search courses...');
-            
-            const response = await searchCourses(searchQuery);
-            console.log('Search API response:', response);
-            console.log('Search results data:', response.data);
-            
+            const response = await searchCourses(searchQuery);            
             setSearchResults(response.data);
             
         } catch (err) {
@@ -127,7 +118,6 @@ function AllCoursesPage() {
             console.error('Error response:', err.response);
             
             // Try client-side search as fallback
-            console.log('Trying client-side search as fallback...');
             const clientSideResults = performClientSideSearch(searchQuery);
             setSearchResults(clientSideResults);
         } finally {
@@ -137,9 +127,7 @@ function AllCoursesPage() {
 
     // Client-side search fallback
     const performClientSideSearch = (query) => {
-        const searchTerm = query.toLowerCase().trim();
-        console.log('Performing client-side search for:', searchTerm);
-        
+        const searchTerm = query.toLowerCase().trim();        
         const results = courses.filter(course => {
             const searchableText = `
                 ${course.title || ''} 
@@ -151,13 +139,11 @@ function AllCoursesPage() {
             return searchableText.includes(searchTerm);
         });
         
-        console.log('Client-side search results:', results);
         return results;
     };
 
     // Clear search
     const clearSearch = () => {
-        console.log('Clearing search');
         setSearchQuery("");
         setSearchResults(null);
         setError("");
