@@ -22,6 +22,7 @@ import AdminMessagesList from "./pages/AdminMessagesList"
 import AdminDashboard from './pages/AdminDashboard';
 import ContactAdminPage from './pages/ContactAdminPage';
 import EnrollmentRouteGuard from './pages/CourseDetailsPage/components/EnrollmentRouteGuard';
+import SignUp from './pages/SignUp';
 const router = createBrowserRouter([
   {
     path: '/',
@@ -99,6 +100,15 @@ const router = createBrowserRouter([
       <>
         <NavigationBar />
         <CourseEditor />
+      </>
+    )
+  },
+    {
+    path: '/signup/',
+    element: (
+      <>
+        <NavigationBar />
+        <SignUp/>
       </>
     )
   },

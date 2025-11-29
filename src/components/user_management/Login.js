@@ -112,7 +112,7 @@ function EnterpriseLogin() {
 
           <div className="footer-links">
             <a href="/forgot-password">Forgot password?</a>
-            <a href="/contact-support">Contact support</a>
+            <a href="/signup">SignUp</a>
           </div>
         </div>
 
