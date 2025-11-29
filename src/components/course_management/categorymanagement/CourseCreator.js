@@ -14,9 +14,9 @@ const CourseCreator = ({ onCourseCreated, existingCourses = [] }) => {
     short_description: '',
     category: '',
     price: '0.00',
-    discount_price: '0.00',
+    discount_price: '', // Changed to empty string to allow null
     level: 'beginner',
-    duration_hours: 0,
+    duration_seconds: 0, // Changed from duration_hours to duration_seconds
     promotional_video: '',
     requirements: '',
     language: 'English',
@@ -40,11 +40,28 @@ const CourseCreator = ({ onCourseCreated, existingCourses = [] }) => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
+    
+    let processedValue = value;
+    
+    if (type === 'checkbox') {
+      processedValue = checked;
+    } else if (type === 'number') {
+      // Handle different number fields
+      if (name === 'duration_seconds') {
+        processedValue = parseInt(value) || 0;
+      } else {
+        processedValue = parseFloat(value) || 0;
+      }
+    }
+    
+    // Special handling for discount_price - allow empty string for null
+    if (name === 'discount_price' && value === '') {
+      processedValue = '';
+    }
+
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : 
-              type === 'number' ? (name === 'duration_hours' ? parseInt(value) || 0 : parseFloat(value) || 0) : 
-              value
+      [name]: processedValue
     }));
   };
 
@@ -79,6 +96,17 @@ const CourseCreator = ({ onCourseCreated, existingCourses = [] }) => {
       return;
     }
 
+    // Validate short_description is not blank and within length limit
+    if (!formData.short_description.trim()) {
+      alert('Short description is required');
+      return;
+    }
+
+    if (formData.short_description.length > 300) {
+      alert('Short description must be 300 characters or less');
+      return;
+    }
+
     // Check for duplicate course titles
     const duplicateCourse = existingCourses.find(
       course => course.title.toLowerCase() === formData.title.toLowerCase()
@@ -99,6 +127,16 @@ const CourseCreator = ({ onCourseCreated, existingCourses = [] }) => {
       return;
     }
 
+    // Validate discount price logic
+    const price = parseFloat(formData.price);
+    const discountPrice = formData.discount_price ? parseFloat(formData.discount_price) : null;
+
+    // If discount price is provided, it must be less than regular price
+    if (discountPrice !== null && discountPrice >= price) {
+      alert('Discount price must be less than regular price or left empty for no discount');
+      return;
+    }
+
     try {
       setIsLoading(true);
       
@@ -106,14 +144,16 @@ const CourseCreator = ({ onCourseCreated, existingCourses = [] }) => {
       const profileResponse = await getMyProfile();
       const instructorId = profileResponse.data.id;
 
-      // Prepare course data with proper formatting
+      // Prepare course data with proper formatting for Django model
       const courseData = {
         ...formData,
         instructor: instructorId,
         price: formData.price.toString(),
-        discount_price: formData.discount_price.toString(),
-        duration_hours: parseInt(formData.duration_hours) || 0,
-        category: formData.category || null
+        // Send null if discount_price is empty, otherwise send the value
+        discount_price: formData.discount_price === '' ? null : formData.discount_price.toString(),
+        duration_seconds: parseInt(formData.duration_seconds) || 0,
+        category: formData.category || null,
+        short_description: formData.short_description.trim()
       };
 
       console.log('Creating course with data:', courseData);
@@ -129,9 +169,9 @@ const CourseCreator = ({ onCourseCreated, existingCourses = [] }) => {
         short_description: '',
         category: '',
         price: '0.00',
-        discount_price: '0.00',
+        discount_price: '', // Reset to empty string
         level: 'beginner',
-        duration_hours: 0,
+        duration_seconds: 0,
         promotional_video: '',
         requirements: '',
         language: 'English',
@@ -155,6 +195,17 @@ const CourseCreator = ({ onCourseCreated, existingCourses = [] }) => {
       setIsLoading(false);
     }
   };
+
+  // Helper function to convert hours to seconds for user convenience
+  const handleDurationHoursChange = (hours) => {
+    const seconds = Math.round(hours * 3600);
+    setFormData(prev => ({
+      ...prev,
+      duration_seconds: seconds
+    }));
+  };
+
+  const durationInHours = formData.duration_seconds / 3600;
 
   return (
     <div className="course-creator">
@@ -192,17 +243,18 @@ const CourseCreator = ({ onCourseCreated, existingCourses = [] }) => {
 
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="short_description">Short Description</label>
+            <label htmlFor="short_description">Short Description *</label>
             <input
               type="text"
               id="short_description"
               name="short_description"
               value={formData.short_description}
               onChange={handleInputChange}
+              required
               placeholder="Brief description (displayed in course cards)"
-              maxLength="150"
+              maxLength="300"
             />
-            <small className="field-hint">{formData.short_description.length}/150 characters</small>
+            <small className="field-hint">{formData.short_description.length}/300 characters</small>
           </div>
 
           <div className="form-group">
@@ -251,7 +303,7 @@ const CourseCreator = ({ onCourseCreated, existingCourses = [] }) => {
 
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="price">Price ($)</label>
+            <label htmlFor="price">Price ($) *</label>
             <input
               type="number"
               id="price"
@@ -261,6 +313,7 @@ const CourseCreator = ({ onCourseCreated, existingCourses = [] }) => {
               min="0"
               step="0.01"
               placeholder="0.00"
+              required
             />
           </div>
 
@@ -274,22 +327,24 @@ const CourseCreator = ({ onCourseCreated, existingCourses = [] }) => {
               onChange={handleInputChange}
               min="0"
               step="0.01"
-              placeholder="0.00"
+              placeholder="Leave empty for no discount"
             />
+            <small className="field-hint">Must be less than regular price. Leave empty for no discount.</small>
           </div>
 
           <div className="form-group">
-            <label htmlFor="duration_hours">Duration (hours)</label>
+            <label htmlFor="duration_seconds">Duration (hours)</label>
             <input
               type="number"
-              id="duration_hours"
-              name="duration_hours"
-              value={formData.duration_hours}
-              onChange={handleInputChange}
+              id="duration_seconds"
+              name="duration_seconds"
+              value={durationInHours}
+              onChange={(e) => handleDurationHoursChange(parseFloat(e.target.value) || 0)}
               min="0"
-              step="1"
+              step="0.5"
               placeholder="0"
             />
+            <small className="field-hint">Total course duration in hours (will be converted to seconds)</small>
           </div>
         </div>
 
