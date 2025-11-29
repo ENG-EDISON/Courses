@@ -1,11 +1,8 @@
-// Course.js
+// src/pages/CourseDetailsPage/components/CourseDetails.jsx
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getCoursePreviewStructure } from "../../../api/CoursesApi";
 import "../../../static/Courses.css";
-
-// Import all the new components we'll create
-
 
 import CourseLoading from "./CourseLoading";
 import CourseError from "./CourseError";
@@ -13,6 +10,7 @@ import VideoModal from "./VideoModal";
 import CourseHero from "./CourseHero";
 import CourseMainContent from "./CourseMainContent";
 import CourseSidebar from "./CourseSidebar";
+import Footer from "../../../components/common/Footer";
 
 function CourseDetails() {
     const { courseId } = useParams();
@@ -81,30 +79,36 @@ function CourseDetails() {
     if (!course) return <CourseError type="not-found" />;
 
     return (
-        <div className="enterprise-course">
-            <VideoModal 
-                show={showVideoModal}
-                currentVideo={currentVideo}
-                onClose={closeVideoModal}
-            />
-            
-            <CourseHero course={course} />
-            
-            <div className="course-container">
-                <div className="course-layout">
-                    <CourseMainContent 
-                        course={course}
-                        expandedSections={expandedSections}
-                        expandedSubsections={expandedSubsections}
-                        onToggleSection={toggleSection}
-                        onToggleSubsection={toggleSubsection}
-                        onPlayPreviewVideo={playPreviewVideo}
-                    />
-                    
-                    <CourseSidebar course={course} />
+        <div>
+            <div className="enterprise-course">
+                <VideoModal
+                    show={showVideoModal}
+                    currentVideo={currentVideo}
+                    onClose={closeVideoModal}
+                />
+
+                {/* Pass skipEnrollmentCheck to prevent double checking */}
+                <CourseHero course={course} skipEnrollmentCheck={true} />
+
+                <div className="course-container">
+                    <div className="course-layout">
+                        <CourseMainContent
+                            course={course}
+                            expandedSections={expandedSections}
+                            expandedSubsections={expandedSubsections}
+                            onToggleSection={toggleSection}
+                            onToggleSubsection={toggleSubsection}
+                            onPlayPreviewVideo={playPreviewVideo}
+                        />
+
+                        <CourseSidebar course={course} />
+                    </div>
                 </div>
             </div>
+            {/* Footer added here */}
+            <Footer/>
         </div>
+
     );
 }
 

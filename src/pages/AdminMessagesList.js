@@ -11,6 +11,7 @@ import {
     getMessageById
 } from '../api/ContactMessages';
 import '../static/AdminMessagesList.css';
+import Footer from '../components/common/Footer';
 
 const AdminMessagesList = () => {
     const [messages, setMessages] = useState([]);
@@ -56,7 +57,7 @@ const AdminMessagesList = () => {
                 getAllMessages(),
                 getMessagesStats()
             ]);
-            
+
             setMessages(messagesResponse?.data || []);
             setStats(statsResponse?.data || {});
         } catch (error) {
@@ -71,7 +72,7 @@ const AdminMessagesList = () => {
 
     const filteredMessages = useMemo(() => {
         if (!Array.isArray(messages)) return [];
-        
+
         return messages.filter(message => {
             if (!message) return false;
 
@@ -88,7 +89,7 @@ const AdminMessagesList = () => {
                 const email = message.customer_email || '';
                 const subject = message.subject || '';
                 const messagePreview = message.message_preview || '';
-                
+
                 return (
                     name.toLowerCase().includes(searchTerm) ||
                     email.toLowerCase().includes(searchTerm) ||
@@ -118,7 +119,7 @@ const AdminMessagesList = () => {
 
     const handleSelectAll = () => {
         if (!Array.isArray(filteredMessages)) return;
-        
+
         if (selectedMessages.size === filteredMessages.length) {
             setSelectedMessages(new Set());
         } else {
@@ -145,7 +146,7 @@ const AdminMessagesList = () => {
                 default:
                     return;
             }
-            
+
             // Small delay to ensure API processing
             await new Promise(resolve => setTimeout(resolve, 300));
             await fetchData();
@@ -173,11 +174,11 @@ const AdminMessagesList = () => {
                 default:
                     return;
             }
-            
+
             // Small delay to ensure API processing
             await new Promise(resolve => setTimeout(resolve, 300));
             await fetchData();
-            
+
             if (action === 'delete' && selectedMessage?.id === id) {
                 setShowDetailModal(false);
             }
@@ -192,15 +193,15 @@ const AdminMessagesList = () => {
             // First get the full message details by ID
             const messageResponse = await getMessageById(id);
             const fullMessage = messageResponse.data;
-            
+
             if (!fullMessage) {
                 setError('Message not found.');
                 return;
             }
-            
+
             setSelectedMessage(fullMessage);
             setShowDetailModal(true);
-            
+
             // Mark as read if not already read
             if (!fullMessage.is_read) {
                 await markAsRead(id);
@@ -231,12 +232,12 @@ const AdminMessagesList = () => {
 
     const getTimeAgo = (dateString) => {
         if (!dateString) return 'Unknown';
-        
+
         try {
             const date = new Date(dateString);
             const now = new Date();
             const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
-            
+
             if (diffInHours < 1) return 'Just now';
             if (diffInHours < 24) return `${diffInHours}h ago`;
             if (diffInHours < 168) return `${Math.floor(diffInHours / 24)}d ago`;
@@ -271,6 +272,7 @@ const AdminMessagesList = () => {
     }
 
     return (
+        <div>
         <div className="admin-messages-container">
             {/* Header */}
             <div className="admin-header">
@@ -283,13 +285,13 @@ const AdminMessagesList = () => {
                         <i className="fas fa-sync-alt"></i> Refresh
                     </button>
                     <div className="view-toggle">
-                        <button 
+                        <button
                             className={viewMode === 'table' ? 'active' : ''}
                             onClick={() => setViewMode('table')}
                         >
                             <i className="fas fa-table"></i>
                         </button>
-                        <button 
+                        <button
                             className={viewMode === 'card' ? 'active' : ''}
                             onClick={() => setViewMode('card')}
                         >
@@ -342,7 +344,7 @@ const AdminMessagesList = () => {
             {/* Filters and Bulk Actions */}
             <div className="toolbar">
                 <div className="filters">
-                    <select 
+                    <select
                         value={filters.status}
                         onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
                         className="filter-select"
@@ -353,7 +355,7 @@ const AdminMessagesList = () => {
                         <option value="unresponded">Unresponded</option>
                         <option value="responded">Responded</option>
                     </select>
-                    
+
                     <div className="search-box">
                         <i className="fas fa-search"></i>
                         <input
@@ -371,7 +373,7 @@ const AdminMessagesList = () => {
                             <span className="selected-count">
                                 {selectedMessages.size} selected
                             </span>
-                            <select 
+                            <select
                                 value={bulkAction}
                                 onChange={(e) => setBulkAction(e.target.value)}
                                 className="bulk-select"
@@ -381,7 +383,7 @@ const AdminMessagesList = () => {
                                 <option value="mark-responded">Mark as Responded</option>
                                 <option value="delete">Delete</option>
                             </select>
-                            <button 
+                            <button
                                 onClick={handleBulkAction}
                                 className="btn-apply"
                                 disabled={!bulkAction}
@@ -416,8 +418,8 @@ const AdminMessagesList = () => {
                         </thead>
                         <tbody>
                             {filteredMessages.map(message => (
-                                <tr 
-                                    key={message.id} 
+                                <tr
+                                    key={message.id}
                                     className={`
                                         ${!message.is_read ? 'unread' : ''}
                                         ${selectedMessages.has(message.id) ? 'selected' : ''}
@@ -510,8 +512,8 @@ const AdminMessagesList = () => {
             ) : (
                 <div className="messages-grid">
                     {filteredMessages.map(message => (
-                        <div 
-                            key={message.id} 
+                        <div
+                            key={message.id}
                             className={`
                                 message-card 
                                 ${!message.is_read ? 'unread' : ''}
@@ -547,7 +549,7 @@ const AdminMessagesList = () => {
                                     </button>
                                 </div>
                             </div>
-                            
+
                             <div className="card-body">
                                 <div className="card-subject">
                                     {message.subject || 'No Subject'}
@@ -556,7 +558,7 @@ const AdminMessagesList = () => {
                                     {getMessagePreview(message)}
                                 </div>
                             </div>
-                            
+
                             <div className="card-footer">
                                 <div className="status-badges">
                                     {!message.is_read && (
@@ -572,7 +574,7 @@ const AdminMessagesList = () => {
                                     {getTimeAgo(message.created_at)}
                                 </div>
                             </div>
-                            
+
                             <div className="card-quick-actions">
                                 {!message.is_read && (
                                     <button
@@ -614,6 +616,8 @@ const AdminMessagesList = () => {
                 />
             )}
         </div>
+        <Footer/>
+        </div>
     );
 };
 
@@ -627,6 +631,7 @@ const MessageDetailModal = ({ message, onClose, onAction, formatDate }) => {
     };
 
     return (
+        <div>
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
@@ -635,7 +640,7 @@ const MessageDetailModal = ({ message, onClose, onAction, formatDate }) => {
                         <i className="fas fa-times"></i>
                     </button>
                 </div>
-                
+
                 <div className="modal-body">
                     <div className="message-meta">
                         <div className="meta-row">
@@ -711,6 +716,8 @@ const MessageDetailModal = ({ message, onClose, onAction, formatDate }) => {
                     </div>
                 </div>
             </div>
+        </div>
+        <Footer/>
         </div>
     );
 };

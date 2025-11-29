@@ -4,6 +4,7 @@ import "../static/AllCoursesPage.css";
 import UdemyStylePopup from "../components/common/UdemyStylePopup";
 import CourseCard from "../components/common/CourseCard";
 import { Link } from "react-router-dom";
+import Footer from "../components/common/Footer";
 
 function AllCoursesPage() {
     const [courses, setCourses] = useState([]);
@@ -414,6 +415,9 @@ function AllCoursesPage() {
                 </div>
                 )}
             </div>
+   
+            {/* Footer - Now inside the component */}
+            <Footer/>
 
             {/* Reusable Udemy-style Popup */}
             <UdemyStylePopup

@@ -14,6 +14,7 @@ import CourseHeader from './components/CourseHeader';
 import CourseLayout from './components/CourseLayout';
 import LoadingState from './components/LoadingState';
 import ErrorState from './components/ErrorState';
+import Footer from '../../components/common/Footer'; // Import Footer
 import "../../static/CourseContentPage.css"
 
 const CourseContentPage = () => {
@@ -318,27 +319,32 @@ const CourseContentPage = () => {
     if (error || !course) return <ErrorState error={error} navigate={navigate} />;
 
     return (
-        <div className="course-content">
-            <CourseHeader 
-                course={course}
-                progressSummary={progressSummary}
-                lastPlayed={lastPlayed}
-                activeVideo={activeVideo}
-                completionStatus={completionStatus}
-                onResumeLastPlayed={handleVideoSelect}
-                findLessonInCourse={findLessonInCourse}
-            />
+        <div className="course-content-page">
+            <div className="course-content">
+                <CourseHeader 
+                    course={course}
+                    progressSummary={progressSummary}
+                    lastPlayed={lastPlayed}
+                    activeVideo={activeVideo}
+                    completionStatus={completionStatus}
+                    onResumeLastPlayed={handleVideoSelect}
+                    findLessonInCourse={findLessonInCourse}
+                />
+                
+                <CourseLayout
+                    course={course}
+                    activeVideo={activeVideo}
+                    expandedSections={expandedSections}
+                    completionStatus={completionStatus}
+                    progressSummary={progressSummary}
+                    onVideoSelect={handleVideoSelect}
+                    onToggleSection={toggleSection}
+                    onMarkComplete={markLessonAsCompleted}
+                />
+            </div>
             
-            <CourseLayout
-                course={course}
-                activeVideo={activeVideo}
-                expandedSections={expandedSections}
-                completionStatus={completionStatus}
-                progressSummary={progressSummary}
-                onVideoSelect={handleVideoSelect}
-                onToggleSection={toggleSection}
-                onMarkComplete={markLessonAsCompleted}
-            />
+            {/* Footer added here */}
+            <Footer />
         </div>
     );
 };

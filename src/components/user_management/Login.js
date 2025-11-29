@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { login } from "../../api/AuthApi";
 import "./Login.css";
+import Footer from "../common/Footer";
 
 function EnterpriseLogin() {
   const [username, setUsername] = useState("");
@@ -56,6 +57,7 @@ function EnterpriseLogin() {
   };
 
   return (
+    <div>
     <div className="enterprise-login">
       <div className="login-container">
         <div className="login-left">
@@ -118,6 +120,8 @@ function EnterpriseLogin() {
           <img src="/api/placeholder/500/400" alt="Course Platform" />
         </div>
       </div>
+    </div>
+    <Footer/>
     </div>
   );
 }

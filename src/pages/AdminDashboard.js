@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import AdminMessagesList from "./AdminMessagesList";
 import "../static/AdminDashboard.css";
 import UserManagement from "./Admin/UserManagement";
+import Footer from "../components/common/Footer";
 
 const menuItems = [
   { id: "overview", label: "Overview", icon: "📊" },
@@ -148,6 +149,7 @@ const AdminDashboard = () => {
   };
 
   return (
+    <div>
     <div className="admin-container">
       {/* SIDEBAR */}
       <aside className="admin-sidebar">
@@ -178,6 +180,9 @@ const AdminDashboard = () => {
       <main className="admin-content">
         {renderPage(activePage)}
       </main>
+    </div>
+    {/* {Footer} */}
+    <Footer/>
     </div>
   );
 };

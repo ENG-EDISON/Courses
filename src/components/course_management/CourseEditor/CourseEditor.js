@@ -7,6 +7,7 @@ import { getAllCourses, updateCourse, deleteCourse } from '../../../api/CoursesA
 import CourseCreator from '../categorymanagement/CourseCreator';
 import CategoryManager from '../categorymanagement/CategoryManager';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
+import Footer from '../../common/Footer';
 
 const CourseEditor = () => {
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -140,6 +141,8 @@ const handleStructureUpdate = (sections) => {
   };
 
   return (
+
+    <div>
     <div className="course-editor">
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal
@@ -416,6 +419,9 @@ const handleStructureUpdate = (sections) => {
           </div>
         )}
       </div>
+    </div>
+      {/* Footer added here */}
+      <Footer/>
     </div>
   );
 };

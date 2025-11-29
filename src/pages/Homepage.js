@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import "../static/Homepage.css";
 import CoursesSection from "../components/CourseSection";
+import Footer from "../components/common/Footer";
 
 function Homepage() {
   return (
@@ -97,6 +98,8 @@ function Homepage() {
           </Link>
         </div>
       </section>
+      <Footer/>
+
     </main>
   );
 }

@@ -603,3 +603,29 @@
         font-size: 1rem;
     }
 }
+
+.course-content-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.course-content {
+    flex: 1;
+}
+
+/* Ensure the loading state takes full height */
+.loading-state {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ensure the error state takes full height */
+.error-state {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

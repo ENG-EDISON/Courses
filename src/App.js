@@ -1,3 +1,4 @@
+// src/App.js
 import './App.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
@@ -20,7 +21,7 @@ import TermsOfService from './pages/TermsOfService';
 import AdminMessagesList from "./pages/AdminMessagesList"
 import AdminDashboard from './pages/AdminDashboard';
 import ContactAdminPage from './pages/ContactAdminPage';
-
+import EnrollmentRouteGuard from './pages/CourseDetailsPage/components/EnrollmentRouteGuard';
 const router = createBrowserRouter([
   {
     path: '/',
@@ -28,7 +29,7 @@ const router = createBrowserRouter([
       <>
         <NavigationBar />
         <Homepage />
-        <Footer/>
+
       </>
     ),
     errorElement: <p>404 Not found</p>,
@@ -39,7 +40,6 @@ const router = createBrowserRouter([
       <>
         <NavigationBar />
         <EnterpriseLogin />
-        <Footer/>
 
       </>
     ),
@@ -51,8 +51,6 @@ const router = createBrowserRouter([
       <>
         <NavigationBar />
         <AdminDashboard />
-        <Footer/>
-
       </>
     ),
     errorElement: <p>404 Not found</p>,
@@ -63,8 +61,6 @@ const router = createBrowserRouter([
       <>
         <NavigationBar />
         <Profile />
-        <Footer/>
-
       </>
     )
   },
@@ -73,8 +69,9 @@ const router = createBrowserRouter([
     element: (
       <>
         <NavigationBar />
-        <CourseDetails /> {/* ✅ Updated component name */}
-        <Footer/>
+        <EnrollmentRouteGuard>
+          <CourseDetails />
+        </EnrollmentRouteGuard>
       </>
     )
   },
@@ -84,7 +81,6 @@ const router = createBrowserRouter([
       <>
         <NavigationBar />
         <AllCourses />
-        <Footer/>
       </>
     )
   },
@@ -94,7 +90,6 @@ const router = createBrowserRouter([
       <>
         <NavigationBar />
         <CourseContentPage />
-        <Footer/>
       </>
     )
   },
@@ -104,7 +99,6 @@ const router = createBrowserRouter([
       <>
         <NavigationBar />
         <CourseEditor />
-        <Footer/>
       </>
     )
   },
@@ -124,71 +118,64 @@ const router = createBrowserRouter([
       <>
         <NavigationBar />
         <MyEnrolledCourses />
-        <Footer/>
       </>
     )
   },
   {
-  path: '/contact',
-  element: (
-    <>
-      <NavigationBar />
-      <ContactPage />
-      <Footer />
-    </>
-  )
-},
-{
-  path: '/about',
-  element: (
-    <>
-      <NavigationBar />
-      <AboutUsPage />
-      <Footer />
-    </>
-  )
-},
-{
-  path: '/privacy',
-  element: (
-    <>
-      <NavigationBar />
-      <PrivacyPolicy />
-      <Footer />
-    </>
-  )
-},
-{
-  path: '/terms',
-  element: (
-    <>
-      <NavigationBar />
-      <TermsOfService />
-      <Footer />
-    </>
-  )
-},
-{
-  path: '/course/:courseId/contact-admin',
-  element: (
-    <>
-      <NavigationBar />
-      <ContactAdminPage />
-      <Footer />
-    </>
-  )
-}
-,
-{
-  path: '/admin/messages',
-  element: (
-    <>
-      <NavigationBar />
-      <AdminMessagesList />
-      <Footer />
-    </>
-  )
-}
+    path: '/contact',
+    element: (
+      <>
+        <NavigationBar />
+        <ContactPage />
+
+      </>
+    )
+  },
+  {
+    path: '/about',
+    element: (
+      <>
+        <NavigationBar />
+        <AboutUsPage />
+      </>
+    )
+  },
+  {
+    path: '/privacy',
+    element: (
+      <>
+        <NavigationBar />
+        <PrivacyPolicy />
+      </>
+    )
+  },
+  {
+    path: '/terms',
+    element: (
+      <>
+        <NavigationBar />
+        <TermsOfService />
+      </>
+    )
+  },
+  {
+    path: '/course/:courseId/contact-admin',
+    element: (
+      <>
+        <NavigationBar />
+        <ContactAdminPage />
+      </>
+    )
+  },
+  {
+    path: '/admin/messages',
+    element: (
+      <>
+        <NavigationBar />
+        <AdminMessagesList />
+      </>
+    )
+  }
 ]);
 
 function App() {

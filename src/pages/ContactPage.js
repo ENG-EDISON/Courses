@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "../static/ContactPage.css"
 import { createMessage } from '../api/ContactMessages';
+import Footer from '../components/common/Footer';
 
 const ContactPage = () => {
     const navigate = useNavigate();
@@ -115,6 +116,7 @@ const ContactPage = () => {
     };
 
     return (
+        <div>
         <div className="contact-page">
             <div className="contact-container">
                 <div className="contact-header">
@@ -251,6 +253,8 @@ const ContactPage = () => {
                     </div>
                 </div>
             </div>
+        </div>
+        <Footer/>
         </div>
     );
 };
