@@ -1,9 +1,9 @@
 import { useDebugValue, useEffect, useState } from "react";
-import { getMyEnrolledCourses } from "../api/ProfileApis";
+import { getMyEnrolledCourses } from "../api/EnrollmentApis";
 import { getCourseProgressSummary } from "../api/LessonProgressApi";
 import "../static/EnrolledCourses.css";
-import CourseSection from "../components/CourseSection";
 import { Link } from "react-router-dom";
+import NotEnrolledCourses from "./NotEnrolledCourses";
 
 function MyEnrolledCourses() {
   const [myCourses, setMyCourses] = useState(null);
@@ -11,18 +11,27 @@ function MyEnrolledCourses() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentUserId, setCurrentUserId] = useState(null); // ADDED: Store user ID
 
   useEffect(() => {
     const fetchMyCourses = async () => {
       try {
         const response = await getMyEnrolledCourses();
-        const courses = response.data;
-        setMyCourses(courses);
+        const coursesData = response.data;
+        console.log('Courses API Response:', coursesData); // Debug log
+        
+        // ADDED: Extract user ID from response
+        if (coursesData?.user_id) {
+          setCurrentUserId(coursesData.user_id);
+        }
+        
+        setMyCourses(coursesData);
 
-        if (courses?.courses) {
-          await fetchAllCourseProgress(courses.courses);
+        if (coursesData?.enrolled_courses) {
+          await fetchAllCourseProgress(coursesData.enrolled_courses);
         }
       } catch (error) {
+        console.error('Error fetching courses:', error);
         setError("Unable to load your courses. Please try again later.");
       } finally {
         setIsLoading(false);
@@ -34,7 +43,10 @@ function MyEnrolledCourses() {
         const promises = courses.map((course) =>
           getCourseProgressSummary(course.id)
             .then((res) => ({ courseId: course.id, progress: res.data }))
-            .catch(() => ({ courseId: course.id, progress: null }))
+            .catch((err) => {
+              console.error(`Error fetching progress for course ${course.id}:`, err);
+              return { courseId: course.id, progress: null };
+            })
         );
 
         const results = await Promise.all(promises);
@@ -45,7 +57,9 @@ function MyEnrolledCourses() {
         });
 
         setCourseProgress(progressMap);
-      } catch {}
+      } catch (error) {
+        console.error('Error fetching course progress:', error);
+      }
     };
 
     fetchMyCourses();
@@ -116,7 +130,7 @@ function MyEnrolledCourses() {
   };
 
   const filteredCourses =
-    myCourses?.courses?.filter(
+    myCourses?.enrolled_courses?.filter(
       (c) =>
         c.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         c.instructor_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -165,7 +179,7 @@ function MyEnrolledCourses() {
         </div>
 
         {/* SEARCH */}
-        {myCourses?.courses?.length > 0 && (
+        {myCourses?.enrolled_courses?.length > 0 && (
           <>
             <div className="ec-search-container">
               <input
@@ -199,7 +213,7 @@ function MyEnrolledCourses() {
                   return (
                     <Link
                       to={`/course-content/${course.id}`}
-                      key={course.enrollment_id}
+                      key={course.id}
                       className="ec-card-link"
                     >
                       <div className="ec-card">
@@ -283,7 +297,7 @@ function MyEnrolledCourses() {
         )}
 
         {/* EMPTY STATE */}
-        {(!myCourses?.courses || myCourses.courses.length === 0) && (
+        {(!myCourses?.enrolled_courses || myCourses.enrolled_courses.length === 0) && (
           <div className="ec-empty">
             <div className="ec-empty-icon">📚</div>
             <h3 className="ec-empty-title">No courses enrolled yet</h3>
@@ -295,7 +309,8 @@ function MyEnrolledCourses() {
       </div>
 
       {/* ALL COURSES SECTION */}
-      <CourseSection />
+      {/* FIX: Pass the userId prop */}
+      {currentUserId && <NotEnrolledCourses userId={currentUserId} />}
     </div>
   );
 }

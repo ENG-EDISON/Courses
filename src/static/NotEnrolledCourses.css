@@ -1,0 +1,274 @@
+.n-e-c {
+  padding: 40px 0;
+  text-align: center;
+  position: relative; /* Added for absolute positioning context */
+}
+
+.n-e-c__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 60px; /* Increased padding to make space for outside buttons */
+  position: relative;
+}
+
+.n-e-c__wrapper {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  width: 100%;
+}
+
+/* This is the key container - hidden overflow and horizontal scrolling */
+.n-e-c__cards {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto; /* Enable horizontal scrolling */
+  overflow-y: hidden; /* Hide vertical overflow */
+  scroll-behavior: smooth;
+  padding: 20px 0; /* Removed side padding since buttons are outside */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  width: 100%;
+  flex-wrap: nowrap; /* Prevent wrapping */
+}
+
+.n-e-c__cards::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Scroll buttons - POSITIONED OUTSIDE THE COURSES-WRAPPER */
+.n-e-c__scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  border: none;
+  font-size: 1.2rem;
+  width: 40px;
+  height: 50px;
+  cursor: pointer;
+  z-index: 10;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Position left button outside the container on the left */
+.n-e-c__scroll-btn--left {
+  left: 10px; /* Position at left edge of container */
+}
+
+/* Position right button outside the container on the right */
+.n-e-c__scroll-btn--right {
+  right: 10px; /* Position at right edge of container */
+}
+
+.n-e-c__scroll-btn:hover {
+  background-color: rgba(0, 0, 0, 0.9);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.n-e-c__scroll-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.n-e-c__scroll-btn:disabled:hover {
+  transform: translateY(-50%) scale(1);
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Search bar */
+.n-e-c__search {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px 16px;
+  font-size: 1rem;
+  margin: 20px auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: block;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box; /* Add this to include padding in width calculation */
+}
+
+.n-e-c__search:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.n-e-c__no-courses {
+  padding: 40px;
+  color: #666;
+  text-align: center;
+  font-size: 1rem;
+  width: 100%;
+}
+
+/* Mobile First Responsive Design */
+@media (max-width: 768px) {
+  .n-e-c {
+    padding: 20px 0;
+  }
+  
+  .n-e-c__container {
+    padding: 0 20px; /* Reduced padding on mobile */
+  }
+  
+  .n-e-c__cards {
+    gap: 15px;
+    padding: 15px 0;
+  }
+  
+  .n-e-c__scroll-btn {
+    display: none; /* Hide scroll buttons on mobile */
+  }
+  
+  .n-e-c__search {
+    max-width: 90%;
+    margin: 15px auto;
+    padding: 10px 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .n-e-c {
+    padding: 15px 0;
+  }
+  
+  .n-e-c__container {
+    padding: 0 15px;
+  }
+  
+  .n-e-c__cards {
+    gap: 12px;
+    padding: 12px 0;
+  }
+  
+  .n-e-c__search {
+    max-width: 95%;
+    margin: 10px auto;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .n-e-c__no-courses {
+    padding: 30px 20px;
+    font-size: 0.9rem;
+  }
+}
+
+/* NEW: Extra small screens below 390px */
+@media (max-width: 390px) {
+  .n-e-c {
+    padding: 10px 0 !important; /* Force minimal padding */
+  }
+  
+  .n-e-c__container {
+    padding: 0 10px !important; /* Drastically reduce container padding */
+  }
+  
+  .n-e-c__wrapper {
+    margin-top: 10px; /* Reduce top margin */
+  }
+  
+  .n-e-c__cards {
+    gap: 8px !important; /* Minimal gap between cards */
+    padding: 8px 0 !important; /* Minimal vertical padding */
+    margin: 0 -5px; /* Negative margin to utilize full width */
+  }
+  
+  .n-e-c__search {
+    max-width: 100% !important; /* Full width search */
+    margin: 8px auto !important; /* Reduced margin */
+    padding: 6px 10px !important; /* Smaller padding */
+    font-size: 0.85rem !important; /* Smaller font */
+    border-radius: 6px; /* Slightly smaller radius */
+  }
+  
+  .n-e-c__no-courses {
+    padding: 20px 10px !important; /* Minimal padding */
+    font-size: 0.85rem !important; /* Smaller font */
+  }
+  
+  /* Ensure course cards don't have excessive padding/margin */
+  .course-card {
+    margin: 0 !important;
+    padding: 0 !important;
+    min-width: 280px !important; /* Ensure cards are not too wide */
+  }
+}
+
+/* Desktop enhancements */
+@media (min-width: 769px) {
+  .n-e-c__scroll-btn {
+    display: flex;
+  }
+}
+
+/* Large desktop screens */
+@media (min-width: 1200px) {
+  .n-e-c__container {
+    padding: 0 70px; /* Even more padding for very large screens */
+  }
+  
+  .n-e-c__scroll-btn--left {
+    left: 15px;
+  }
+  
+  .n-e-c__scroll-btn--right {
+    right: 15px;
+  }
+}
+
+/* Extra large screens */
+@media (min-width: 1400px) {
+  .n-e-c__container {
+    max-width: 1300px;
+    padding: 0 80px;
+  }
+  
+  .n-e-c__scroll-btn {
+    width: 45px;
+    height: 55px;
+    font-size: 1.3rem;
+  }
+  
+  .n-e-c__scroll-btn--left {
+    left: 20px;
+  }
+  
+  .n-e-c__scroll-btn--right {
+    right: 20px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .n-e-c__scroll-btn {
+    border: 2px solid #000;
+  }
+  
+  .n-e-c__scroll-btn:hover {
+    border: 2px solid #fff;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .n-e-c__cards {
+    scroll-behavior: auto;
+  }
+  
+  .n-e-c__scroll-btn {
+    transition: none;
+  }
+  
+  .n-e-c__scroll-btn:hover {
+    transform: translateY(-50%);
+  }
+}

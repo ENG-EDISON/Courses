@@ -11,3 +11,23 @@ export const checkEnrollment = (courseId) => apiClient.get(`/api/check-enrollmen
 export const getEnrollmentDetails = (enrollmentId) => apiClient.get(`/api/enrollment/${enrollmentId}/`);
 export const updateEnrollment = (enrollmentId, data) => apiClient.patch(`/api/enrollment/${enrollmentId}/`, data);
 export const cancelEnrollment = (enrollmentId) => apiClient.delete(`/api/enrollment/${enrollmentId}/`);
+
+// Get enrolled courses for CURRENT user
+export const getMyEnrolledCourses = () => apiClient.get('/api/user/enrolled-courses/');
+
+// Get enrolled courses for specific user
+export const getUserEnrolledCourses = (userId) => 
+  apiClient.get(`/api/enrollments/user/${userId}/courses/`);
+
+// Get courses not enrolled by specific user
+export const getUserNotEnrolledCourses = (userId, filters = {}) => {
+  const params = new URLSearchParams();
+  
+  if (filters.category_slug) params.append('category_slug', filters.category_slug);
+  if (filters.level) params.append('level', filters.level);
+  
+  const queryString = params.toString();
+  const url = `/api/courses/not-enrolled/user/${userId}/${queryString ? `?${queryString}` : ''}`;
+  
+  return apiClient.get(url);
+};
