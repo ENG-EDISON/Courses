@@ -1,0 +1,171 @@
+.contact-admin-page {
+    min-height: 100vh;
+    background: #f8f9fa;
+    padding: 40px 20px;
+}
+
+.contact-admin-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.contact-admin-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px;
+    text-align: center;
+}
+
+.back-to-course {
+    color: white;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    opacity: 0.9;
+}
+
+.back-to-course:hover {
+    opacity: 1;
+}
+
+.contact-admin-header h1 {
+    margin: 0 0 10px 0;
+    font-size: 2.5rem;
+}
+
+.contact-admin-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+.contact-admin-content {
+    padding: 40px;
+}
+
+.contact-info {
+    display: grid;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.contact-method {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    padding: 25px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-method:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.contact-icon {
+    font-size: 2rem;
+    color: #667eea;
+    min-width: 60px;
+}
+
+.contact-details h3 {
+    margin: 0 0 8px 0;
+    color: #495057;
+}
+
+.contact-details p {
+    margin: 0 0 15px 0;
+    color: #6c757d;
+}
+
+.contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.email-btn {
+    background: #007bff;
+    color: white;
+}
+
+.email-btn:hover {
+    background: #0056b3;
+    color: white;
+}
+
+.phone-btn {
+    background: #28a745;
+    color: white;
+}
+
+.phone-btn:hover {
+    background: #1e7e34;
+    color: white;
+}
+
+.chat-btn {
+    background: #6f42c1;
+    color: white;
+}
+
+.chat-btn:hover {
+    background: #59359a;
+    color: white;
+}
+
+.enrollment-info {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.enrollment-info h3 {
+    margin: 0 0 15px 0;
+    color: #495057;
+}
+
+.enrollment-info ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #6c757d;
+}
+
+.enrollment-info li {
+    margin-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+    .contact-admin-header {
+        padding: 30px 20px;
+    }
+    
+    .contact-admin-header h1 {
+        font-size: 2rem;
+    }
+    
+    .contact-admin-content {
+        padding: 20px;
+    }
+    
+    .contact-method {
+        flex-direction: column;
+        text-align: center;
+    }
+}

@@ -202,3 +202,18 @@
         gap: var(--spacing-sm);
     }
 }
+
+/* Free course styling */
+.coursehero-free-price {
+    font-size: 24px;
+    font-weight: bold;
+    color: #10b981;
+}
+
+.coursehero-free-btn {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.coursehero-free-btn:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+}

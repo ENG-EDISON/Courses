@@ -30,6 +30,56 @@ const calculateDiscountPercentage = (originalPrice, discountPrice) => {
   return Math.round(((originalPrice - discountPrice) / originalPrice) * 100);
 };
 
+const formatDuration = (durationSeconds) => {
+  const seconds = parseInt(durationSeconds) || 0;
+  
+  if (seconds === 0) return "0s";
+  
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+  
+  if (hours > 0) {
+    if (minutes > 0 && remainingSeconds > 0) {
+      return `${hours}h ${minutes}m ${remainingSeconds}s`;
+    } else if (minutes > 0) {
+      return `${hours}h ${minutes}m`;
+    } else {
+      return `${hours}h`;
+    }
+  } else if (minutes > 0) {
+    if (remainingSeconds > 0) {
+      return `${minutes}m ${remainingSeconds}s`;
+    } else {
+      return `${minutes}m`;
+    }
+  } else {
+    return `${remainingSeconds}s`;
+  }
+};
+
+const formatCompactDuration = (durationSeconds) => {
+  const seconds = parseInt(durationSeconds) || 0;
+  
+  if (seconds === 0) return "0s";
+  
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  } else if (minutes > 0) {
+    return `${minutes}m`;
+  } else {
+    return `${seconds}s`;
+  }
+};
+
+const getDurationInHours = (durationSeconds) => {
+  const seconds = parseInt(durationSeconds) || 0;
+  return (seconds / 3600).toFixed(1);
+};
+
 const validateCourseData = (course) => {
   const defaults = {
     id: 0,
@@ -39,8 +89,8 @@ const validateCourseData = (course) => {
     discount_price: null,
     average_rating: 0,
     total_reviews: 0,
-    duration_hours: 0,
-    lectures_count: 0,
+    duration_seconds: 0, // CHANGED: from duration_hours to duration_seconds
+    total_lessons: 0, // ADDED: for lesson count
     level: "beginner",
     category: "",
     thumbnail: COURSE_CONSTANTS.DEFAULT_THUMBNAIL,
@@ -123,6 +173,8 @@ function CourseCard({
   onMouseEnter,
   onMouseLeave,
   showCategory = false,
+  showLessonsCount = true, // ADDED: Option to show lesson count
+  durationFormat = "compact", // ADDED: 'compact', 'detailed', or 'hours'
   layout = "vertical",
   className = "",
   ...props
@@ -159,6 +211,22 @@ function CourseCard({
     validatedCourse.price,
     validatedCourse.discount_price,
   ]);
+
+  const durationDisplay = useMemo(() => {
+    const durationSeconds = validatedCourse.duration_seconds || 0;
+    
+    switch (durationFormat) {
+      case 'detailed':
+        return formatDuration(durationSeconds);
+      case 'hours':
+        return `${getDurationInHours(durationSeconds)} hours`;
+      case 'compact':
+      default:
+        return formatCompactDuration(durationSeconds);
+    }
+  }, [validatedCourse.duration_seconds, durationFormat]);
+
+  const lessonsCount = validatedCourse.total_lessons || 0;
 
   return (
     <div className="coursecard-wrapper" >
@@ -207,9 +275,17 @@ function CourseCard({
 
               <div className="coursecard-duration">
                 <i className="fas fa-clock"></i>
-                <span>{validatedCourse.duration_hours || 0} hours</span>
+                <span>{durationDisplay}</span>
               </div>
             </div>
+
+            {/* LESSONS COUNT - NEW SECTION */}
+            {showLessonsCount && lessonsCount > 0 && (
+              <div className="coursecard-lessons">
+                <i className="fas fa-play-circle"></i>
+                <span>{lessonsCount} {lessonsCount === 1 ? 'lesson' : 'lessons'}</span>
+              </div>
+            )}
 
             {/* PRICE */}
             <div className="coursecard-pricing">
@@ -247,6 +323,9 @@ export {
   formatCurrency,
   calculateDiscountPercentage,
   validateCourseData,
+  formatDuration,
+  formatCompactDuration,
+  getDurationInHours,
 };
 
 export default CourseCard;

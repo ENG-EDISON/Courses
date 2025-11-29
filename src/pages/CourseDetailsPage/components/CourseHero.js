@@ -1,24 +1,41 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import "../css/CourseHero.css"
+import { EnrollToCourse } from '../../../api/EnrollmentApis';
 
 function CourseHero({ course }) {
-    const renderPricing = () => {
-        const regularPrice = parseFloat(course.price);
-        const discountPrice = parseFloat(course.discount_price);
-        const hasValidDiscount = discountPrice && discountPrice < regularPrice;
+    const isFree = parseFloat(course.price) === 0;
+    const navigate = useNavigate();
 
-        if (hasValidDiscount) {
-            return (
-                <div className="coursehero-pricing-group">
-                    <span className="coursehero-original-price">${course.price}</span>
-                    <span className="coursehero-current-price">${course.discount_price}</span>
-                    <span className="coursehero-discount-badge">
-                        Save {Math.round(((regularPrice - discountPrice) / regularPrice) * 100)}%
-                    </span>
-                </div>
-            );
+    const renderPricing = () => {
+        if (isFree) {
+            return <span className="coursehero-free-price">Free</span>;
         }
         return <span className="coursehero-current-price">${course.price}</span>;
+    };
+
+    const handleEnroll = async () => {
+        if (isFree) {
+            try {
+                const response = await EnrollToCourse(course.id);
+                if (response.data.success) {
+                    alert('Successfully enrolled in the course!');
+                    // Redirect to course content page
+                    window.location.href = `/course-content/${course.id}`;
+                }
+            } catch (error) {
+                if (error.response?.data?.message === "You are already enrolled in this course") {
+                    alert('You are already enrolled in this course!');
+                    // Redirect to course content page
+                    window.location.href = `/course-content/${course.id}`;
+                } else {
+                    alert('Enrollment failed. Please try again.');
+                    console.error('Enrollment error:', error);
+                }
+            }
+        } else {
+            // Redirect to contact admin page for paid courses
+            navigate(`/course/${course.id}/contact-admin`);
+        }
     };
 
     return (
@@ -37,7 +54,7 @@ function CourseHero({ course }) {
                     <div className="coursehero-text-content">
                         <h1 className="coursehero-title">{course.title}</h1>
                         <p className="coursehero-description">{course.short_description}</p>
-                        
+
                         <div className="coursehero-meta-info">
                             <div className="coursehero-meta-item">
                                 <i className="fas fa-signal"></i>
@@ -64,12 +81,15 @@ function CourseHero({ course }) {
                         <div className="coursehero-pricing-section">
                             {renderPricing()}
                         </div>
-                        
-                        <button className="coursehero-enroll-btn">
-                            Enroll Now
+
+                        <button
+                            className={`coursehero-enroll-btn ${isFree ? 'coursehero-free-btn' : 'coursehero-paid-btn'}`}
+                            onClick={handleEnroll}
+                        >
+                            {isFree ? 'Enroll for Free' : 'Purchase Course'}
                             <i className="fas fa-arrow-right"></i>
                         </button>
-                        
+
                         <div className="coursehero-features">
                             <div className="coursehero-feature">
                                 <i className="fas fa-check"></i>
@@ -79,6 +99,12 @@ function CourseHero({ course }) {
                                 <i className="fas fa-check"></i>
                                 Project Files
                             </div>
+                            {isFree && (
+                                <div className="coursehero-feature">
+                                    <i className="fas fa-check"></i>
+                                    Free Forever
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

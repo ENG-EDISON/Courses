@@ -19,6 +19,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import AdminMessagesList from "./pages/AdminMessagesList"
 import AdminDashboard from './pages/AdminDashboard';
+import ContactAdminPage from './pages/ContactAdminPage';
 
 const router = createBrowserRouter([
   {
@@ -163,6 +164,16 @@ const router = createBrowserRouter([
     <>
       <NavigationBar />
       <TermsOfService />
+      <Footer />
+    </>
+  )
+},
+{
+  path: '/course/:courseId/contact-admin',
+  element: (
+    <>
+      <NavigationBar />
+      <ContactAdminPage />
       <Footer />
     </>
   )
