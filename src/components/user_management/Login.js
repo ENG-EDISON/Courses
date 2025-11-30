@@ -174,7 +174,7 @@ function EnterpriseLogin() {
               <div className="sidepanel-content">
                 <div className="feature-badge">Premium Learning</div>
                 <h2>Advance Your Skills</h2>
-                <p>Access 1000+ courses, hands-on projects, and career-focused learning paths to boost your career.</p>
+                <p>Access hands-on projects, and career-focused learning paths to boost your career.</p>
                 <div className="features-list">
                   <div className="feature-item">
                     <span className="feature-icon">⚡</span>
