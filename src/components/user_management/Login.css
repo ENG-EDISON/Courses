@@ -1,9 +1,10 @@
 .enterprise-wrapper {
-  min-height: 100vh;
+  min-height: calc(100vh - 60px);
   display: flex;
   flex-direction: column;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  margin-top: 60px;
 }
 
 .enterprise-login {
@@ -11,7 +12,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  min-height: calc(100vh - 60px);
   padding: 0;
 }
 
@@ -19,7 +20,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 60px);
   background: white;
   overflow: hidden;
 }
@@ -33,7 +34,7 @@
   padding: 20px;
   background: white;
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh - 60px);
 }
 
 .form-container {
@@ -391,6 +392,217 @@
 /* RESPONSIVE BREAKPOINTS */
 /* ==================== */
 
+/* Small phones (390px and below) */
+@media (max-width: 390px) {
+  .enterprise-wrapper {
+    min-height: calc(100vh - 60px);
+    margin-top: 60px;
+  }
+  
+  .enterprise-login {
+    min-height: calc(100vh - 60px);
+  }
+  
+  .login-container {
+    height: calc(100vh - 60px);
+  }
+  
+  .login-left {
+    padding: 16px;
+    padding-top: 20px;
+    min-height: calc(100vh - 60px);
+    align-items: flex-start;
+  }
+  
+  .form-container {
+    max-width: 100%;
+    padding-top: 10px;
+  }
+  
+  .form-header {
+    margin-bottom: 30px;
+  }
+  
+  .header-main h1 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+  }
+  
+  .header-main p {
+    font-size: 1rem;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group input {
+    padding: 12px 14px;
+  }
+  
+  .login-btn {
+    padding: 14px;
+    font-size: 0.95rem;
+  }
+  
+  .form-footer {
+    font-size: 0.9rem;
+  }
+  
+  .error-message {
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  
+  .hero-feature span {
+    font-size: 1rem;
+  }
+}
+
+/* Fix for 412x914 with navbar */
+@media (max-width: 412px) and (min-height: 800px) {
+  .enterprise-wrapper {
+    min-height: calc(100vh - 60px);
+    margin-top: 60px;
+  }
+  
+  .enterprise-login {
+    min-height: calc(100vh - 60px);
+  }
+  
+  .login-container {
+    height: calc(100vh - 60px);
+  }
+  
+  .login-left {
+    padding: 16px 14px;
+    padding-top: 15px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    min-height: calc(100vh - 60px);
+  }
+  
+  .form-container {
+    max-width: 100%;
+    padding-top: 5vh;
+    padding-bottom: 20px;
+  }
+  
+  .form-header {
+    margin-bottom: 25px;
+  }
+  
+  .header-main h1 {
+    font-size: 1.75rem;
+    margin-bottom: 6px;
+  }
+  
+  .header-main p {
+    font-size: 1rem;
+  }
+  
+  .form-group {
+    margin-bottom: 18px;
+  }
+}
+
+/* Extra small phones (320px and below) */
+@media (max-width: 320px) {
+  .enterprise-wrapper {
+    min-height: calc(100vh - 60px);
+    margin-top: 60px;
+  }
+  
+  .enterprise-login {
+    min-height: calc(100vh - 60px);
+  }
+  
+  .login-container {
+    height: calc(100vh - 60px);
+  }
+  
+  .login-left {
+    padding: 12px;
+    padding-top: 15px;
+  }
+  
+  .header-main h1 {
+    font-size: 1.75rem;
+  }
+  
+  .header-main p {
+    font-size: 0.95rem;
+  }
+  
+  .form-group input {
+    padding: 11px 12px;
+  }
+  
+  .login-btn {
+    padding: 13px;
+  }
+  
+  .form-options {
+    gap: 12px;
+  }
+}
+
+/* Very short screens */
+@media (max-height: 700px) {
+  .login-left {
+    padding-top: 10px;
+    align-items: flex-start;
+  }
+  
+  .form-container {
+    padding-top: 0;
+  }
+  
+  .form-header {
+    margin-bottom: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 16px;
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 390px) and (orientation: landscape) {
+  .enterprise-wrapper {
+    min-height: calc(100vh - 60px);
+  }
+  
+  .enterprise-login {
+    min-height: calc(100vh - 60px);
+  }
+  
+  .login-container {
+    height: calc(100vh - 60px);
+  }
+  
+  .login-left {
+    padding: 10px 12px;
+    align-items: flex-start;
+  }
+  
+  .form-header {
+    margin-bottom: 15px;
+  }
+  
+  .form-group {
+    margin-bottom: 12px;
+  }
+  
+  .form-group input {
+    padding: 10px 12px;
+  }
+  
+  .login-btn {
+    padding: 12px;
+  }
+}
+
 /* Tablets and larger phones (768px and up) */
 @media (min-width: 768px) {
   .enterprise-login {
@@ -474,53 +686,26 @@
   }
 }
 
-/* Very small phones (390px and below) */
-@media (max-width: 390px) {
+/* Prevent horizontal scrolling */
+@media (max-width: 450px) {
+  .login-container {
+    overflow-x: hidden;
+  }
+  
   .login-left {
-    padding: 16px;
-    padding-top: 40px;
+    box-sizing: border-box;
   }
   
   .form-container {
-    max-width: 100%;
+    box-sizing: border-box;
   }
-  
-  .form-header {
-    margin-bottom: 30px;
-  }
-  
-  .header-main h1 {
-    font-size: 2rem;
-    margin-bottom: 8px;
-  }
-  
-  .header-main p {
-    font-size: 1rem;
-  }
-  
-  .form-group {
-    margin-bottom: 20px;
-  }
-  
-  .form-group input {
-    padding: 12px 14px;
-  }
-  
-  .login-btn {
-    padding: 14px;
-    font-size: 0.95rem;
-  }
-  
-  .form-footer {
-    font-size: 0.9rem;
-  }
-  
-  .error-message {
-    padding: 14px;
-    margin-bottom: 16px;
-  }
-  
-  .hero-feature span {
-    font-size: 1rem;
+}
+
+/* iOS zoom prevention */
+@media (max-width: 390px) {
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 16px !important;
   }
 }
