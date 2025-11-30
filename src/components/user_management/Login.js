@@ -2,6 +2,7 @@ import { useState } from "react";
 import { login } from "../../api/AuthApi";
 import "./Login.css";
 import Footer from "../common/Footer";
+import NavigationBar from "../common/NavigationBar";
 
 function EnterpriseLogin() {
   const [username, setUsername] = useState("");
@@ -49,6 +50,8 @@ function EnterpriseLogin() {
   };
 
   return (
+    <>
+    <NavigationBar/>
     <div className="enterprise-wrapper">
       <div className="enterprise-login">
         <div className="login-container">
@@ -164,6 +167,7 @@ function EnterpriseLogin() {
       </div>
       <Footer/>
     </div>
+    </>
   );
 }
 

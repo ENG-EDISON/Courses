@@ -2,10 +2,12 @@ import { Link } from "react-router-dom";
 import "../static/Homepage.css";
 import CoursesSection from "../components/CourseSection";
 import Footer from "../components/common/Footer";
+import NavigationBar from "../components/common/NavigationBar";
 
 function Homepage() {
   return (
     <main className="homepage">
+      <NavigationBar/>
       {/* Hero Section */}
       <section className="homepage-hero">
         <div className="homepage-container">
