@@ -6,18 +6,8 @@ import Footer from "../common/Footer";
 function EnterpriseLogin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-
-  // Load remembered username on component mount
-  useState(() => {
-    const rememberedUsername = localStorage.getItem('rememberedUsername');
-    if (rememberedUsername) {
-      setUsername(rememberedUsername);
-      setRememberMe(true);
-    }
-  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -32,21 +22,10 @@ function EnterpriseLogin() {
 
       const response = await login(credentials);      
       
-      // Handle tokens based on remember me choice
+      // Store tokens in localStorage
       if (response.data.access && response.data.refresh) {
-        if (rememberMe) {
-          // Store tokens in localStorage (persists after browser close)
-          localStorage.setItem('access_token', response.data.access);
-          localStorage.setItem('refresh_token', response.data.refresh);
-          // Remember username for next time
-          localStorage.setItem('rememberedUsername', username);
-        } else {
-          // Store tokens in sessionStorage (clears when browser closes)
-          sessionStorage.setItem('access_token', response.data.access);
-          sessionStorage.setItem('refresh_token', response.data.refresh);
-          // Clear remembered username if not checked
-          localStorage.removeItem('rememberedUsername');
-        }
+        localStorage.setItem('access_token', response.data.access);
+        localStorage.setItem('refresh_token', response.data.refresh);
       
         // Redirect to dashboard
         window.location.href = '/';
@@ -69,44 +48,32 @@ function EnterpriseLogin() {
     }
   };
 
-  const handleRememberMeChange = (e) => {
-    setRememberMe(e.target.checked);
-    // If unchecking, immediately clear the remembered username
-    if (!e.target.checked) {
-      localStorage.removeItem('rememberedUsername');
-    }
-  };
-
   return (
     <div className="enterprise-wrapper">
       <div className="enterprise-login">
         <div className="login-container">
+          {/* Left Side - Form Section */}
           <div className="login-left">
-            <div className="enterprise-header">
-              <div className="enterprise-logo">
-                <div className="logo-icon">H</div>
-                <span className="logo-text">Hayducate</span>
-              </div>
-              <div className="enterprise-badge">Enterprise</div>
-            </div>
-            
-            <div className="login-content">
-              <div className="welcome-section">
-                <h1>Welcome back</h1>
-                <p>Sign in to your account</p>
+            <div className="form-container">
+              {/* Clean Header */}
+              <div className="form-header">
+                <div className="header-main">
+                  <h1>Welcome back</h1>
+                  <p>Sign in to your Hayducate account</p>
+                </div>
               </div>
 
               {error && (
-                <div className="enterprise-error">
+                <div className="error-message">
                   <div className="error-icon">⚠️</div>
                   <div className="error-content">
                     <span className="error-title">Authentication failed</span>
-                    <span className="error-message">{error}</span>
+                    <span className="error-message-text">{error}</span>
                   </div>
                 </div>
               )}
 
-              <form onSubmit={handleLogin} className="enterprise-form">
+              <form onSubmit={handleLogin} className="login-form">
                 <div className="form-group">
                   <label>Username</label>
                   <input
@@ -135,12 +102,7 @@ function EnterpriseLogin() {
 
                 <div className="form-options">
                   <label className="remember-me">
-                    <input 
-                      type="checkbox" 
-                      checked={rememberMe}
-                      onChange={handleRememberMeChange}
-                      disabled={isLoading}
-                    />
+                    <input type="checkbox" />
                     <span>Remember me</span>
                   </label>
                   <a href="/forgot-password" className="forgot-link">Forgot password?</a>
@@ -148,7 +110,7 @@ function EnterpriseLogin() {
 
                 <button 
                   type="submit" 
-                  className="btn-enterprise"
+                  className="login-btn"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -157,36 +119,42 @@ function EnterpriseLogin() {
                       Signing in...
                     </>
                   ) : (
-                    "Sign in to account"
+                    "Sign in"
                   )}
                 </button>
               </form>
 
-              <div className="enterprise-footer">
+              <div className="form-footer">
                 <span>Don't have an account?</span>
-                <a href="/signup" className="enterprise-link">Sign Up</a>
+                <a href="/signup" className="signup-link">Create account</a>
               </div>
             </div>
           </div>
 
+          {/* Right Side - Hero Section with Image */}
           <div className="login-right">
-            <div className="enterprise-sidepanel">
-              <div className="sidepanel-content">
-                <div className="feature-badge">Premium Learning</div>
-                <h2>Advance Your Skills</h2>
-                <p>Access hands-on projects, and career-focused learning paths to boost your career.</p>
-                <div className="features-list">
-                  <div className="feature-item">
-                    <span className="feature-icon">⚡</span>
-                    <span>Self-paced learning</span>
-                  </div>
-                  <div className="feature-item">
-                    <span className="feature-icon">🛠️</span>
-                    <span>Hands-on projects</span>
-                  </div>
-                  <div className="feature-item">
-                    <span className="feature-icon">🎯</span>
-                    <span>Career-focused courses</span>
+            <div className="hero-section">
+              <div className="hero-image">
+                <img src="japan.png" alt="Online Learning" />
+                <div className="hero-overlay">
+                  <div className="hero-content">
+                    <div className="brand-logo">
+                      <div className="logo-icon">H</div>
+                      <span className="logo-text">Hayducate</span>
+                    </div>
+                    <h1>Learn Without Limits</h1>
+                    <p>Start, switch, or advance your career with hands-on projects and career-focused learning paths.</p>
+                    <div className="hero-features">
+                      <div className="hero-feature">
+                        <span>Self-paced learning</span>
+                      </div>
+                      <div className="hero-feature">
+                        <span>Hands-on projects</span>
+                      </div>
+                      <div className="hero-feature">
+                        <span>Career-focused courses</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
