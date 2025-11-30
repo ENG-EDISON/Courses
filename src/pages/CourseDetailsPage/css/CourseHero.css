@@ -4,6 +4,16 @@
     color: white;
     padding: var(--spacing-xl) 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+}
+
+.coursehero-compact-hero.coursehero-redirecting {
+    opacity: 0.9;
+    pointer-events: none;
+}
+
+.coursehero-compact-hero.coursehero-success {
+    background: linear-gradient(135deg, #065f46 0%, #047857 100%);
 }
 
 .coursehero-hero-content {
@@ -87,12 +97,14 @@
     width: 16px;
 }
 
+/* Action Card Styles */
 .coursehero-action-card {
     background: rgba(255, 255, 255, 0.95);
     border-radius: var(--border-radius-lg);
     padding: var(--spacing-lg);
     box-shadow: var(--shadow-lg);
     border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #1e293b;
 }
 
 .coursehero-pricing-section {
@@ -109,14 +121,14 @@
 
 .coursehero-original-price {
     text-decoration: line-through;
-    color: var(--text-secondary);
+    color: #64748b;
     font-size: 0.9rem;
 }
 
 .coursehero-current-price {
     font-size: 2rem;
     font-weight: 700;
-    color: var(--text-primary);
+    color: #1e293b;
 }
 
 .coursehero-discount-badge {
@@ -128,31 +140,240 @@
     font-weight: 600;
 }
 
+/* Free course styling */
+.coursehero-free-price {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #10b981;
+}
+
+/* Button Styles */
 .coursehero-enroll-btn {
     width: 100%;
-    background: #3b82f6;
-    color: white;
     border: none;
     padding: var(--spacing-md) var(--spacing-lg);
     border-radius: var(--border-radius-md);
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: var(--spacing-sm);
     margin-bottom: var(--spacing-md);
+    font-size: 1rem;
 }
 
-.coursehero-enroll-btn:hover {
+/* Default/Paid button */
+.coursehero-paid-btn {
+    background: #3b82f6;
+    color: white;
+}
+
+.coursehero-paid-btn:hover:not(:disabled) {
     background: #2563eb;
 }
 
+/* Free button */
+.coursehero-free-btn {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.coursehero-free-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #059669, #047857);
+}
+
+/* Continue learning button */
+.coursehero-continue-btn {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+}
+
+.coursehero-continue-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+}
+
+/* Loading button */
+.coursehero-loading-btn {
+    background: #94a3b8;
+    color: white;
+    cursor: not-allowed;
+}
+
+/* Redirecting button */
+.coursehero-redirecting-btn {
+    background: #f59e0b;
+    color: white;
+    cursor: not-allowed;
+}
+
+/* Success button */
+.coursehero-success-btn {
+    background: #10b981;
+    color: white;
+    cursor: not-allowed;
+}
+
+.coursehero-enroll-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Success Message */
+.coursehero-success-message {
+    background: #d1fae5;
+    border: 1px solid #a7f3d0;
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: #065f46;
+}
+
+.coursehero-success-message i {
+    color: #10b981;
+    font-size: 1.25rem;
+}
+
+.coursehero-success-content h4 {
+    margin: 0 0 4px 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.coursehero-success-content p {
+    margin: 0;
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+/* Enrollment Status */
+.coursehero-enrollment-status {
+    margin-bottom: var(--spacing-md);
+}
+
+.coursehero-status-loading,
+.coursehero-status-error,
+.coursehero-status-enrolled,
+.coursehero-status-not-enrolled {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius-md);
+    font-size: 0.875rem;
+}
+
+.coursehero-status-loading {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.coursehero-status-loading i {
+    color: #f59e0b;
+}
+
+.coursehero-status-error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.coursehero-status-error i {
+    color: #ef4444;
+}
+
+.coursehero-status-enrolled {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.coursehero-status-enrolled i {
+    color: #10b981;
+}
+
+.coursehero-status-not-enrolled {
+    background: #e0f2fe;
+    color: #075985;
+    border: 1px solid #bae6fd;
+}
+
+.coursehero-status-not-enrolled i {
+    color: #0ea5e9;
+}
+
+/* Auth Info */
+.coursehero-auth-info {
+    margin-bottom: var(--spacing-md);
+}
+
+.coursehero-auth-notice,
+.coursehero-user-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius-md);
+    font-size: 0.875rem;
+}
+
+.coursehero-auth-notice {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.coursehero-auth-notice i {
+    color: #f59e0b;
+}
+
+.coursehero-user-info {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.coursehero-user-info i {
+    color: #10b981;
+}
+
+.coursehero-user-email {
+    opacity: 0.8;
+    font-size: 0.8rem;
+}
+
+/* Loading State */
+.coursehero-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-xl) 0;
+    color: #cbd5e1;
+}
+
+.coursehero-loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid #38bdf8;
+    border-radius: 50%;
+    animation: coursehero-spin 1s linear infinite;
+}
+
+@keyframes coursehero-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Features */
 .coursehero-features {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-md);
 }
 
 .coursehero-feature {
@@ -160,12 +381,101 @@
     align-items: center;
     gap: var(--spacing-sm);
     font-size: 0.875rem;
-    color: var(--text-secondary);
+    color: #64748b;
 }
 
 .coursehero-feature i {
     color: #10b981;
     font-size: 0.8rem;
+}
+
+.coursehero-feature-highlight i {
+    color: #f59e0b;
+}
+
+/* Additional Info */
+.coursehero-additional-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.coursehero-info-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.coursehero-info-item i {
+    color: #8b5cf6;
+    width: 16px;
+    text-align: center;
+}
+
+/* Stats */
+.coursehero-stats {
+    display: flex;
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.coursehero-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.coursehero-stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+}
+
+.coursehero-stat-label {
+    font-size: 0.875rem;
+    color: #94a3b8;
+}
+
+/* Enrollment Details */
+.coursehero-enrollment-details {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+}
+
+.coursehero-enrollment-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.coursehero-enrollment-info strong {
+    font-size: 0.875rem;
+}
+
+.coursehero-enrollment-meta {
+    display: flex;
+    gap: var(--spacing-sm);
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+.coursehero-enrollment-id {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-top: 2px;
+}
+
+.coursehero-enrollment-id code {
+    background: rgba(0, 0, 0, 0.1);
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-family: monospace;
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
@@ -186,6 +496,11 @@
     .coursehero-meta-info {
         gap: var(--spacing-md);
     }
+    
+    .coursehero-stats {
+        justify-content: center;
+        text-align: center;
+    }
 }
 
 @media (max-width: 480px) {
@@ -201,19 +516,32 @@
         flex-direction: column;
         gap: var(--spacing-sm);
     }
+    
+    .coursehero-action-card {
+        padding: var(--spacing-md);
+    }
+    
+    .coursehero-stats {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+    
+    .coursehero-enrollment-meta {
+        flex-direction: column;
+        gap: 0;
+    }
 }
 
-/* Free course styling */
-.coursehero-free-price {
-    font-size: 24px;
-    font-weight: bold;
-    color: #10b981;
+/* Animation for smooth transitions */
+.coursehero-compact-hero {
+    transition: all 0.3s ease;
 }
 
-.coursehero-free-btn {
-    background: linear-gradient(135deg, #10b981, #059669);
+.coursehero-enroll-btn {
+    transition: all 0.3s ease;
 }
 
-.coursehero-free-btn:hover {
-    background: linear-gradient(135deg, #059669, #047857);
+.coursehero-enroll-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

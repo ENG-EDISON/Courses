@@ -19,14 +19,12 @@ function CourseHero({ course, skipEnrollmentCheck = false }) {
 
     // CHECK ENROLLMENT STATUS ON COMPONENT MOUNT
     useEffect(() => {
-        // Skip enrollment check if prop is set to true
         if (skipEnrollmentCheck) {
             setEnrollmentLoading(false);
             return;
         }
 
         const checkUserEnrollment = async () => {
-            // Only check if user is logged in and we have a course ID
             if (isLoggedIn && course?.id) {
                 try {
                     setEnrollmentLoading(true);
@@ -41,12 +39,10 @@ function CourseHero({ course, skipEnrollmentCheck = false }) {
                     setEnrollmentLoading(false);
                 }
             } else {
-                // Not logged in or no course ID
                 setEnrollmentLoading(false);
             }
         };
 
-        // Only run the check if auth is done loading
         if (!authLoading) {
             checkUserEnrollment();
         }
@@ -54,17 +50,15 @@ function CourseHero({ course, skipEnrollmentCheck = false }) {
 
     const isEnrolled = enrollmentData?.is_enrolled || false;
 
-    // Smooth redirect function with useCallback
+    // Smooth redirect function
     const smoothRedirect = useCallback((path) => {
         setIsRedirecting(true);
-        
-        // Add a small delay for smooth transition
         setTimeout(() => {
             navigate(path);
         }, 400);
     }, [navigate]);
 
-    // Handle successful enrollment with smooth transition
+    // Handle successful enrollment
     useEffect(() => {
         if (enrollSuccess && course?.id) {
             const timer = setTimeout(() => {
@@ -83,15 +77,12 @@ function CourseHero({ course, skipEnrollmentCheck = false }) {
     };
 
     const handleEnroll = async () => {
-        // If user is already enrolled, redirect to course content
         if (isEnrolled) {
             smoothRedirect(`/course-content/${course.id}`);
             return;
         }
 
-        // CHECK AUTHENTICATION FIRST
         if (!isLoggedIn) {
-            // Store course info and redirect to login
             localStorage.setItem('enrollment_redirect', JSON.stringify({
                 courseId: course.id,
                 courseTitle: course.title,
@@ -102,29 +93,23 @@ function CourseHero({ course, skipEnrollmentCheck = false }) {
             return;
         }
 
-        // User is authenticated and not enrolled, proceed with enrollment
         if (isFree) {
             try {
                 setEnrollmentLoading(true);
                 const response = await EnrollToCourse(course.id);
                 if (response.data.success) {
-                    // Remove stored enrollment data
                     localStorage.removeItem('enrollment_redirect');
-                    // Update enrollment status
                     setEnrollmentData({
                         is_enrolled: true,
                         enrollment_id: response.data.enrollment_id,
                         enrolled_at: new Date().toISOString()
                     });
-                    
-                    // Show success state before redirect
                     setEnrollSuccess(true);
                     setEnrollmentLoading(false);
                 }
             } catch (error) {
                 setEnrollmentLoading(false);
                 if (error.response?.data?.message === "You are already enrolled in this course") {
-                    // Handle case where user is enrolled but our check didn't catch it
                     setEnrollmentData({
                         is_enrolled: true,
                         enrollment_id: null,
@@ -137,37 +122,11 @@ function CourseHero({ course, skipEnrollmentCheck = false }) {
                 }
             }
         } else {
-            // Redirect to contact admin page for paid courses
             smoothRedirect(`/course/${course.id}/contact-admin`);
         }
     };
 
-    // Format enrollment date for display
-    const formatEnrollmentDate = (dateString) => {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    };
-
-    // Format relative time (e.g., "2 days ago")
-    const formatRelativeTime = (dateString) => {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffTime = Math.abs(now - date);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 1) return 'yesterday';
-        if (diffDays < 7) return `${diffDays} days ago`;
-        if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-        return `${Math.floor(diffDays / 30)} months ago`;
-    };
-
-    // Determine button text and behavior based on enrollment status
+    // Determine button text and behavior
     const getButtonConfig = () => {
         if (isRedirecting) {
             return {
@@ -224,7 +183,6 @@ function CourseHero({ course, skipEnrollmentCheck = false }) {
 
     const buttonConfig = getButtonConfig();
 
-    // Show loading state if auth is still checking
     if (authLoading) {
         return (
             <div className="coursehero-compact-hero">
@@ -275,26 +233,9 @@ function CourseHero({ course, skipEnrollmentCheck = false }) {
                                 </div>
                             )}
                         </div>
-
-                        {/* Course statistics */}
-                        <div className="coursehero-stats">
-                            <div className="coursehero-stat">
-                                <span className="coursehero-stat-number">{course.enrollment_count || 0}</span>
-                                <span className="coursehero-stat-label">Students</span>
-                            </div>
-                            <div className="coursehero-stat">
-                                <span className="coursehero-stat-number">{course.average_rating || 0}</span>
-                                <span className="coursehero-stat-label">Rating</span>
-                            </div>
-                            <div className="coursehero-stat">
-                                <span className="coursehero-stat-number">{course.total_reviews || 0}</span>
-                                <span className="coursehero-stat-label">Reviews</span>
-                            </div>
-                        </div>
                     </div>
 
                     <div className="coursehero-action-card">
-                        {/* Success Message */}
                         {enrollSuccess && (
                             <div className="coursehero-success-message">
                                 <i className="fas fa-check-circle"></i>
@@ -307,9 +248,6 @@ function CourseHero({ course, skipEnrollmentCheck = false }) {
 
                         <div className="coursehero-pricing-section">
                             {renderPricing()}
-                            {!isFree && course.discount_price && (
-                                <span className="coursehero-original-price">${course.price}</span>
-                            )}
                         </div>
 
                         <button
@@ -320,73 +258,6 @@ function CourseHero({ course, skipEnrollmentCheck = false }) {
                             {buttonConfig.text}
                             <i className={buttonConfig.icon}></i>
                         </button>
-
-                        {/* Enrollment status and information */}
-                        {isLoggedIn && !skipEnrollmentCheck && (
-                            <div className="coursehero-enrollment-status">
-                                {enrollmentLoading ? (
-                                    <div className="coursehero-status-loading">
-                                        <i className="fas fa-spinner fa-spin"></i>
-                                        <span>Checking enrollment status...</span>
-                                    </div>
-                                ) : enrollmentError ? (
-                                    <div className="coursehero-status-error">
-                                        <i className="fas fa-exclamation-triangle"></i>
-                                        <span>{enrollmentError}</span>
-                                    </div>
-                                ) : isEnrolled ? (
-                                    <div className="coursehero-status-enrolled">
-                                        <div className="coursehero-enrollment-details">
-                                            <i className="fas fa-check-circle"></i>
-                                            <div className="coursehero-enrollment-info">
-                                                <strong>You're enrolled in this course</strong>
-                                                {enrollmentData?.enrolled_at && (
-                                                    <div className="coursehero-enrollment-meta">
-                                                        <span className="coursehero-enrollment-date">
-                                                            Since {formatEnrollmentDate(enrollmentData.enrolled_at)}
-                                                        </span>
-                                                        <span className="coursehero-enrollment-relative">
-                                                            ({formatRelativeTime(enrollmentData.enrolled_at)})
-                                                        </span>
-                                                    </div>
-                                                )}
-                                                {enrollmentData?.enrollment_id && (
-                                                    <div className="coursehero-enrollment-id">
-                                                        Enrollment ID: <code>{enrollmentData.enrollment_id}</code>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="coursehero-status-not-enrolled">
-                                        <i className="fas fa-info-circle"></i>
-                                        <div className="coursehero-enrollment-info">
-                                            <strong>You're not enrolled yet</strong>
-                                            <span>Enroll now to start learning!</span>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {/* User authentication information */}
-                        <div className="coursehero-auth-info">
-                            {!isLoggedIn ? (
-                                <div className="coursehero-auth-notice">
-                                    <i className="fas fa-info-circle"></i>
-                                    <span>Login to enroll in this course</span>
-                                </div>
-                            ) : (
-                                <div className="coursehero-user-info">
-                                    <i className="fas fa-user-check"></i>
-                                    <span>Logged in as {user?.username}</span>
-                                    {user?.email && (
-                                        <span className="coursehero-user-email">({user.email})</span>
-                                    )}
-                                </div>
-                            )}
-                        </div>
 
                         {/* Course features */}
                         <div className="coursehero-features">
@@ -416,20 +287,42 @@ function CourseHero({ course, skipEnrollmentCheck = false }) {
                             )}
                         </div>
 
-                        {/* Additional course information */}
-                        <div className="coursehero-additional-info">
-                            <div className="coursehero-info-item">
-                                <i className="fas fa-globe"></i>
-                                <span>Language: {course.language || 'English'}</span>
+                        {isLoggedIn && !skipEnrollmentCheck && (
+                            <div className="coursehero-enrollment-status">
+                                {enrollmentLoading ? (
+                                    <div className="coursehero-status-loading">
+                                        <i className="fas fa-spinner fa-spin"></i>
+                                        <span>Checking enrollment status...</span>
+                                    </div>
+                                ) : enrollmentError ? (
+                                    <div className="coursehero-status-error">
+                                        <i className="fas fa-exclamation-triangle"></i>
+                                        <span>{enrollmentError}</span>
+                                    </div>
+                                ) : isEnrolled ? (
+                                    <div className="coursehero-status-enrolled">
+                                        <i className="fas fa-check-circle"></i>
+                                        <span>You're enrolled in this course</span>
+                                    </div>
+                                ) : (
+                                    <div className="coursehero-status-not-enrolled">
+                                        <i className="fas fa-info-circle"></i>
+                                        <span>You're not enrolled yet</span>
+                                    </div>
+                                )}
                             </div>
-                            <div className="coursehero-info-item">
-                                <i className="fas fa-infinity"></i>
-                                <span>Self-paced learning</span>
-                            </div>
-                            {course.requirements && (
-                                <div className="coursehero-info-item">
-                                    <i className="fas fa-tools"></i>
-                                    <span>Requirements: {course.requirements}</span>
+                        )}
+
+                        <div className="coursehero-auth-info">
+                            {!isLoggedIn ? (
+                                <div className="coursehero-auth-notice">
+                                    <i className="fas fa-info-circle"></i>
+                                    <span>Login to enroll in this course</span>
+                                </div>
+                            ) : (
+                                <div className="coursehero-user-info">
+                                    <i className="fas fa-user-check"></i>
+                                    <span>Logged in as {user?.username}</span>
                                 </div>
                             )}
                         </div>
