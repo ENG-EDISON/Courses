@@ -53,11 +53,11 @@ function EnterpriseLogin() {
       <div className="login-container">
         <div className="login-left">
           <div className="logo">
-            <h2>CoursePro</h2>
+            <h2>Hayducate</h2>
           </div>
           
           <div className="header">
-            <h1>Enterprise Login</h1>
+            <h1>Login</h1>
             <p>Access your company's learning dashboard</p>
           </div>
 
