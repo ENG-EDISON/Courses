@@ -1,57 +1,108 @@
+.enterprise-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .enterprise-login {
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #f8fafc;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  padding: 20px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+  padding: 16px;
 }
 
 .login-container {
   display: flex;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   overflow: hidden;
-  max-width: 900px;
+  max-width: 1000px;
+  width: 100%;
+  min-height: 600px;
+}
+
+/* Left Panel - Compact Form */
+.login-left {
+  flex: 1;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+.enterprise-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.enterprise-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #1e293b;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.enterprise-badge {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.login-content {
+  max-width: 360px;
+  margin: 0 auto;
   width: 100%;
 }
 
-/* Left Panel */
-.login-left {
-  flex: 1;
-  padding: 50px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+.welcome-section {
+  margin-bottom: 32px;
 }
 
-.logo h2 {
-  color: #2563eb;
-  margin-bottom: 40px;
-  font-size: 1.5rem;
-}
-
-.header {
-  margin-bottom: 40px;
-}
-
-.header h1 {
-  font-size: 2rem;
+.welcome-section h1 {
+  font-size: 1.75rem;
   font-weight: 700;
   margin-bottom: 8px;
-  color: #1f2937;
+  color: #1e293b;
 }
 
-.header p {
-  color: #6b7280;
+.welcome-section p {
+  color: #64748b;
   margin: 0;
+  font-size: 0.95rem;
 }
 
-/* Form Styles */
-.form-group {
+/* Enterprise Form */
+.enterprise-form {
   margin-bottom: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
 }
 
 .form-group label {
@@ -59,259 +110,227 @@
   margin-bottom: 6px;
   font-weight: 500;
   color: #374151;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 }
 
 .form-group input {
   width: 100%;
-  padding: 12px 16px;
-  border: 1px solid #d1d5db;
+  padding: 12px;
+  border: 1.5px solid #e2e8f0;
   border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.2s;
+  font-size: 0.95rem;
+  transition: all 0.2s;
   box-sizing: border-box;
+  background: white;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.btn-login {
+.form-group input::placeholder {
+  color: #9ca3af;
+}
+
+/* Form Options */
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  font-size: 0.875rem;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.remember-me input {
+  margin: 0;
+}
+
+.forgot-link {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+/* Enterprise Button */
+.btn-enterprise {
   width: 100%;
-  background: #2563eb;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
   color: white;
   padding: 12px;
   border: none;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.btn-login:hover {
-  background: #1d4ed8;
-}
-
-.footer-links {
+  transition: all 0.2s;
   display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
-.footer-links a {
-  color: #2563eb;
+.btn-enterprise:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.btn-enterprise:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Enterprise Footer */
+.enterprise-footer {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.enterprise-link {
+  color: #3b82f6;
   text-decoration: none;
-  font-size: 0.9rem;
+  font-weight: 500;
+  margin-left: 4px;
 }
 
-.footer-links a:hover {
+.enterprise-link:hover {
   text-decoration: underline;
 }
 
-/* Right Panel */
+/* Right Panel - Enterprise Sidepanel */
 .login-right {
   flex: 1;
-  background: #f1f5f9;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 40px;
+  position: relative;
+  overflow: hidden;
 }
 
-.login-right img {
+.enterprise-sidepanel {
+  color: white;
+  max-width: 400px;
   width: 100%;
-  height: auto;
-  border-radius: 8px;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .login-container {
-    flex-direction: column;
-  }
-  
-  .login-left {
-    padding: 40px 30px;
-  }
-  
-  .login-right {
-    padding: 30px;
-  }
-  
-  .footer-links {
-    flex-direction: column;
-    gap: 10px;
-    text-align: center;
-  }
+.sidepanel-content {
+  position: relative;
+  z-index: 2;
 }
 
-/* Add these styles to your existing Login.css */
-
-/* Enhanced Error Messages */
-.error-message {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 12px;
-  padding: 20px;
+.feature-badge {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
   margin-bottom: 24px;
-  animation: slideIn 0.3s ease-out;
+  border: 1px solid rgba(96, 165, 250, 0.3);
 }
 
-.error-invalid_credentials {
-  background: #fffbeb;
-  border-color: #fed7aa;
+.sidepanel-content h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  line-height: 1.3;
+  background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.error-inactive_account {
-  background: #f0f9ff;
-  border-color: #bae6fd;
+.sidepanel-content p {
+  color: #cbd5e1;
+  margin-bottom: 32px;
+  line-height: 1.6;
+  font-size: 0.95rem;
 }
 
-.error-rate_limit {
-  background: #faf5ff;
-  border-color: #ddd6fe;
+.features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.error-server_error {
-  background: #fef7ff;
-  border-color: #f5d0fe;
-}
-
-.error-header {
+.feature-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 12px;
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  padding: 8px 0;
 }
 
-.error-icon {
-  font-size: 1.5rem;
-}
-
-.error-title {
-  margin: 0;
-  color: #dc2626;
+.feature-icon {
   font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.error-invalid_credentials .error-title {
-  color: #d97706;
-}
-
-.error-inactive_account .error-title {
-  color: #0369a1;
-}
-
-.error-rate_limit .error-title {
-  color: #7c3aed;
-}
-
-.error-server_error .error-title {
-  color: #a21caf;
-}
-
-.error-description {
-  margin: 0 0 16px 0;
-  color: #57534e;
-  line-height: 1.5;
-}
-
-.error-suggestions {
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
-.suggestions-title {
-  font-weight: 600;
-  color: #44403c;
-  margin: 0 0 8px 0;
-  font-size: 0.9rem;
-}
-
-.suggestions-list {
-  margin: 0;
-  padding-left: 0;
-  list-style: none;
-}
-
-.suggestion-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 6px;
-  color: #57534e;
-  font-size: 0.9rem;
-  line-height: 1.4;
-}
-
-.suggestion-bullet {
-  color: #dc2626;
-  font-weight: bold;
+  width: 24px;
+  text-align: center;
   flex-shrink: 0;
 }
 
-.error-invalid_credentials .suggestion-bullet {
-  color: #d97706;
-}
-
-.error-inactive_account .suggestion-bullet {
-  color: #0369a1;
-}
-
-.error-actions {
+/* Enterprise Error */
+.enterprise-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
   display: flex;
+  align-items: flex-start;
   gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
+  animation: slideIn 0.3s ease-out;
 }
 
-.error-action-btn {
-  background: #dc2626;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
+.error-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 1px;
 }
 
-.error-action-btn:hover {
-  background: #b91c1c;
+.error-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.error-invalid_credentials .error-action-btn {
-  background: #d97706;
+.error-title {
+  font-weight: 600;
+  color: #dc2626;
+  font-size: 0.875rem;
 }
 
-.error-invalid_credentials .error-action-btn:hover {
-  background: #b45309;
+.error-message {
+  color: #7f1d1d;
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 
-.error-action-link {
-  color: #2563eb;
-  text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.error-action-link:hover {
-  text-decoration: underline;
-}
-
-/* Input error state */
 .input-error {
   border-color: #dc2626 !important;
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
 }
 
-/* Loading spinner */
+/* Loading Spinner */
 .loading-spinner {
   display: inline-block;
   width: 16px;
@@ -320,14 +339,13 @@
   border-top: 2px solid currentColor;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-right: 8px;
 }
 
 /* Animations */
 @keyframes slideIn {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-8px);
   }
   to {
     opacity: 1;
@@ -340,19 +358,277 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Responsive adjustments */
+/* ===== RESPONSIVE DESIGN ===== */
+
+/* Tablet and below */
 @media (max-width: 768px) {
-  .error-actions {
+  .enterprise-login {
+    padding: 12px;
+    background: white;
+  }
+  
+  .login-container {
     flex-direction: column;
-    align-items: stretch;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    min-height: auto;
   }
   
-  .error-action-btn {
-    order: 2;
+  .login-left {
+    padding: 32px 24px;
+    flex: none;
   }
   
-  .error-action-link {
-    order: 1;
+  .login-right {
+    padding: 32px 24px;
+    flex: none;
+  }
+  
+  .login-content {
+    max-width: none;
+  }
+  
+  .form-options {
+    flex-direction: row;
+    gap: 0;
+  }
+  
+  .sidepanel-content {
     text-align: center;
+  }
+  
+  .features-list {
+    align-items: center;
+  }
+  
+  .feature-item {
+    justify-content: center;
+  }
+}
+
+/* Small tablets and large phones */
+@media (max-width: 640px) {
+  .enterprise-login {
+    padding: 8px;
+  }
+  
+  .login-container {
+    border-radius: 8px;
+  }
+  
+  .login-left {
+    padding: 28px 20px;
+  }
+  
+  .login-right {
+    padding: 28px 20px;
+  }
+  
+  .welcome-section h1 {
+    font-size: 1.5rem;
+  }
+  
+  .sidepanel-content h2 {
+    font-size: 1.35rem;
+  }
+  
+  .sidepanel-content p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  .enterprise-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 32px;
+  }
+  
+  .login-left {
+    padding: 24px 16px;
+  }
+  
+  .login-right {
+    padding: 24px 16px;
+  }
+  
+  .welcome-section {
+    margin-bottom: 24px;
+  }
+  
+  .welcome-section h1 {
+    font-size: 1.4rem;
+  }
+  
+  .welcome-section p {
+    font-size: 0.9rem;
+  }
+  
+  .form-group {
+    margin-bottom: 16px;
+  }
+  
+  .form-group input {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+  
+  .btn-enterprise {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+  
+  .sidepanel-content h2 {
+    font-size: 1.25rem;
+  }
+  
+  .sidepanel-content p {
+    font-size: 0.85rem;
+    margin-bottom: 24px;
+  }
+  
+  .features-list {
+    gap: 12px;
+  }
+  
+  .feature-item {
+    font-size: 0.85rem;
+    padding: 6px 0;
+  }
+  
+  .feature-icon {
+    font-size: 1rem;
+  }
+}
+
+/* Small mobile phones (390px and below) */
+@media (max-width: 390px) {
+  .enterprise-login {
+    padding: 6px;
+  }
+  
+  .login-container {
+    border-radius: 6px;
+  }
+  
+  .login-left {
+    padding: 20px 14px;
+  }
+  
+  .login-right {
+    padding: 20px 14px;
+  }
+  
+  .enterprise-logo {
+    font-size: 1.1rem;
+  }
+  
+  .logo-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+  
+  .enterprise-badge {
+    font-size: 0.7rem;
+    padding: 3px 6px;
+  }
+  
+  .welcome-section h1 {
+    font-size: 1.3rem;
+  }
+  
+  .welcome-section p {
+    font-size: 0.85rem;
+  }
+  
+  .form-group label {
+    font-size: 0.8rem;
+  }
+  
+  .form-group input {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+  
+  .form-options {
+    font-size: 0.8rem;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .btn-enterprise {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+  
+  .enterprise-footer {
+    font-size: 0.8rem;
+  }
+  
+  .sidepanel-content h2 {
+    font-size: 1.2rem;
+  }
+  
+  .sidepanel-content p {
+    font-size: 0.8rem;
+  }
+  
+  .feature-item {
+    font-size: 0.8rem;
+    gap: 8px;
+  }
+  
+  .feature-icon {
+    font-size: 0.9rem;
+    width: 20px;
+  }
+  
+  .enterprise-error {
+    padding: 12px;
+    gap: 8px;
+  }
+  
+  .error-title {
+    font-size: 0.8rem;
+  }
+  
+  .error-message {
+    font-size: 0.75rem;
+  }
+}
+
+/* Very small screens (orientation changes) */
+@media (max-width: 360px) {
+  .login-left {
+    padding: 18px 12px;
+  }
+  
+  .login-right {
+    padding: 18px 12px;
+  }
+  
+  .welcome-section h1 {
+    font-size: 1.25rem;
+  }
+  
+  .sidepanel-content h2 {
+    font-size: 1.15rem;
+  }
+}
+
+/* Height adjustments for very short screens */
+@media (max-height: 700px) and (max-width: 768px) {
+  .enterprise-login {
+    align-items: flex-start;
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  
+  .login-container {
+    min-height: auto;
   }
 }
