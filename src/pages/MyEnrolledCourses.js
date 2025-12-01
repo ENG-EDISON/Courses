@@ -4,7 +4,7 @@ import { getCourseProgressSummary } from "../api/LessonProgressApi";
 import "../static/EnrolledCourses.css";
 import { Link } from "react-router-dom";
 import NotEnrolledCourses from "./NotEnrolledCourses";
-import Footer from "../components/common/Footer"; // Import Footer
+import Footer from "../components/common/Footer";
 
 function MyEnrolledCourses() {
   const [myCourses, setMyCourses] = useState(null);
@@ -12,14 +12,25 @@ function MyEnrolledCourses() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentUserId, setCurrentUserId] = useState(null); // ADDED: Store user ID
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsSmallScreen(window.innerWidth <= 480);
+    };
+    
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   useEffect(() => {
     const fetchMyCourses = async () => {
       try {
         const response = await getMyEnrolledCourses();
         const coursesData = response.data;        
-        // ADDED: Extract user ID from response
         if (coursesData?.user_id) {
           setCurrentUserId(coursesData.user_id);
         }
@@ -136,8 +147,6 @@ function MyEnrolledCourses() {
         c.category?.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
-  /* ==================== STATES ====================== */
-
   if (isLoading) {
     return (
       <div className="ec-page">
@@ -167,8 +176,6 @@ function MyEnrolledCourses() {
     );
   }
 
-  /* ==================== MAIN ====================== */
-
   return (
     <div className="ec-page">
       <div className="ec-container">
@@ -188,7 +195,7 @@ function MyEnrolledCourses() {
               <div className="ec-search-container">
                 <input
                   type="text"
-                  placeholder="Search your courses by title, instructor, or category..."
+                  placeholder={isSmallScreen ? "Search courses..." : "Search your courses by title, instructor, or category..."}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="ec-search"
@@ -313,7 +320,6 @@ function MyEnrolledCourses() {
         </div>
 
         {/* ALL COURSES SECTION */}
-        {/* FIX: Pass the userId prop */}
         {currentUserId && <NotEnrolledCourses userId={currentUserId} />}
       </div>
       
