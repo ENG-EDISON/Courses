@@ -3,7 +3,7 @@ import "../static/Homepage.css";
 import CoursesSection from "../components/CourseSection";
 import Footer from "../components/common/Footer";
 import NavigationBar from "../components/common/NavigationBar";
-import embeddedsystemsImage from "../embedded-systems3.JPG"
+import embeddedsystemsImage from "../embedded-systems3.jpg"
 function Homepage() {
   return (
     <main className="homepage">

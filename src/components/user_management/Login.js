@@ -3,7 +3,7 @@ import { login } from "../../api/AuthApi";
 import "./Login.css";
 import Footer from "../common/Footer";
 import NavigationBar from "../common/NavigationBar";
-import stm32Image from "./stm32.png"; // or from relative path
+import stm32Image from "./stm32.jpg"; // or from relative path
 
 function EnterpriseLogin() {
   const [username, setUsername] = useState("");
