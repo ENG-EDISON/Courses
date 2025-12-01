@@ -3,7 +3,7 @@ import "../static/Homepage.css";
 import CoursesSection from "../components/CourseSection";
 import Footer from "../components/common/Footer";
 import NavigationBar from "../components/common/NavigationBar";
-
+import embeddedsystemsImage from "../embedded-systems1.png"
 function Homepage() {
   return (
     <main className="homepage">
@@ -34,7 +34,7 @@ function Homepage() {
             {/* Image */}
             <div className="homepage-hero-image">
               <img
-                src="/japan.png"
+                src={embeddedsystemsImage}
                 alt="Online learning illustration"
               />
             </div>

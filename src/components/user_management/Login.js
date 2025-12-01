@@ -3,6 +3,7 @@ import { login } from "../../api/AuthApi";
 import "./Login.css";
 import Footer from "../common/Footer";
 import NavigationBar from "../common/NavigationBar";
+import stm32Image from "./stm32.png"; // or from relative path
 
 function EnterpriseLogin() {
   const [username, setUsername] = useState("");
@@ -138,7 +139,7 @@ function EnterpriseLogin() {
           <div className="login-right">
             <div className="hero-section">
               <div className="hero-image">
-                <img src="japan.png" alt="Online Learning" />
+                <img src={stm32Image} alt="Online Learning" />
                 <div className="hero-overlay">
                   <div className="hero-content">
                     <div className="brand-logo">
