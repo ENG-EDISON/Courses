@@ -76,7 +76,7 @@
 
 /* ===== HERO SECTION ===== */
 .homepage-hero {
-  margin-top: 60px;
+  margin-top: 30px;
   background: #ffffff;
   position: relative;
   overflow: hidden;
@@ -501,8 +501,7 @@
   }
   
   .homepage-hero {
-    padding: 50px 0 30px;
-    padding-top: calc(50px + 50px);
+    padding-top:0px;
   }
   
   .homepage-hero-text h1 {
@@ -580,7 +579,7 @@
   }
   
   .homepage-hero {
-    padding: 40px 0 20px;
+    padding: 0px;
   }
   
   .homepage-hero-text h1 {
