@@ -34,7 +34,7 @@ function Homepage() {
             {/* Image */}
             <div className="homepage-hero-image">
               <img
-                src="/images/embedded-systems3.jpg"
+                src="/embedded-systems3.jpg"
                 alt="Online learning illustration"
               />
             </div>
