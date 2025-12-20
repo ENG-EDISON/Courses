@@ -4,6 +4,7 @@ import CoursesSection from "../components/CourseSection";
 import Footer from "../components/common/Footer";
 import NavigationBar from "../components/common/NavigationBar";
 import embeddedsystemsImage from "../embedded-systems3.jpg"
+import TestimonialsCarousel from "../components/TestimonialsCarousel";
 function Homepage() {
   return (
     <main className="homepage">
@@ -67,25 +68,7 @@ function Homepage() {
       <CoursesSection />  
 
       {/* Testimonials Section */}
-      <section className="homepage-testimonials">
-        <div className="homepage-container">
-          <h2>What Our Students Say</h2>
-          <div className="homepage-testimonial-cards">
-            <div className="homepage-testimonial-card">
-              <p>"Hayducate's courses helped me land my dream job. Highly recommend!"</p>
-              <h3>Michael Jones</h3>
-            </div>
-            <div className="homepage-testimonial-card">
-              <p>"The interactive exercises and real-world projects are amazing."</p>
-              <h3>Brian Kagiri</h3>
-            </div>
-            <div className="homepage-testimonial-card">
-              <p>"The instructors are experts who actually care about your success."</p>
-              <h3>Sarah Mwende</h3>
-            </div>
-          </div>
-        </div>
-      </section>
+      <TestimonialsCarousel/>
 
       {/* Call to Action */}
       <section className="homepage-cta">

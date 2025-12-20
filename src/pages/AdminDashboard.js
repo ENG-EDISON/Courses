@@ -3,11 +3,13 @@ import AdminMessagesList from "./AdminMessagesList";
 import "../static/AdminDashboard.css";
 import UserManagement from "./Admin/UserManagement";
 import Footer from "../components/common/Footer";
+import TestimonialsManagement from "./TestimonialsManagement";
 
 const menuItems = [
   { id: "overview", label: "Overview", icon: "📊" },
   { id: "users", label: "Users", icon: "👤" },
   { id: "courses", label: "Courses", icon: "📚" },
+  { id: "testimonials", label: "Testimonials", icon: "💬" }, // Add this
   { id: "analytics", label: "Analytics", icon: "📈" },
   { id: "messages", label: "Messages", icon: "💬" },
   { id: "settings", label: "Settings", icon: "⚙️" },
@@ -94,6 +96,8 @@ const renderPage = (page) => {
       return <UserManagement />;
     case "courses":
       return <CoursesManagement />;
+    case "testimonials":
+      return <TestimonialsManagement />;
     case "analytics":
       return <AnalyticsDashboard />;
     case "messages":
