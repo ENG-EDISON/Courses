@@ -1,10 +1,11 @@
-/* ===== TESTIMONIALS CAROUSEL - MODERN DESIGN ===== */
+/* ===== TESTIMONIALS CAROUSEL - MODERN / ENTERPRISE DESIGN ===== */
 
 .testimonials-carousel {
   width: 100%;
-  padding: 100px 0;
-  background: #f9fafb;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  padding: 40px 0;
+  background: linear-gradient(180deg, #f9fafb 0%, #f3f4f6 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
 }
 
 .carousel-wrapper {
@@ -13,10 +14,11 @@
   padding: 0 24px;
 }
 
-/* Header */
+/* ================= HEADER ================= */
+
 .testimonials-header {
   text-align: center;
-  margin-bottom: 64px;
+  margin-bottom: 30px;
 }
 
 .testimonials-title {
@@ -33,10 +35,11 @@
   color: #6b7280;
   margin: 0;
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
-/* Main Content */
+/* ================= MAIN CONTENT ================= */
+
 .carousel-content {
   display: flex;
   align-items: center;
@@ -45,7 +48,8 @@
   margin-bottom: 48px;
 }
 
-/* Navigation */
+/* ================= NAVIGATION ================= */
+
 .carousel-nav {
   width: 60px;
   height: 60px;
@@ -57,21 +61,33 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 }
 
-.carousel-nav:hover {
+.carousel-nav:hover:not(:disabled) {
   background: #4f46e5;
   border-color: #4f46e5;
   color: #ffffff;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(79, 70, 229, 0.25);
+  transform: translateY(-3px);
+  box-shadow: 0 18px 36px rgba(79, 70, 229, 0.35);
 }
 
 .carousel-nav:active {
-  transform: translateY(0);
+  transform: translateY(-1px);
+}
+
+.carousel-nav:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.carousel-nav:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.35);
 }
 
 .nav-arrow {
@@ -80,38 +96,50 @@
   line-height: 1;
 }
 
-/* Testimonial Card */
+/* ================= TESTIMONIAL CARD ================= */
+
 .testimonial-card {
   flex: 1;
   background: #ffffff;
   border-radius: 28px;
   padding: 56px;
-  box-shadow: 
-    0 10px 25px rgba(0, 0, 0, 0.04),
+  box-shadow:
+    0 20px 45px rgba(0, 0, 0, 0.06),
     0 0 0 1px rgba(0, 0, 0, 0.03);
   border: 1px solid #f3f4f6;
-  transition: box-shadow 0.3s ease;
+  animation: testimonialFade 420ms ease-out;
 }
 
 .testimonial-card:hover {
-  box-shadow: 
-    0 15px 35px rgba(0, 0, 0, 0.08),
+  box-shadow:
+    0 25px 55px rgba(0, 0, 0, 0.09),
     0 0 0 1px rgba(0, 0, 0, 0.03);
 }
 
-/* Quote Container */
+@keyframes testimonialFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================= QUOTE ================= */
+
 .testimonial-quote-container {
   position: relative;
-  margin-bottom: 48px;
 }
 
 .quote-mark {
   position: absolute;
-  top: -28px;
-  left: -16px;
-  font-size: 96px;
+  top: -32px;
+  left: -18px;
+  font-size: 100px;
   color: #4f46e5;
-  opacity: 0.08;
+  opacity: 0.07;
   font-family: Georgia, serif;
   line-height: 1;
   font-weight: 700;
@@ -119,16 +147,16 @@
 
 .testimonial-text {
   font-size: 24px;
-  line-height: 1.7;
+  line-height: 1.75;
   color: #1f2937;
   margin: 0;
   padding-left: 24px;
   font-weight: 400;
-  font-style: normal;
-  font-family: 'Georgia', serif;
+  font-family: Georgia, serif;
 }
 
-/* Author Info */
+/* ================= AUTHOR ================= */
+
 .testimonial-author-info {
   display: flex;
   align-items: center;
@@ -137,17 +165,18 @@
   border-top: 1px solid #f3f4f6;
 }
 
+/* Find and update the .author-avatar class in your CSS */
 .author-avatar {
   position: relative;
-  width: 100px;
-  height: 100px;
+  /* Increase these two values to make the avatar bigger */
+  width: 140px;  /* Changed from 100px */
+  height: 140px; /* Changed from 100px */
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
   border: 3px solid #ffffff;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
 }
-
 .author-image {
   width: 100%;
   height: 100%;
@@ -156,21 +185,34 @@
 
 .verified-indicator {
   position: absolute;
-  bottom: 0;
-  right: 0;
-  background: #10b981;
+  bottom: 0px;
+  right: 30px;
+  background: #3b6d03;
   color: #ffffff;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   border: 3px solid #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
+
+.verified-indicator:hover {
+  transform: scale(1.2);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+}
+
+.verified-indicator::after {
+  content: '✓';
+  display: block;
+  font-weight: 700;
+}
+
 
 .author-details {
   flex: 1;
@@ -181,7 +223,6 @@
   font-weight: 600;
   color: #111827;
   margin: 0 0 10px 0;
-  line-height: 1.3;
 }
 
 .author-meta {
@@ -197,22 +238,20 @@
   font-size: 16px;
   color: #4b5563;
   font-weight: 500;
-  line-height: 1.4;
 }
 
 .meta-separator {
   color: #9ca3af;
-  font-weight: 400;
 }
 
 .testimonial-date {
   font-size: 14px;
   color: #9ca3af;
   font-style: italic;
-  font-weight: 400;
 }
 
-/* Progress Dots */
+/* ================= DOTS ================= */
+
 .carousel-dots {
   display: flex;
   justify-content: center;
@@ -228,21 +267,22 @@
   border: none;
   cursor: pointer;
   padding: 0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.25s ease;
 }
 
 .progress-dot:hover {
   background: #d1d5db;
-  transform: scale(1.3);
+  transform: scale(1.35);
 }
 
 .progress-dot.active {
   background: #4f46e5;
-  transform: scale(1.3);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  transform: scale(1.35);
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2);
 }
 
-/* Loading State */
+/* ================= LOADING ================= */
+
 .testimonials-loading {
   text-align: center;
   padding: 80px;
@@ -260,10 +300,13 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-/* Error State */
+/* ================= ERROR ================= */
+
 .testimonials-error {
   text-align: center;
   padding: 48px;
@@ -285,7 +328,6 @@
   font-weight: 500;
   font-size: 15px;
   transition: all 0.2s ease;
-  font-family: inherit;
 }
 
 .retry-btn:hover {
@@ -294,7 +336,8 @@
   box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
 }
 
-/* Empty State */
+/* ================= EMPTY ================= */
+
 .testimonials-empty {
   text-align: center;
   padding: 48px;
@@ -303,20 +346,21 @@
   font-size: 18px;
 }
 
-/* Responsive Design */
+/* ================= RESPONSIVE ================= */
+
 @media (max-width: 1024px) {
   .testimonials-carousel {
     padding: 80px 0;
   }
-  
+
   .carousel-content {
     gap: 36px;
   }
-  
+
   .testimonial-card {
     padding: 48px;
   }
-  
+
   .testimonials-title {
     font-size: 42px;
   }
@@ -326,59 +370,59 @@
   .testimonials-carousel {
     padding: 64px 0;
   }
-  
+
   .carousel-wrapper {
     padding: 0 20px;
   }
-  
+
   .testimonials-title {
     font-size: 36px;
   }
-  
+
   .testimonials-subtitle {
     font-size: 16px;
   }
-  
+
   .carousel-content {
     flex-direction: column;
     gap: 32px;
   }
-  
+
   .carousel-nav {
     order: 2;
     width: 52px;
     height: 52px;
   }
-  
+
   .carousel-nav-prev {
     order: 1;
   }
-  
+
   .carousel-nav-next {
     order: 3;
   }
-  
+
   .testimonial-card {
     order: 2;
     padding: 40px;
   }
-  
+
   .testimonial-text {
     font-size: 20px;
     padding-left: 20px;
   }
-  
+
   .quote-mark {
     font-size: 80px;
     top: -24px;
     left: -12px;
   }
-  
+
   .author-avatar {
     width: 72px;
     height: 72px;
   }
-  
+
   .author-name {
     font-size: 18px;
   }
@@ -388,36 +432,36 @@
   .testimonials-carousel {
     padding: 48px 0;
   }
-  
+
   .testimonials-title {
     font-size: 32px;
   }
-  
+
   .testimonial-card {
     padding: 32px 24px;
     border-radius: 24px;
   }
-  
+
   .testimonial-text {
     font-size: 18px;
     padding-left: 16px;
   }
-  
+
   .testimonial-author-info {
     flex-direction: column;
     text-align: center;
     gap: 20px;
   }
-  
+
   .author-meta {
     justify-content: center;
   }
-  
+
   .carousel-nav {
     width: 48px;
     height: 48px;
   }
-  
+
   .nav-arrow {
     font-size: 20px;
   }

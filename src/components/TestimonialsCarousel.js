@@ -18,6 +18,7 @@ const TestimonialsCarousel = () => {
       setLoading(true);
       const response = await getTestimonials();
       setTestimonials(response.data);
+      console.log(response.data)
       setError(null);
     } catch (err) {
       setError('Failed to load testimonials');
@@ -59,9 +60,13 @@ const TestimonialsCarousel = () => {
     return photoUrl;
   };
 
-  // Don't show loading state if there's nothing to load
-  if (loading && testimonials.length === 0) {
-    return null; // Return nothing during initial load
+  if (loading) {
+    return (
+      <div className="testimonials-loading">
+        <div className="spinner"></div>
+        <p>Loading testimonials...</p>
+      </div>
+    );
   }
 
   if (error) {
@@ -76,7 +81,11 @@ const TestimonialsCarousel = () => {
   }
 
   if (testimonials.length === 0) {
-    return null; // Return nothing if no testimonials
+    return (
+      <div className="testimonials-empty">
+        <p>No testimonials available yet.</p>
+      </div>
+    );
   }
 
   const currentTestimonial = testimonials[currentIndex];
@@ -104,7 +113,6 @@ const TestimonialsCarousel = () => {
             onClick={prevTestimonial}
             className="carousel-nav carousel-nav-prev"
             aria-label="Previous testimonial"
-            disabled={testimonials.length <= 1}
           >
             <span className="nav-arrow">&lt;</span>
           </button>
@@ -167,26 +175,23 @@ const TestimonialsCarousel = () => {
             onClick={nextTestimonial}
             className="carousel-nav carousel-nav-next"
             aria-label="Next testimonial"
-            disabled={testimonials.length <= 1}
           >
             <span className="nav-arrow">&gt;</span>
           </button>
 
         </div>
 
-        {/* Progress Dots - Only show if more than 1 testimonial */}
-        {testimonials.length > 1 && (
-          <div className="carousel-dots">
-            {testimonials.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToTestimonial(index)}
-                className={`progress-dot ${index === currentIndex ? 'active' : ''}`}
-                aria-label={`Go to testimonial ${index + 1}`}
-              />
-            ))}
-          </div>
-        )}
+        {/* Progress Dots */}
+        <div className="carousel-dots">
+          {testimonials.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToTestimonial(index)}
+              className={`progress-dot ${index === currentIndex ? 'active' : ''}`}
+              aria-label={`Go to testimonial ${index + 1}`}
+            />
+          ))}
+        </div>
 
       </div>
     </section>
