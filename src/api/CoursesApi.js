@@ -7,7 +7,7 @@ export const getMyCoursesAsInstructor=()=>apiClient.get('/courses/my-courses/');
 export const getCourseFullStructure = (id) => apiClient.get(`/api/courses/${id}/full-structure/`);
 export const getCoursePreviewStructure = (id) => apiClient.get(`/api/courses/${id}/preview/`);
 export const createCourse = (data) => {
-  console.log('Creating course with data:', data);
+//   console.log('Creating course with data:', data);
   return apiClient.post('/api/course/', data)
     .then(response => {
     //   console.log('Course created successfully:', response.data);
