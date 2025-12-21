@@ -336,16 +336,6 @@
   box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
 }
 
-/* ================= EMPTY ================= */
-
-.testimonials-empty {
-  text-align: center;
-  padding: 48px;
-  color: #6b7280;
-  font-style: italic;
-  font-size: 18px;
-}
-
 /* ================= RESPONSIVE ================= */
 
 @media (max-width: 1024px) {

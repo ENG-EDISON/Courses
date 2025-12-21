@@ -81,12 +81,9 @@ const TestimonialsCarousel = () => {
   }
 
   if (testimonials.length === 0) {
-    return (
-      <div className="testimonials-empty">
-        <p>No testimonials available yet.</p>
-      </div>
-    );
-  }
+  return null;
+}
+
 
   const currentTestimonial = testimonials[currentIndex];
   const photoUrl = getPhotoUrl(currentTestimonial.photo_url);
