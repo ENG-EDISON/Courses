@@ -61,13 +61,9 @@ const TestimonialsCarousel = () => {
   };
 
   if (loading) {
-    return (
-      <div className="testimonials-loading">
-        <div className="spinner"></div>
-        <p>Loading testimonials...</p>
-      </div>
-    );
-  }
+  return null;
+}
+
 
   if (error) {
     return (
