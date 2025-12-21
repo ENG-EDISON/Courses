@@ -1,0 +1,111 @@
+/* Features Section Styles */
+.w-c-u-section {
+  padding: 80px 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.w-c-u-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.w-c-u-title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.w-c-u-subtitle {
+  text-align: center;
+  font-size: 1.125rem;
+  color: #64748b;
+  max-width: 600px;
+  margin: 0 auto 3rem;
+}
+
+.w-c-u-feature-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.w-c-u-feature-card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+}
+
+.w-c-u-feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.w-c-u-feature-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.w-c-u-feature-blue .w-c-u-feature-icon {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.w-c-u-feature-green .w-c-u-feature-icon {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.w-c-u-feature-purple .w-c-u-feature-icon {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+.w-c-u-feature-orange .w-c-u-feature-icon {
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.w-c-u-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.w-c-u-feature-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.75rem;
+}
+
+.w-c-u-feature-description {
+  color: #64748b;
+  line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .w-c-u-section {
+    padding: 60px 0;
+  }
+  
+  .w-c-u-title {
+    font-size: 2rem;
+  }
+  
+  .w-c-u-feature-cards {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+}

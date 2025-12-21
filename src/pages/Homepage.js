@@ -4,6 +4,7 @@ import CoursesSection from "../components/CourseSection";
 import Footer from "../components/common/Footer";
 import NavigationBar from "../components/common/NavigationBar";
 import TestimonialsCarousel from "../components/TestimonialsCarousel";
+import FeaturesSection from "./FeaturesSection";
 function Homepage() {
   return (
     <main className="homepage">
@@ -43,28 +44,11 @@ function Homepage() {
       </section>
 
       {/* Features Section */}
-      <section className="homepage-features">
-        <div className="homepage-container">
-          <h2>Why Choose Hayducate?</h2>
-          <p>From beginner to advanced, we provide the tools and resources you need to succeed.</p>
-          <div className="homepage-feature-cards">
-            <div className="homepage-feature-card">
-              <h3>Expert Courses</h3>
-              <p>Learn from industry experts and master practical skills that accelerate your career.</p>
-            </div>
-            <div className="homepage-feature-card">
-              <h3>Interactive Learning</h3>
-              <p>Hands-on exercises and projects make learning more engaging and effective.</p>
-            </div>
-            <div className="homepage-feature-card">
-              <h3>Certificates</h3>
-              <p>Earn professional certificates to showcase your new skills to employers worldwide.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
+      <>
+      <FeaturesSection/>
       <CoursesSection />  
+      </>
+      
 
       {/* Testimonials Section */}
       <TestimonialsCarousel/>
