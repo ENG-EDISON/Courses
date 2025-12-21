@@ -5,21 +5,29 @@ import {
   updateEnrollment, 
   cancelEnrollment,
   getEnrollmentDetails,
+  EnrollToCourse
 } from '../api/EnrollmentApis';
 import { getAllCourses } from '../api/CoursesApi';
 import '../static/CourseAdminManagement.css';
 
-// Enrollment Management Component (moved to a separate component)
+// Enrollment Management Component
 const EnrollmentManagementTab = ({ 
   enrollments: propEnrollments, 
   courses: propCourses,
   fetchInitialData 
 }) => {
-  // IMPORTANT: propEnrollments now comes from response.data.enrollments
   const [enrollments, setEnrollments] = useState(propEnrollments || []);
   const [courses, setCourses] = useState(propCourses || []);
   const [loading, setLoading] = useState(false);
   const [selectedEnrollment, setSelectedEnrollment] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addFormData, setAddFormData] = useState({
+    student_id: '',
+    course_id: '',
+    is_active: true,
+    progress: 0
+  });
+  const [students, setStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     enrollmentStatus: 'all',
@@ -41,16 +49,29 @@ const EnrollmentManagementTab = ({
 
   // Update when props change
   useEffect(() => {
-    // propEnrollments is now the nested enrollments array from API response
     setEnrollments(propEnrollments || []);
     setCourses(propCourses || []);
     calculateStats(propEnrollments || []);
+    extractStudents(propEnrollments || []);
   }, [propEnrollments, propCourses]);
+
+  const extractStudents = (enrollmentList) => {
+    const uniqueStudents = [];
+    const studentMap = new Map();
+    
+    enrollmentList.forEach(enrollment => {
+      if (enrollment.student_details && !studentMap.has(enrollment.student_details.id)) {
+        studentMap.set(enrollment.student_details.id, enrollment.student_details);
+        uniqueStudents.push(enrollment.student_details);
+      }
+    });
+    
+    setStudents(uniqueStudents);
+  };
 
   const calculateStats = (enrollmentList) => {
     const total = enrollmentList.length;
     const active = enrollmentList.filter(e => {
-      // Check both ways for status
       if (e.enrollment_status === 'active') return true;
       return e.is_active && !e.completed_at;
     }).length;
@@ -82,7 +103,6 @@ const EnrollmentManagementTab = ({
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(enrollment => {
-        // Access student details from student_details object
         const studentUsername = enrollment.student_details?.username?.toLowerCase() || '';
         const studentEmail = enrollment.student_details?.email?.toLowerCase() || '';
         const courseTitle = enrollment.course_details?.title?.toLowerCase() || '';
@@ -139,7 +159,6 @@ const EnrollmentManagementTab = ({
     filtered.sort((a, b) => {
       let aValue, bValue;
       
-      // Handle different sort keys
       if (sortConfig.key === 'student__username') {
         aValue = a.student_details?.username || '';
         bValue = b.student_details?.username || '';
@@ -285,6 +304,49 @@ const EnrollmentManagementTab = ({
     }
   };
 
+  const handleAddEnrollment = async () => {
+    try {
+      setLoading(true);
+      
+      if (!addFormData.student_id || !addFormData.course_id) {
+        alert('Please select both student and course');
+        return;
+      }
+
+      // Use the EnrollToCourse API to create enrollment
+      const response = await EnrollToCourse(addFormData.course_id, {
+        student_id: addFormData.student_id,
+        is_active: addFormData.is_active,
+        progress: addFormData.progress
+      });
+
+      if (response.data) {
+        alert('Enrollment added successfully!');
+        setShowAddModal(false);
+        setAddFormData({
+          student_id: '',
+          course_id: '',
+          is_active: true,
+          progress: 0
+        });
+        await fetchInitialData();
+      }
+    } catch (error) {
+      console.error('Error adding enrollment:', error);
+      alert(`Failed to add enrollment: ${error.response?.data?.error || error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddFormChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setAddFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
   if (loading) {
     return (
       <div className="s-a-m-loading">
@@ -368,6 +430,13 @@ const EnrollmentManagementTab = ({
         </div>
         
         <div className="s-a-m-bulk-actions">
+          <button 
+            className="s-a-m-btn s-a-m-btn-primary"
+            onClick={() => setShowAddModal(true)}
+          >
+            + Add Enrollment
+          </button>
+          
           <span className="s-a-m-selected-count">
             {selectedIds.length} selected
           </span>
@@ -545,46 +614,176 @@ const EnrollmentManagementTab = ({
         </div>
       )}
 
-      {/* Enrollment Details Modal */}
+      {/* Compact Add Enrollment Modal */}
+      {showAddModal && (
+        <div className="s-a-m-modal-overlay">
+          <div className="s-a-m-modal-content">
+            <div className="s-a-m-modal-header">
+              <h3>➕ Add New Enrollment</h3>
+              <button className="s-a-m-close-btn" onClick={() => setShowAddModal(false)}>×</button>
+            </div>
+            
+            <div className="s-a-m-modal-body">
+              <div className="s-a-m-form-grid">
+                <div className="s-a-m-form-row">
+                  <label className="s-a-m-form-label" htmlFor="student_id">Student *</label>
+                  <select
+                    id="student_id"
+                    name="student_id"
+                    value={addFormData.student_id}
+                    onChange={handleAddFormChange}
+                    className="s-a-m-form-select"
+                    required
+                  >
+                    <option value="">Select student</option>
+                    {students.map(student => (
+                      <option key={student.id} value={student.id}>
+                        {student.username} ({student.email})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="s-a-m-form-row">
+                  <label className="s-a-m-form-label" htmlFor="course_id">Course *</label>
+                  <select
+                    id="course_id"
+                    name="course_id"
+                    value={addFormData.course_id}
+                    onChange={handleAddFormChange}
+                    className="s-a-m-form-select"
+                    required
+                  >
+                    <option value="">Select course</option>
+                    {courses.map(course => (
+                      <option key={course.id} value={course.id}>
+                        {course.title} ({course.instructor?.username})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="s-a-m-form-row">
+                  <label className="s-a-m-form-label" htmlFor="progress">Progress (%)</label>
+                  <input
+                    type="number"
+                    id="progress"
+                    name="progress"
+                    value={addFormData.progress}
+                    onChange={handleAddFormChange}
+                    min="0"
+                    max="100"
+                    className="s-a-m-form-input"
+                    placeholder="0"
+                  />
+                </div>
+                
+                <div className="s-a-m-form-check">
+                  <input
+                    type="checkbox"
+                    id="is_active"
+                    name="is_active"
+                    checked={addFormData.is_active}
+                    onChange={handleAddFormChange}
+                    className="s-a-m-checkbox-input"
+                  />
+                  <label htmlFor="is_active" className="s-a-m-checkbox-label">
+                    Active Enrollment
+                  </label>
+                </div>
+              </div>
+              
+              <div className="s-a-m-modal-actions">
+                <button 
+                  className="s-a-m-btn s-a-m-btn-primary s-a-m-modal-btn"
+                  onClick={handleAddEnrollment}
+                  disabled={!addFormData.student_id || !addFormData.course_id || loading}
+                >
+                  {loading ? 'Adding...' : 'Add'}
+                </button>
+                <button 
+                  className="s-a-m-btn s-a-m-btn-close s-a-m-modal-btn"
+                  onClick={() => setShowAddModal(false)}
+                  disabled={loading}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Compact Enrollment Details Modal */}
       {selectedEnrollment && (
         <div className="s-a-m-modal-overlay">
           <div className="s-a-m-modal-content">
             <div className="s-a-m-modal-header">
-              <h3>Enrollment Details</h3>
+              <h3>📋 Enrollment Details</h3>
               <button className="s-a-m-close-btn" onClick={() => setSelectedEnrollment(null)}>×</button>
             </div>
             
             <div className="s-a-m-modal-body">
               <div className="s-a-m-detail-grid">
                 <div className="s-a-m-detail-section">
-                  <h4>Student Information</h4>
-                  <p><strong>Username:</strong> {selectedEnrollment.student_details?.username}</p>
-                  <p><strong>Email:</strong> {selectedEnrollment.student_details?.email}</p>
-                  <p><strong>User Type:</strong> {selectedEnrollment.student_details?.user_type}</p>
-                  <p><strong>Phone:</strong> {selectedEnrollment.student_details?.phone_number || 'N/A'}</p>
+                  <h4>👤 Student</h4>
+                  <div className="s-a-m-detail-item">
+                    <span className="s-a-m-detail-label">Name:</span>
+                    <span className="s-a-m-detail-value">{selectedEnrollment.student_details?.username}</span>
+                  </div>
+                  <div className="s-a-m-detail-item">
+                    <span className="s-a-m-detail-label">Email:</span>
+                    <span className="s-a-m-detail-value">{selectedEnrollment.student_details?.email}</span>
+                  </div>
+                  <div className="s-a-m-detail-item">
+                    <span className="s-a-m-detail-label">Type:</span>
+                    <span className="s-a-m-detail-value">{selectedEnrollment.student_details?.user_type}</span>
+                  </div>
                 </div>
                 
                 <div className="s-a-m-detail-section">
-                  <h4>Course Information</h4>
-                  <p><strong>Course:</strong> {selectedEnrollment.course_details?.title}</p>
-                  <p><strong>Instructor:</strong> {selectedEnrollment.course_details?.instructor?.username}</p>
-                  <p><strong>Category:</strong> {selectedEnrollment.course_details?.category}</p>
-                  <p><strong>Status:</strong> {selectedEnrollment.course_details?.status}</p>
+                  <h4>📚 Course</h4>
+                  <div className="s-a-m-detail-item">
+                    <span className="s-a-m-detail-label">Title:</span>
+                    <span className="s-a-m-detail-value">{selectedEnrollment.course_details?.title}</span>
+                  </div>
+                  <div className="s-a-m-detail-item">
+                    <span className="s-a-m-detail-label">Instructor:</span>
+                    <span className="s-a-m-detail-value">{selectedEnrollment.course_details?.instructor?.username}</span>
+                  </div>
+                  <div className="s-a-m-detail-item">
+                    <span className="s-a-m-detail-label">Category:</span>
+                    <span className="s-a-m-detail-value">{selectedEnrollment.course_details?.category}</span>
+                  </div>
                 </div>
                 
                 <div className="s-a-m-detail-section">
-                  <h4>Enrollment Details</h4>
-                  <p><strong>Enrolled:</strong> {new Date(selectedEnrollment.enrolled_at).toLocaleString()}</p>
-                  <p><strong>Last Accessed:</strong> {new Date(selectedEnrollment.last_accessed).toLocaleString()}</p>
-                  <p><strong>Progress:</strong> {selectedEnrollment.progress}%</p>
-                  <p><strong>Days Enrolled:</strong> {selectedEnrollment.days_enrolled} days</p>
-                  <p><strong>Status:</strong> 
-                    <span className={`s-a-m-status-badge s-a-m-status-${selectedEnrollment.enrollment_status || (selectedEnrollment.completed_at ? 'completed' : selectedEnrollment.is_active ? 'active' : 'cancelled')}`}>
-                      {selectedEnrollment.enrollment_status || (selectedEnrollment.completed_at ? 'Completed' : selectedEnrollment.is_active ? 'Active' : 'Cancelled')}
+                  <h4>📊 Enrollment</h4>
+                  <div className="s-a-m-detail-item">
+                    <span className="s-a-m-detail-label">Enrolled:</span>
+                    <span className="s-a-m-detail-value">
+                      {new Date(selectedEnrollment.enrolled_at).toLocaleDateString()}
                     </span>
-                  </p>
+                  </div>
+                  <div className="s-a-m-detail-item">
+                    <span className="s-a-m-detail-label">Progress:</span>
+                    <span className="s-a-m-detail-value">{selectedEnrollment.progress}%</span>
+                  </div>
+                  <div className="s-a-m-detail-item">
+                    <span className="s-a-m-detail-label">Status:</span>
+                    <span className="s-a-m-detail-value">
+                      <span className={`s-a-m-status-badge s-a-m-status-${selectedEnrollment.enrollment_status || (selectedEnrollment.completed_at ? 'completed' : selectedEnrollment.is_active ? 'active' : 'cancelled')}`}>
+                        {selectedEnrollment.enrollment_status || (selectedEnrollment.completed_at ? 'Completed' : selectedEnrollment.is_active ? 'Active' : 'Cancelled')}
+                      </span>
+                    </span>
+                  </div>
                   {selectedEnrollment.completed_at && (
-                    <p><strong>Completed:</strong> {new Date(selectedEnrollment.completed_at).toLocaleString()}</p>
+                    <div className="s-a-m-detail-item">
+                      <span className="s-a-m-detail-label">Completed:</span>
+                      <span className="s-a-m-detail-value">
+                        {new Date(selectedEnrollment.completed_at).toLocaleDateString()}
+                      </span>
+                    </div>
                   )}
                 </div>
               </div>
@@ -593,36 +792,36 @@ const EnrollmentManagementTab = ({
                 {selectedEnrollment.is_active && !selectedEnrollment.completed_at && (
                   <>
                     <button 
-                      className="s-a-m-btn s-a-m-btn-complete"
+                      className="s-a-m-btn s-a-m-btn-complete s-a-m-modal-btn"
                       onClick={() => {
                         handleUpdateStatus(selectedEnrollment.id, { completed_at: new Date().toISOString() });
                       }}
                     >
-                      Mark as Complete
+                      Mark Complete
                     </button>
                     <button 
-                      className="s-a-m-btn s-a-m-btn-cancel"
+                      className="s-a-m-btn s-a-m-btn-cancel s-a-m-modal-btn"
                       onClick={() => {
                         handleCancelEnrollment(selectedEnrollment.id);
                         setSelectedEnrollment(null);
                       }}
                     >
-                      Cancel Enrollment
+                      Cancel
                     </button>
                   </>
                 )}
                 {!selectedEnrollment.is_active && !selectedEnrollment.completed_at && (
                   <button 
-                    className="s-a-m-btn s-a-m-btn-activate"
+                    className="s-a-m-btn s-a-m-btn-activate s-a-m-modal-btn"
                     onClick={() => {
                       handleUpdateStatus(selectedEnrollment.id, { is_active: true });
                     }}
                   >
-                    Reactivate Enrollment
+                    Reactivate
                   </button>
                 )}
                 <button 
-                  className="s-a-m-btn s-a-m-btn-close"
+                  className="s-a-m-btn s-a-m-btn-close s-a-m-modal-btn"
                   onClick={() => setSelectedEnrollment(null)}
                 >
                   Close
@@ -636,7 +835,7 @@ const EnrollmentManagementTab = ({
   );
 };
 
-// Courses Management Component (placeholder for now)
+// Courses Management Component
 const CoursesManagementTab = () => {
   return (
     <div className="s-a-m-tab-content">
@@ -660,7 +859,7 @@ const CoursesManagementTab = () => {
   );
 };
 
-// Progress Tracking Component (placeholder for now)
+// Progress Tracking Component
 const ProgressTrackingTab = () => {
   return (
     <div className="s-a-m-tab-content">
@@ -706,12 +905,10 @@ const CourseAdminManagement = () => {
         getAllCourses()
       ]);
       
-      // IMPORTANT: Access the nested enrollments array from response
       const enrollmentData = enrollmentsRes.data?.enrollments || enrollmentsRes.data || [];
       setEnrollments(enrollmentData);
       setCourses(coursesRes.data || []);
       
-      // Update stats from API response if available
       if (enrollmentsRes.data) {
         setEnrollmentStats({
           total: enrollmentsRes.data.total_enrollments || enrollmentData.length,
