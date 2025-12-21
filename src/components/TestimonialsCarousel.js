@@ -101,7 +101,7 @@ const TestimonialsCarousel = () => {
         
         {/* Header */}
         <div className="testimonials-header">
-          <h2 className="testimonials-title">What Our Students Say</h2>
+          <h2 className="testimonials-title">What People Say</h2>
           <p className="testimonials-subtitle">Real stories from our learning community</p>
         </div>
 
