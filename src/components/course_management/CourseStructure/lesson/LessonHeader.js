@@ -25,10 +25,54 @@ const LessonHeader = ({
   const [isUpdating, setIsUpdating] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [calculatedDuration, setCalculatedDuration] = useState(0);
 
-  // Handle Create New Lesson
-  // Handle Create New Lesson
-  // Handle Create New Lesson
+  // Function to calculate video duration from file
+  const calculateVideoDuration = (file) => {
+    return new Promise((resolve, reject) => {
+      if (!file || !file.type.startsWith('video/')) {
+        resolve(0);
+        return;
+      }
+
+      // Create video element
+      const video = document.createElement('video');
+      const url = URL.createObjectURL(file);
+      
+      video.preload = 'metadata';
+      video.src = url;
+      
+      // Set timeout for video loading
+      const timeoutId = setTimeout(() => {
+        URL.revokeObjectURL(url);
+        video.remove();
+        resolve(0); // Return 0 on timeout
+      }, 10000); // 10 second timeout
+      
+      video.onloadedmetadata = () => {
+        clearTimeout(timeoutId);
+        URL.revokeObjectURL(url);
+        video.remove();
+        
+        const duration = video.duration;
+        const roundedDuration = Math.round(duration);
+        console.log(`🎬 Frontend calculated duration: ${duration}s → ${roundedDuration}s`);
+        resolve(roundedDuration);
+      };
+      
+      video.onerror = () => {
+        clearTimeout(timeoutId);
+        URL.revokeObjectURL(url);
+        video.remove();
+        console.warn('❌ Could not load video for duration calculation');
+        resolve(0);
+      };
+      
+      video.load();
+    });
+  };
+
+  // Handle Create New Lesson with duration calculation
   const handleCreateLesson = async (e) => {
     e.stopPropagation();
 
@@ -59,6 +103,16 @@ const LessonHeader = ({
 
     setIsCreating(true);
     try {
+      // ✅ Calculate duration if video file exists
+      let videoDuration = lesson.video_duration || 0;
+      
+      if (lesson.video_file instanceof File) {
+        console.log('📹 Calculating video duration for new lesson...');
+        videoDuration = await calculateVideoDuration(lesson.video_file);
+        setCalculatedDuration(videoDuration);
+        console.log(`✅ Duration calculated: ${videoDuration} seconds`);
+      }
+
       // ✅ FIX: Determine video_source based on actual content
       const determineVideoSource = () => {
         // If there's a video file, it's uploaded
@@ -83,14 +137,20 @@ const LessonHeader = ({
         subsection: subsectionId,
         course: courseId,
         video_url: lesson.video_url || '',
-        video_duration: lesson.video_duration || 0,
-        video_source: determineVideoSource(), // ✅ Use the smart determination
+        video_duration: videoDuration, // ✅ Use calculated duration
+        video_source: determineVideoSource(),
       };
 
       // Add video file if it exists and is a File object
       if (lesson.video_file instanceof File) {
         lessonData.video_file = lesson.video_file;
       }
+      
+      console.log('📤 Sending lesson data to API:', {
+        ...lessonData,
+        video_file: lessonData.video_file ? `File: ${lessonData.video_file.name}` : 'No file'
+      });
+      
       // Create the lesson using your API
       const response = await createLesson(lessonData);
 
@@ -99,7 +159,7 @@ const LessonHeader = ({
         onLessonCreate(response.data, sectionIndex, subsectionIndex, lessonIndex);
       }
 
-      alert('Lesson created successfully!');
+      alert(`Lesson created successfully! Duration: ${videoDuration} seconds`);
     } catch (error) {
       console.error('Error creating lesson:', error);
       const errorMessage = error.response?.data?.message || error.message || 'Unknown error occurred';
@@ -109,119 +169,134 @@ const LessonHeader = ({
     }
   };
 
-  // Handle Update Lesson
-// Handle Update Lesson
-const handleUpdateLesson = async (e) => {
-  e.stopPropagation();
+  // Handle Update Lesson with duration calculation
+  const handleUpdateLesson = async (e) => {
+    e.stopPropagation();
 
-  if (!isExistingInDatabase(lesson)) {
-    alert('Cannot update a lesson that is not saved in the database. Please save the lesson first.');
-    return;
-  }
-
-  if (!lesson.id) {
-    alert('Lesson ID is required for update.');
-    return;
-  }
-
-  setIsUpdating(true);
-  try {
-    // ✅ COMPREHENSIVE: Handle all video source transitions
-    const determineVideoSource = () => {
-      const hasNewFile = lesson.video_file instanceof File;
-      const hasUrl = lesson.video_url && lesson.video_url.trim() !== '';
-      const hadUploaded = lesson.video_source === 'uploaded';
-      const hadExternal = lesson.video_source === 'external_url';
-
-      // Case 1: Adding new uploaded file (from none or external)
-      if (hasNewFile) {
-        return 'uploaded';
-      }
-      
-      // Case 2: Adding new URL (from none or uploaded)
-      if (hasUrl) {
-        return 'external_url';
-      }
-      
-      // Case 3: Removing video entirely (explicit clear)
-      if (lesson.video_file === null && lesson.video_url === '') {
-        return 'none';
-      }
-      
-      // Case 4: Switching from uploaded to none (file was cleared)
-      if (hadUploaded && lesson.video_file === null) {
-        return 'none';
-      }
-      
-      // Case 5: Switching from external to none (URL was cleared)
-      if (hadExternal && !hasUrl) {
-        return 'none';
-      }
-      
-      // Case 6: No changes to video content - set to 'none' if undefined
-      return lesson.video_source || 'none'; // ✅ Always set to 'none' if undefined
-    };
-
-    // Prepare the data for update - ALWAYS include video_source
-    const updateData = {
-      title: lesson.title || '',
-      content: lesson.content || '',
-      lesson_type: lesson.lesson_type || 'video',
-      order: lesson.order !== undefined ? lesson.order : lessonIndex,
-      is_preview: lesson.is_preview || false,
-      subsection: lesson.subsection || subsectionId,
-      video_url: lesson.video_url || '',
-      video_duration: lesson.video_duration || 0,
-      video_source: determineVideoSource(), // ✅ This will always be set to 'none' if undefined
-    };
-
-    // ✅ COMPREHENSIVE: Handle file transitions for all cases
-    const handleFileTransitions = () => {
-      const hasNewFile = lesson.video_file instanceof File;
-      const hasUrl = lesson.video_url && lesson.video_url.trim() !== '';
-      const previousSource = lesson.video_source;
-
-      // Case 1: Adding new uploaded file
-      if (hasNewFile) {
-        updateData.video_file = lesson.video_file;
-        // Clear URL when switching to uploaded file
-        if (hasUrl) {
-          updateData.video_url = '';
-        }
-      }
-      // Case 2: Switching from uploaded to external URL
-      else if (previousSource === 'uploaded' && hasUrl) {
-        updateData.video_file = null; // Clear the uploaded file
-      }
-      // Case 3: Switching from uploaded to none
-      else if (previousSource === 'uploaded' && !hasUrl && !hasNewFile) {
-        updateData.video_file = null; // Clear the uploaded file
-      }
-      // Case 4: Explicit file removal
-      else if (lesson.video_file === null) {
-        updateData.video_file = null;
-      }
-      // Case 5: If video_file is a string (existing file), don't include it
-    };
-
-    handleFileTransitions();
-    // Update the lesson using your API
-    const response = await updateLesson(lesson.id, updateData);
-
-    // Call the parent callback if provided
-    if (onLessonUpdate) {
-      onLessonUpdate(lesson.id, response.data);
+    if (!isExistingInDatabase(lesson)) {
+      alert('Cannot update a lesson that is not saved in the database. Please save the lesson first.');
+      return;
     }
 
-    alert('Lesson updated successfully!');
-  } catch (error) {
-    console.error('Error updating lesson:', error);
-    const errorMessage = error.response?.data?.message || error.message || 'Unknown error occurred';
-    alert(`Error updating lesson: ${errorMessage}`);
-  } finally {
-    setIsUpdating(false);
-  }
-};
+    if (!lesson.id) {
+      alert('Lesson ID is required for update.');
+      return;
+    }
+
+    setIsUpdating(true);
+    try {
+      // ✅ Calculate duration if new video file is uploaded
+      let videoDuration = lesson.video_duration || 0;
+      
+      if (lesson.video_file instanceof File) {
+        console.log('📹 Calculating video duration for updated lesson...');
+        videoDuration = await calculateVideoDuration(lesson.video_file);
+        setCalculatedDuration(videoDuration);
+        console.log(`✅ Duration calculated: ${videoDuration} seconds`);
+      }
+
+      // ✅ COMPREHENSIVE: Handle all video source transitions
+      const determineVideoSource = () => {
+        const hasNewFile = lesson.video_file instanceof File;
+        const hasUrl = lesson.video_url && lesson.video_url.trim() !== '';
+        const hadUploaded = lesson.video_source === 'uploaded';
+        const hadExternal = lesson.video_source === 'external_url';
+
+        // Case 1: Adding new uploaded file (from none or external)
+        if (hasNewFile) {
+          return 'uploaded';
+        }
+        
+        // Case 2: Adding new URL (from none or uploaded)
+        if (hasUrl) {
+          return 'external_url';
+        }
+        
+        // Case 3: Removing video entirely (explicit clear)
+        if (lesson.video_file === null && lesson.video_url === '') {
+          return 'none';
+        }
+        
+        // Case 4: Switching from uploaded to none (file was cleared)
+        if (hadUploaded && lesson.video_file === null) {
+          return 'none';
+        }
+        
+        // Case 5: Switching from external to none (URL was cleared)
+        if (hadExternal && !hasUrl) {
+          return 'none';
+        }
+        
+        // Case 6: No changes to video content - set to 'none' if undefined
+        return lesson.video_source || 'none';
+      };
+
+      // Prepare the data for update - ALWAYS include video_source
+      const updateData = {
+        title: lesson.title || '',
+        content: lesson.content || '',
+        lesson_type: lesson.lesson_type || 'video',
+        order: lesson.order !== undefined ? lesson.order : lessonIndex,
+        is_preview: lesson.is_preview || false,
+        subsection: lesson.subsection || subsectionId,
+        video_url: lesson.video_url || '',
+        video_duration: videoDuration, // ✅ Use calculated duration
+        video_source: determineVideoSource(),
+      };
+
+      // ✅ COMPREHENSIVE: Handle file transitions for all cases
+      const handleFileTransitions = () => {
+        const hasNewFile = lesson.video_file instanceof File;
+        const hasUrl = lesson.video_url && lesson.video_url.trim() !== '';
+        const previousSource = lesson.video_source;
+
+        // Case 1: Adding new uploaded file
+        if (hasNewFile) {
+          updateData.video_file = lesson.video_file;
+          // Clear URL when switching to uploaded file
+          if (hasUrl) {
+            updateData.video_url = '';
+          }
+        }
+        // Case 2: Switching from uploaded to external URL
+        else if (previousSource === 'uploaded' && hasUrl) {
+          updateData.video_file = null; // Clear the uploaded file
+        }
+        // Case 3: Switching from uploaded to none
+        else if (previousSource === 'uploaded' && !hasUrl && !hasNewFile) {
+          updateData.video_file = null; // Clear the uploaded file
+        }
+        // Case 4: Explicit file removal
+        else if (lesson.video_file === null) {
+          updateData.video_file = null;
+        }
+      };
+
+      handleFileTransitions();
+      
+      console.log('📤 Sending update data to API:', {
+        ...updateData,
+        video_file: updateData.video_file ? `File: ${updateData.video_file.name}` : 'No file',
+        video_duration: videoDuration
+      });
+      
+      // Update the lesson using your API
+      const response = await updateLesson(lesson.id, updateData);
+
+      // Call the parent callback if provided
+      if (onLessonUpdate) {
+        onLessonUpdate(lesson.id, response.data);
+      }
+
+      alert(`Lesson updated successfully! Duration: ${videoDuration} seconds`);
+    } catch (error) {
+      console.error('Error updating lesson:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Unknown error occurred';
+      alert(`Error updating lesson: ${errorMessage}`);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   // Handle Delete Lesson
   const handleDeleteLesson = async (e) => {
@@ -261,6 +336,23 @@ const handleUpdateLesson = async (e) => {
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  // Format duration for display
+  const formatDuration = (seconds) => {
+    if (!seconds || seconds <= 0) return '0s';
+    
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m ${secs}s`;
+    }
+    if (minutes > 0) {
+      return `${minutes}m ${secs}s`;
+    }
+    return `${secs}s`;
   };
 
   // Handle Add/Update button text and functionality
@@ -326,6 +418,8 @@ const handleUpdateLesson = async (e) => {
         isPreview={lesson.is_preview}
         isCreating={isCreating}
         isUpdating={isUpdating}
+        calculatedDuration={calculatedDuration}
+        formatDuration={formatDuration}
       />
 
       <LhLessonActions
@@ -354,7 +448,16 @@ const LhOrderInput = ({ value, onChange }) => (
   </div>
 );
 
-const LhLessonStatus = ({ isExisting, hasVideoFile, lessonType, isPreview, isCreating, isUpdating }) => (
+const LhLessonStatus = ({ 
+  isExisting, 
+  hasVideoFile, 
+  lessonType, 
+  isPreview, 
+  isCreating, 
+  isUpdating,
+  calculatedDuration,
+  formatDuration 
+}) => (
   <div className="lh-status">
     <span className={`lh-status-badge ${isExisting ? 'existing' : 'new'}`}>
       {isExisting ? 'EXISTING' : 'NEW'}
@@ -364,6 +467,11 @@ const LhLessonStatus = ({ isExisting, hasVideoFile, lessonType, isPreview, isCre
     </span>
     {hasVideoFile && <span className="lh-upload-badge">UPLOADED</span>}
     {isPreview && <span className="lh-preview-badge">PREVIEW</span>}
+    {calculatedDuration > 0 && (
+      <span className="lh-duration-badge" title={`Duration: ${calculatedDuration} seconds`}>
+        ⏱️ {formatDuration(calculatedDuration)}
+      </span>
+    )}
     {isCreating && <span className="creating-badge">CREATING...</span>}
     {isUpdating && <span className="updating-badge">UPDATING...</span>}
   </div>

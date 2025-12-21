@@ -154,3 +154,20 @@
     margin-top: 8px;
   }
 }
+
+/* LessonHeader.css */
+.lh-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lh-duration-badge {
+  background: #3498db;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: help;
+}
