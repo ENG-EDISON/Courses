@@ -57,6 +57,16 @@ const TestimonialsManagement = () => {
     fetchTestimonials();
   }, []);
 
+  // Cleanup effect for photo preview URLs
+  useEffect(() => {
+    return () => {
+      // Cleanup photo preview URLs when component unmounts
+      if (photoPreview && photoPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(photoPreview);
+      }
+    };
+  }, [photoPreview]);
+
   const fetchTestimonials = async () => {
     try {
       setLoading(true);
@@ -107,6 +117,11 @@ const TestimonialsManagement = () => {
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Cleanup previous preview if it was a blob URL
+      if (photoPreview && photoPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(photoPreview);
+      }
+      
       setPhotoFile(file);
       
       // Create preview URL
@@ -117,7 +132,7 @@ const TestimonialsManagement = () => {
 
   // Remove photo
   const handleRemovePhoto = () => {
-    if (photoPreview) {
+    if (photoPreview && photoPreview.startsWith('blob:')) {
       URL.revokeObjectURL(photoPreview);
     }
     setPhotoFile(null);
@@ -134,6 +149,11 @@ const TestimonialsManagement = () => {
   };
 
   const handleCloseModal = () => {
+    // Cleanup photo preview if it's a blob URL
+    if (photoPreview && photoPreview.startsWith('blob:')) {
+      URL.revokeObjectURL(photoPreview);
+    }
+    
     setShowAddModal(false);
     setShowEditModal(false);
     setEditingTestimonial(null);
@@ -155,6 +175,11 @@ const TestimonialsManagement = () => {
 
   // Edit Testimonial handlers
   const handleEditTestimonial = (testimonial) => {
+    // Cleanup previous preview if it was a blob URL
+    if (photoPreview && photoPreview.startsWith('blob:')) {
+      URL.revokeObjectURL(photoPreview);
+    }
+    
     setEditingTestimonial(testimonial);
     setNewTestimonial({
       quote: testimonial.quote,
@@ -164,9 +189,15 @@ const TestimonialsManagement = () => {
       is_verified: testimonial.is_verified,
       status: testimonial.status
     });
+    
+    // Set photo preview to existing photo URL if it exists
     if (testimonial.photo_url) {
       setPhotoPreview(testimonial.photo_url);
+    } else {
+      setPhotoPreview(null);
     }
+    
+    setPhotoFile(null); // Reset photo file when editing
     setShowEditModal(true);
     setSubmitStatus(null);
   };
@@ -179,7 +210,7 @@ const TestimonialsManagement = () => {
     }));
   };
 
-  // Submit testimonial (Create or Update)
+    // Submit testimonial (Create or Update)
   const handleSubmitTestimonial = async (e) => {
     e.preventDefault();
     
@@ -208,24 +239,9 @@ const TestimonialsManagement = () => {
         formData.append('author_photo', photoFile);
       }
       
-      let response;
       if (editingTestimonial) {
         // Update existing testimonial
-        response = await updateTestimonial(editingTestimonial.id, formData);
-        
-        // Update in state
-        setTestimonials(testimonials.map(t => 
-          t.id === editingTestimonial.id ? {
-            ...t,
-            quote: response.data.quote,
-            author_name: response.data.author_name,
-            author_role: response.data.author_role,
-            author_company: response.data.author_company,
-            is_verified: response.data.is_verified,
-            status: response.data.status,
-            photo_url: response.data.author_photo || response.data.photo_url || t.photo_url
-          } : t
-        ));
+        await updateTestimonial(editingTestimonial.id, formData);
         
         setSubmitStatus({ 
           type: 'success', 
@@ -233,24 +249,7 @@ const TestimonialsManagement = () => {
         });
       } else {
         // Create new testimonial
-        response = await createTestimonial(formData);
-        
-        // Add the new testimonial to the list
-        const newTestimonialData = {
-          id: response.data.id,
-          quote: response.data.quote,
-          author_name: response.data.author_name,
-          author_role: response.data.author_role,
-          author_company: response.data.author_company,
-          author_photo: response.data.author_photo,
-          photo_url: response.data.author_photo || response.data.photo_url,
-          is_verified: response.data.is_verified,
-          status: response.data.status,
-          is_featured: response.data.is_featured || false,
-          created_at: response.data.created_at
-        };
-        
-        setTestimonials(prev => [newTestimonialData, ...prev]);
+        await createTestimonial(formData);
         
         setSubmitStatus({ 
           type: 'success', 
@@ -258,10 +257,16 @@ const TestimonialsManagement = () => {
         });
       }
       
-      // Reset form and close modal after 1.5 seconds
-      setTimeout(() => {
-        handleCloseModal();
-      }, 1500);
+      // Cleanup photo preview blob URL if we had one
+      if (photoPreview && photoPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(photoPreview);
+      }
+      
+      // Refresh the testimonials list to get fresh data from server
+      await fetchTestimonials();
+      
+      // Close modal immediately instead of waiting
+      handleCloseModal();
       
     } catch (err) {
       console.error('Error saving testimonial:', err);
@@ -285,16 +290,12 @@ const TestimonialsManagement = () => {
       setSubmitting(false);
     }
   };
-
   // Handle testimonial status updates
   const handleApprove = async (id) => {
     try {
       await approveTestimonial(id);
-      setTestimonials(testimonials.map(testimonial => 
-        testimonial.id === id 
-          ? { ...testimonial, status: 'approved' } 
-          : testimonial
-      ));
+      // Refresh the testimonials list
+      await fetchTestimonials();
     } catch (err) {
       console.error('Error approving testimonial:', err);
       // Show error in custom popup
@@ -311,11 +312,8 @@ const TestimonialsManagement = () => {
   const handleReject = async (id) => {
     try {
       await rejectTestimonial(id);
-      setTestimonials(testimonials.map(testimonial => 
-        testimonial.id === id 
-          ? { ...testimonial, status: 'rejected' } 
-          : testimonial
-      ));
+      // Refresh the testimonials list
+      await fetchTestimonials();
     } catch (err) {
       console.error('Error rejecting testimonial:', err);
       showCustomConfirm({
@@ -331,11 +329,8 @@ const TestimonialsManagement = () => {
   const handleFeature = async (id) => {
     try {
       await featureTestimonial(id);
-      setTestimonials(testimonials.map(testimonial => 
-        testimonial.id === id 
-          ? { ...testimonial, status: 'featured', is_featured: true } 
-          : testimonial
-      ));
+      // Refresh the testimonials list
+      await fetchTestimonials();
     } catch (err) {
       console.error('Error featuring testimonial:', err);
       showCustomConfirm({
@@ -366,12 +361,8 @@ const TestimonialsManagement = () => {
       formData.append('is_featured', false);
       
       await updateTestimonial(id, formData);
-      
-      setTestimonials(testimonials.map(testimonial => 
-        testimonial.id === id 
-          ? { ...testimonial, status: 'approved', is_featured: false } 
-          : testimonial
-      ));
+      // Refresh the testimonials list
+      await fetchTestimonials();
     } catch (err) {
       console.error('Error unfeaturing testimonial:', err);
       showCustomConfirm({
@@ -397,7 +388,8 @@ const TestimonialsManagement = () => {
 
     try {
       await deleteTestimonial(id);
-      setTestimonials(testimonials.filter(testimonial => testimonial.id !== id));
+      // Refresh the testimonials list
+      await fetchTestimonials();
     } catch (err) {
       console.error('Error deleting testimonial:', err);
       showCustomConfirm({
@@ -429,12 +421,8 @@ const TestimonialsManagement = () => {
         await approveTestimonial(id);
       }
       
-      setTestimonials(testimonials.map(testimonial => 
-        selectedTestimonials.includes(testimonial.id)
-          ? { ...testimonial, status: 'approved' }
-          : testimonial
-      ));
-      
+      // Refresh the testimonials list
+      await fetchTestimonials();
       setSelectedTestimonials([]);
     } catch (err) {
       console.error('Error bulk approving:', err);
@@ -466,12 +454,8 @@ const TestimonialsManagement = () => {
         await featureTestimonial(id);
       }
       
-      setTestimonials(testimonials.map(testimonial => 
-        selectedTestimonials.includes(testimonial.id)
-          ? { ...testimonial, status: 'featured', is_featured: true }
-          : testimonial
-      ));
-      
+      // Refresh the testimonials list
+      await fetchTestimonials();
       setSelectedTestimonials([]);
     } catch (err) {
       console.error('Error bulk featuring:', err);
@@ -503,10 +487,8 @@ const TestimonialsManagement = () => {
         await deleteTestimonial(id);
       }
       
-      setTestimonials(testimonials.filter(testimonial => 
-        !selectedTestimonials.includes(testimonial.id)
-      ));
-      
+      // Refresh the testimonials list
+      await fetchTestimonials();
       setSelectedTestimonials([]);
     } catch (err) {
       console.error('Error bulk deleting:', err);
@@ -1007,6 +989,13 @@ const TestimonialsManagement = () => {
                     <div className="testimonial-photo-preview">
                       <div className="testimonial-photo-preview-title">Preview</div>
                       <img src={photoPreview} alt="Profile preview" />
+                      <button 
+                        type="button" 
+                        onClick={handleRemovePhoto}
+                        className="testimonial-remove-preview-btn"
+                      >
+                        Remove Photo
+                      </button>
                     </div>
                   )}
                   
