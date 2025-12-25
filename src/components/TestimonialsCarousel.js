@@ -1,24 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getTestimonials } from '../api/TestimonialsApi';
 import '../static/TestimonialsCarousel.css';
 
 const TestimonialsCarousel = () => {
   const [testimonials, setTestimonials] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(3);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch testimonials
+  // Determine how many testimonials to show based on screen width
+  const updateVisibleCount = useCallback(() => {
+    const width = window.innerWidth;
+    if (width < 768) {
+      setVisibleCount(1);
+    } else if (width < 1024) {
+      setVisibleCount(2);
+    } else {
+      setVisibleCount(3);
+    }
+  }, []);
+
+  // Fetch testimonials and handle responsive updates
   useEffect(() => {
     fetchTestimonials();
-  }, []);
+    updateVisibleCount();
+    
+    const handleResize = () => {
+      updateVisibleCount();
+      // Reset to first slide when resizing to avoid index issues
+      setCurrentSlide(0);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [updateVisibleCount]);
 
   const fetchTestimonials = async () => {
     try {
       setLoading(true);
       const response = await getTestimonials();
       setTestimonials(response.data);
-      console.log(response.data)
       setError(null);
     } catch (err) {
       setError('Failed to load testimonials');
@@ -28,22 +50,29 @@ const TestimonialsCarousel = () => {
     }
   };
 
-  const nextTestimonial = () => {
-    if (testimonials.length === 0) return;
-    setCurrentIndex((prevIndex) => 
-      prevIndex === testimonials.length - 1 ? 0 : prevIndex + 1
+  const nextSlide = () => {
+    if (testimonials.length <= visibleCount) return;
+    
+    const totalSlides = Math.ceil(testimonials.length / visibleCount);
+    setCurrentSlide((prevSlide) => 
+      prevSlide === totalSlides - 1 ? 0 : prevSlide + 1
     );
   };
 
-  const prevTestimonial = () => {
-    if (testimonials.length === 0) return;
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1
+  const prevSlide = () => {
+    if (testimonials.length <= visibleCount) return;
+    
+    const totalSlides = Math.ceil(testimonials.length / visibleCount);
+    setCurrentSlide((prevSlide) => 
+      prevSlide === 0 ? totalSlides - 1 : prevSlide - 1
     );
   };
 
-  const goToTestimonial = (index) => {
-    setCurrentIndex(index);
+  const goToSlide = (slideIndex) => {
+    const totalSlides = Math.ceil(testimonials.length / visibleCount);
+    if (slideIndex < totalSlides) {
+      setCurrentSlide(slideIndex);
+    }
   };
 
   const getPhotoUrl = (photoUrl) => {
@@ -60,10 +89,19 @@ const TestimonialsCarousel = () => {
     return photoUrl;
   };
 
-  if (loading) {
-  return null;
-}
+  // Get testimonials for current slide
+  const getVisibleTestimonials = () => {
+    if (testimonials.length === 0) return [];
+    
+    const startIndex = currentSlide * visibleCount;
+    const endIndex = Math.min(startIndex + visibleCount, testimonials.length);
+    
+    return testimonials.slice(startIndex, endIndex);
+  };
 
+  if (loading) {
+    return null;
+  }
 
   if (error) {
     return (
@@ -77,16 +115,11 @@ const TestimonialsCarousel = () => {
   }
 
   if (testimonials.length === 0) {
-  return null;
-}
+    return null;
+  }
 
-
-  const currentTestimonial = testimonials[currentIndex];
-  const photoUrl = getPhotoUrl(currentTestimonial.photo_url);
-  const authorName = currentTestimonial.author_info?.name || 'Student';
-  const authorRole = currentTestimonial.author_info?.role;
-  const authorCompany = currentTestimonial.author_info?.company;
-  const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=4F46E5&color=fff&size=150&bold=true`;
+  const visibleTestimonials = getVisibleTestimonials();
+  const totalSlides = Math.ceil(testimonials.length / visibleCount);
 
   return (
     <section className="testimonials-carousel">
@@ -103,71 +136,90 @@ const TestimonialsCarousel = () => {
           
           {/* Left Navigation */}
           <button 
-            onClick={prevTestimonial}
+            onClick={prevSlide}
             className="carousel-nav carousel-nav-prev"
-            aria-label="Previous testimonial"
+            aria-label="Previous slide"
+            disabled={testimonials.length <= visibleCount}
           >
             <span className="nav-arrow">&lt;</span>
           </button>
 
-          {/* Testimonial Card */}
-          <div className="testimonial-card">
-            
-            {/* Quote */}
-            <div className="testimonial-quote-container">
-              <div className="quote-mark">"</div>
-              <p className="testimonial-text">"{currentTestimonial.quote}"</p>
-            </div>
+          {/* Testimonial Cards Container */}
+          <div className="testimonials-container">
+            {visibleTestimonials.map((testimonial, index) => {
+              const photoUrl = getPhotoUrl(testimonial.photo_url);
+              const authorName = testimonial.author_info?.name || 'Student';
+              const authorRole = testimonial.author_info?.role;
+              const authorCompany = testimonial.author_info?.company;
+              const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=4F46E5&color=fff&size=150&bold=true`;
 
-            {/* Author Info */}
-            <div className="testimonial-author-info">
-              <div className="author-avatar">
-                <img 
-                  src={photoUrl || fallbackAvatar}
-                  alt={authorName}
-                  className="author-image"
-                  onError={(e) => {
-                    e.target.src = fallbackAvatar;
-                  }}
-                />
-                {currentTestimonial.is_verified && (
-                  <span className="verified-indicator" title="Verified student">
-                    ✓
-                  </span>
-                )}
-              </div>
-              
-              <div className="author-details">
-                <h3 className="author-name">{authorName}</h3>
-                
-                <div className="author-meta">
-                  {authorRole && (
-                    <span className="author-role">{authorRole}</span>
-                  )}
-                  {authorRole && authorCompany && (
-                    <span className="meta-separator"> • </span>
-                  )}
-                  {authorCompany && (
-                    <span className="author-company">{authorCompany}</span>
-                  )}
-                </div>
-                
-                <div className="testimonial-date">
-                  {new Date(currentTestimonial.created_at).toLocaleDateString('en-US', {
-                    month: 'long',
-                    year: 'numeric'
-                  })}
-                </div>
-              </div>
-            </div>
+              return (
+                <div 
+                  key={`${testimonial.id}-${currentSlide}-${index}`} 
+                  className="testimonial-card-item"
+                >
+                  {/* Testimonial Card */}
+                  <div className="testimonial-card">
+                    
+                    {/* Quote */}
+                    <div className="testimonial-quote-container">
+                      <div className="quote-mark">"</div>
+                      <p className="testimonial-text">"{testimonial.quote}"</p>
+                    </div>
 
+                    {/* Author Info */}
+                    <div className="testimonial-author-info">
+                      <div className="author-avatar">
+                        <img 
+                          src={photoUrl || fallbackAvatar}
+                          alt={authorName}
+                          className="author-image"
+                          onError={(e) => {
+                            e.target.src = fallbackAvatar;
+                          }}
+                        />
+                        {testimonial.is_verified && (
+                          <span className="verified-indicator" title="Verified student">
+                            ✓
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="author-details">
+                        <h3 className="author-name">{authorName}</h3>
+                        
+                        <div className="author-meta">
+                          {authorRole && (
+                            <span className="author-role">{authorRole}</span>
+                          )}
+                          {authorRole && authorCompany && (
+                            <span className="meta-separator"> • </span>
+                          )}
+                          {authorCompany && (
+                            <span className="author-company">{authorCompany}</span>
+                          )}
+                        </div>
+                        
+                        <div className="testimonial-date">
+                          {new Date(testimonial.created_at).toLocaleDateString('en-US', {
+                            month: 'long',
+                            year: 'numeric'
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {/* Right Navigation */}
           <button 
-            onClick={nextTestimonial}
+            onClick={nextSlide}
             className="carousel-nav carousel-nav-next"
-            aria-label="Next testimonial"
+            aria-label="Next slide"
+            disabled={testimonials.length <= visibleCount}
           >
             <span className="nav-arrow">&gt;</span>
           </button>
@@ -176,12 +228,12 @@ const TestimonialsCarousel = () => {
 
         {/* Progress Dots */}
         <div className="carousel-dots">
-          {testimonials.map((_, index) => (
+          {Array.from({ length: totalSlides }).map((_, index) => (
             <button
               key={index}
-              onClick={() => goToTestimonial(index)}
-              className={`progress-dot ${index === currentIndex ? 'active' : ''}`}
-              aria-label={`Go to testimonial ${index + 1}`}
+              onClick={() => goToSlide(index)}
+              className={`progress-dot ${currentSlide === index ? 'active' : ''}`}
+              aria-label={`Go to slide ${index + 1}`}
             />
           ))}
         </div>
