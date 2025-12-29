@@ -186,186 +186,432 @@
     font-size: 1rem;
 }
 
-
-
-/* ===== COURSE SIDEBAR COMPONENT ===== */
+/* Course Sidebar Styles */
 .course-sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xl);
     position: sticky;
-    top: var(--spacing-xl);
+    top: 20px;
 }
 
 .sidebar-card {
-    background: var(--background-primary);
-    border-radius: var(--border-radius-xl);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-light);
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
     overflow: hidden;
 }
 
 .card-header {
-    padding: var(--spacing-lg);
-    background: var(--background-secondary);
-    border-bottom: 1px solid var(--border-light);
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
 }
 
 .card-header h3 {
     margin: 0;
-    font-size: 1.125rem;
+    font-size: 18px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: #1f2937;
 }
 
 /* Instructor Info */
 .instructor-info {
-    padding: var(--spacing-lg);
+    padding: 20px;
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
+    gap: 16px;
 }
 
 .instructor-avatar {
-    width: 60px;
-    height: 60px;
-    background: var(--primary-light);
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
+    background: #f3f4f6;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--primary-color);
-    font-size: 1.5rem;
-    flex-shrink: 0;
-}
-
-.instructor-details {
-    flex: 1;
-    min-width: 0;
+    font-size: 24px;
+    color: #6b7280;
 }
 
 .instructor-details h4 {
-    margin: 0 0 var(--spacing-xs) 0;
-    font-size: 1.125rem;
+    margin: 0 0 8px 0;
+    font-size: 16px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: #1f2937;
 }
 
 .instructor-stats {
     display: flex;
-    gap: var(--spacing-lg);
+    gap: 20px;
 }
 
 .instructor-stats .stat {
-    text-align: center;
+    display: flex;
+    flex-direction: column;
 }
 
-.instructor-stats .stat strong {
-    display: block;
-    font-size: 1.125rem;
-    color: var(--text-primary);
-    font-weight: 700;
+.instructor-stats strong {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
 }
 
-.instructor-stats .stat span {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    font-weight: 500;
+.instructor-stats span {
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* Stats Grid */
 .stats-grid {
-    padding: var(--spacing-lg);
+    padding: 20px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-md);
+    gap: 16px;
 }
 
 .stat-item {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
-    padding: var(--spacing-md);
-    background: var(--background-secondary);
-    border-radius: var(--border-radius-lg);
-    transition: all 0.3s ease;
-}
-
-.stat-item:hover {
-    background: var(--background-tertiary);
-    transform: translateY(-2px);
+    gap: 12px;
 }
 
 .stat-icon {
     width: 40px;
     height: 40px;
-    background: var(--primary-light);
-    border-radius: var(--border-radius-md);
+    border-radius: 8px;
+    background: #f3f4f6;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--primary-color);
-    font-size: 1rem;
-    flex-shrink: 0;
+    color: #6b7280;
 }
 
 .stat-info {
-    flex: 1;
-    min-width: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .stat-value {
-    font-size: 1.25rem;
+    font-size: 20px;
     font-weight: 700;
-    color: var(--text-primary);
-    line-height: 1.2;
+    color: #111827;
+    line-height: 1;
 }
 
 .stat-label {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    font-weight: 500;
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* Action Buttons */
 .action-buttons {
-    padding: var(--spacing-lg);
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: 12px;
 }
 
 .action-btn {
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    background: white;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md);
-    border: 1px solid var(--border-medium);
-    background: var(--background-primary);
-    border-radius: var(--border-radius-lg);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
+    gap: 8px;
 }
 
 .action-btn:hover {
-    background: var(--background-secondary);
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    transform: translateY(-1px);
+    background: #f9fafb;
+    border-color: #d1d5db;
 }
 
-.action-btn.secondary {
-    color: var(--text-secondary);
+.action-btn:active {
+    transform: translateY(1px);
+}
+
+.action-btn.active {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
 }
 
 .action-btn i {
-    font-size: 0.9rem;
+    font-size: 16px;
 }
 
+/* Share Container */
+.share-container {
+    position: relative;
+}
+
+/* Share Menu */
+.share-menu {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    padding: 16px;
+    animation: slideUp 0.2s ease-out;
+    border: 1px solid #e5e7eb;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.share-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.share-header h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.close-menu {
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.close-menu:hover {
+    background: #f3f4f6;
+}
+
+.close-menu i {
+    font-size: 16px;
+}
+
+/* Share Options Grid */
+.share-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.share-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.share-option:hover {
+    background: #f9fafb;
+    transform: translateY(-2px);
+    border-color: #d1d5db;
+}
+
+.share-option:active {
+    transform: translateY(0);
+}
+
+.share-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: white;
+}
+
+.share-icon.facebook {
+    background: #1877f2;
+}
+
+.share-icon.twitter {
+    background: #1da1f2;
+}
+
+.share-icon.linkedin {
+    background: #0a66c2;
+}
+
+.share-icon.whatsapp {
+    background: #25d366;
+}
+
+.share-icon.telegram {
+    background: #0088cc;
+}
+
+.share-icon.email {
+    background: #ea4335;
+}
+
+.share-option span {
+    font-size: 12px;
+    color: #374151;
+    font-weight: 500;
+}
+
+/* Copy Link Section */
+.copy-link-section {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 16px;
+}
+
+.url-preview {
+    margin-bottom: 12px;
+}
+
+.url-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #374151;
+    background: #f9fafb;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.url-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.copy-link-btn {
+    width: 100%;
+    padding: 12px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.copy-link-btn:hover {
+    background: #2563eb;
+}
+
+.copy-link-btn:active {
+    transform: translateY(1px);
+}
+
+.copy-link-btn.copied {
+    background: #10b981;
+}
+
+.copy-link-btn.copied:hover {
+    background: #059669;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .course-sidebar {
+        position: static;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        flex-direction: row;
+    }
+    
+    .action-btn {
+        flex: 1;
+    }
+    
+    .share-menu {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto;
+        border-radius: 16px 16px 0 0;
+        animation: slideUpMobile 0.3s ease-out;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    
+    @keyframes slideUpMobile {
+        from {
+            transform: translateY(100%);
+        }
+        to {
+            transform: translateY(0);
+        }
+    }
+    
+    .share-options {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile Native Share */
+@media (max-width: 768px) {
+    .share-container .action-btn {
+        display: none;
+    }
+    
+    .share-container::after {
+        content: '';
+        display: block;
+        height: 100%;
+        width: 100%;
+    }
+}
+
+/* Make sure share button shows on desktop even with native share API */
+@media (min-width: 769px) {
+    .share-container .action-btn {
+        display: flex;
+    }
+}
 /* ===== VIDEO MODAL COMPONENT ===== */
 .video-modal-overlay {
     position: fixed;
