@@ -5,6 +5,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import Homepage from './pages/Homepage';
 import Profile from './components/UserManagement/Profile';
 import NavigationBar from './components/common/NavigationBar';
+import "../src/components/common/NavigationBar.css";
 import "./index.css"
 import EnterpriseLogin from './components/user_management/Login';
 import CourseDetails from './pages/CourseDetailsPage/components/CourseDetails';
@@ -28,8 +29,8 @@ const router = createBrowserRouter([
     path: '/',
     element: (
       <>
+        <NavigationBar/>
         <Homepage />
-
       </>
     ),
     errorElement: <p>404 Not found</p>,

@@ -21,10 +21,10 @@ export const createCourse = (data) => {
 export const deleteCourse = (id) => apiClient.delete(`/api/course/${id}/`);
 export const getCoursebyId = (id) => apiClient.get(`/api/course/${id}/`); // ADDED trailing slash
 export const updateCourse = (id, data) => {
-  console.log('Updating course with ID:', id, 'and data:', data);  // Log the data
+  // console.log('Updating course with ID:', id, 'and data:', data);  // Log the data
   return apiClient.patch(`/api/course/${id}/`, data)
     .then(response => {
-      console.log('Course updated successfully:', response.data);  // Log the success response
+      // console.log('Course updated successfully:', response.data);  // Log the success response
       return response;
     })
     .catch(error => {

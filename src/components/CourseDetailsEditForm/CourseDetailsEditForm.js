@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './CourseDetailsEditForm.css';
 import { updateCourse } from '../../api/CoursesApi';
 import { getAllCoursesCategories } from '../../api/CourseCategoryApi';
@@ -20,28 +20,30 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
         is_featured: false,
         status: 'draft',
         thumbnail: null,
-        category: '',
-        learning_objectives: []
+        category: ''
     });
 
     const [thumbnailPreview, setThumbnailPreview] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const [categories, setCategories] = useState([]);
+    const [courseObjectives, setCourseObjectives] = useState([]);
+    const [formErrors, setFormErrors] = useState({});
 
-    // Load categories
-    useEffect(() => {
-        loadCategories();
-    }, []);
-
-    const loadCategories = async () => {
+    // Load categories with useCallback
+    const loadCategories = useCallback(async () => {
         try {
             const response = await getAllCoursesCategories();
             setCategories(response.data.filter(cat => cat.is_active));
         } catch (error) {
             console.error('Error loading categories:', error);
         }
-    };
+    }, []);
+
+    // Load categories on mount
+    useEffect(() => {
+        loadCategories();
+    }, [loadCategories]);
 
     // Initialize form when course changes
     useEffect(() => {
@@ -61,18 +63,52 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                 is_featured: course.is_featured || false,
                 status: course.status || 'draft',
                 thumbnail: null,
-                category: course.category || '',
-                learning_objectives: course.learning_objectives || []
+                category: course.category || ''
             });
+
+            // Initialize objectives separately
+            setCourseObjectives(course.learning_objectives || []);
 
             if (course.thumbnail) {
                 setThumbnailPreview(course.thumbnail);
             }
+            
+            // Clear any existing errors
+            setFormErrors({});
         }
     }, [course]);
 
+    const validateForm = () => {
+        const errors = {};
+        
+        if (!formData.title?.trim()) {
+            errors.title = 'Course title is required';
+        }
+        
+        if (!formData.short_description?.trim()) {
+            errors.short_description = 'Short description is required';
+        } else if (formData.short_description.length > 200) {
+            errors.short_description = 'Short description must be 200 characters or less';
+        }
+        
+        if (!formData.description?.trim()) {
+            errors.description = 'Description is required';
+        }
+        
+        if (!formData.category) {
+            errors.category = 'Category is required';
+        }
+        
+        return errors;
+    };
+
     const handleInputChange = (e) => {
         const { name, value, type, checked, files } = e.target;
+
+        // Clear error for this field
+        if (formErrors[name]) {
+            setFormErrors(prev => ({ ...prev, [name]: '' }));
+        }
 
         if (type === 'checkbox') {
             setFormData(prev => ({
@@ -102,20 +138,31 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
     };
 
     const handleTextareaChange = (name, value) => {
+        // Clear error for this field
+        if (formErrors[name]) {
+            setFormErrors(prev => ({ ...prev, [name]: '' }));
+        }
+        
         setFormData(prev => ({
             ...prev,
             [name]: value
         }));
     };
 
-    const handleObjectivesChange = (updatedObjectives) => {
-        setFormData(prev => ({
-            ...prev,
-            learning_objectives: updatedObjectives
-        }));
+    const handleObjectivesUpdated = (updatedObjectives) => {
+        // Update local objectives state ONLY
+        setCourseObjectives(updatedObjectives);
+        // Objectives save independently via their own API
+        console.log('Objectives updated locally');
     };
 
     const showCompleteStructure = () => {
+        const errors = validateForm();
+        if (Object.keys(errors).length > 0) {
+            setFormErrors(errors);
+            alert('Please fix the errors in the form before previewing.');
+            return;
+        }
         setShowPreview(true);
     };
 
@@ -123,49 +170,21 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
         const submitData = new FormData();
 
         Object.keys(formData).forEach(key => {
-            if (key === 'learning_objectives') {
-                const validObjectives = Array.isArray(formData[key]) ? formData[key] : [];
-                const nonEmptyObjectives = validObjectives.filter(obj => 
-                    obj.objective && obj.objective.trim() !== ''
-                );
-
-                const formattedObjectives = nonEmptyObjectives.map((obj, index) => {
-                    const formatted = {
-                        id: obj.id || null,
-                        objective: obj.objective.trim(),
-                        order: obj.order !== undefined ? obj.order : index,
-                        icon: obj.icon || (index + 1).toString(),
-                        course: course.id
-                    };
-                    return formatted;
-                });
-
-                
-                if (formattedObjectives.length > 0) {
-                    submitData.append(key, JSON.stringify(formattedObjectives));
-                } else {
-                    submitData.append(key, JSON.stringify([]));
-                }
-
-            } else if (key === 'thumbnail') {
+            // No learning_objectives handling here - they're managed separately
+            if (key === 'thumbnail') {
                 if (formData[key] instanceof File) {
                     submitData.append(key, formData[key]);
                 } else if (formData[key] === null) {
                     submitData.append(key, '');
                 }
-
             } else if (key === 'price' || key === 'discount_price') {
                 submitData.append(key, formData[key] ? formData[key].toString() : '0.00');
-
             } else if (key === 'duration_seconds') {
                 submitData.append(key, formData[key] ? parseInt(formData[key]) : 0);
-
             } else if (key === 'category') {
                 submitData.append(key, formData[key] ? parseInt(formData[key]) : '');
-
             } else if (key === 'certificate_available' || key === 'is_featured') {
                 submitData.append(key, formData[key].toString());
-
             } else {
                 submitData.append(key, formData[key]);
             }
@@ -185,53 +204,62 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
         if (course?.instructor) {
             submitData.append('instructor', course.instructor.toString());
         }
+        
         return submitData;
     };
 
     const handleSubmit = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (!course) return;
-    
-    if (isSubmitting) {
-        console.log('Already submitting, skipping');
-        return;
-    }
-    
-    if (!showPreview) {
-        showCompleteStructure();
-        return;
-    }
-    
-    setIsSubmitting(true);
-    
-    try {
-        const submitData = createFormData();
+        e.preventDefault();
+        e.stopPropagation();
         
-        console.log('=== CHILD: Making API call ===');
+        if (!course) return;
         
-        // Child handles the API call
-        const response = await updateCourse(course.id, submitData);
-        
-        console.log('Child API call successful');
-        
-        if (onUpdate) {
-            console.log('Passing response data to parent');
-            // Pass ONLY the response data
-            onUpdate(response.data);
+        if (isSubmitting) {
+            console.log('Already submitting, skipping');
+            return;
         }
         
-        setShowPreview(false);
-        alert('Course updated successfully!');
+        if (!showPreview) {
+            showCompleteStructure();
+            return;
+        }
         
-    } catch (error) {
-        console.error('Child API call failed:', error);
-        alert('Error updating course: ' + (error.response?.data?.message || error.message));
-    } finally {
-        setIsSubmitting(false);
-    }
-};
+        setIsSubmitting(true);
+        
+        try {
+            const submitData = createFormData();
+            
+            console.log('=== Making API call for course update ===');
+            
+            // Update course data only (objectives are managed separately)
+            const response = await updateCourse(course.id, submitData);
+            
+            console.log('Course update successful');
+            
+            if (onUpdate) {
+                console.log('Passing course data to parent');
+                // Pass ONLY the course response data - NO objectives
+                onUpdate(response.data);
+                // Remove the objectives merge - they save independently
+            }
+            
+            setShowPreview(false);
+            setFormErrors({});
+            alert('Course updated successfully!');
+            
+        } catch (error) {
+            console.error('Course update failed:', error);
+            const errorMessage = error.response?.data?.message || error.message;
+            alert('Error updating course: ' + errorMessage);
+            
+            // Set form errors if available from backend
+            if (error.response?.data?.errors) {
+                setFormErrors(error.response.data.errors);
+            }
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     const handleReset = () => {
         if (course) {
@@ -250,11 +278,15 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                 is_featured: course.is_featured || false,
                 status: course.status || 'draft',
                 thumbnail: null,
-                category: course.category || '',
-                learning_objectives: course.learning_objectives || []
+                category: course.category || ''
             });
+            
+            // Reset objectives separately
+            setCourseObjectives(course.learning_objectives || []);
+            
             setThumbnailPreview(course.thumbnail || '');
             setShowPreview(false);
+            setFormErrors({});
         }
     };
 
@@ -304,7 +336,12 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                         onChange={handleInputChange}
                                         required
                                         placeholder="Enter course title"
+                                        disabled={isSubmitting}
+                                        className={formErrors.title ? 'error' : ''}
                                     />
+                                    {formErrors.title && (
+                                        <div className="c-d-e-error-message">{formErrors.title}</div>
+                                    )}
                                 </div>
                             </div>
 
@@ -320,10 +357,15 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                         required
                                         placeholder="Brief description that appears in course listings"
                                         maxLength="200"
+                                        disabled={isSubmitting}
+                                        className={formErrors.short_description ? 'error' : ''}
                                     />
                                     <div className="c-d-e-character-count">
                                         {formData.short_description.length}/200 characters
                                     </div>
+                                    {formErrors.short_description && (
+                                        <div className="c-d-e-error-message">{formErrors.short_description}</div>
+                                    )}
                                 </div>
                             </div>
 
@@ -338,7 +380,12 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                         rows="6"
                                         required
                                         placeholder="Detailed course description that explains what students will learn"
+                                        disabled={isSubmitting}
+                                        className={formErrors.description ? 'error' : ''}
                                     />
+                                    {formErrors.description && (
+                                        <div className="c-d-e-error-message">{formErrors.description}</div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -361,6 +408,7 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                                         setFormData(prev => ({ ...prev, thumbnail: null }));
                                                         setThumbnailPreview('');
                                                     }}
+                                                    disabled={isSubmitting}
                                                 >
                                                     Remove
                                                 </button>
@@ -372,6 +420,7 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                             name="thumbnail"
                                             onChange={handleInputChange}
                                             accept="image/*"
+                                            disabled={isSubmitting}
                                         />
                                         <small>Recommended: 1280x720 pixels, JPG or PNG</small>
                                     </div>
@@ -386,6 +435,7 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                         value={formData.promotional_video}
                                         onChange={handleInputChange}
                                         placeholder="https://youtube.com/watch?v=..."
+                                        disabled={isSubmitting}
                                     />
                                     <small>YouTube or Vimeo URL for course promotion</small>
                                 </div>
@@ -408,6 +458,7 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                         min="0"
                                         step="0.01"
                                         placeholder="0.00"
+                                        disabled={isSubmitting}
                                     />
                                 </div>
 
@@ -422,6 +473,7 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                         min="0"
                                         step="0.01"
                                         placeholder="0.00"
+                                        disabled={isSubmitting}
                                     />
                                     <small>Set to 0 for no discount</small>
                                 </div>
@@ -454,6 +506,7 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                         name="language"
                                         value={formData.language}
                                         onChange={handleInputChange}
+                                        disabled={isSubmitting}
                                     >
                                         <option value="English">English</option>
                                         <option value="Spanish">Spanish</option>
@@ -475,6 +528,7 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                         name="level"
                                         value={formData.level}
                                         onChange={handleInputChange}
+                                        disabled={isSubmitting}
                                     >
                                         <option value="beginner">Beginner</option>
                                         <option value="intermediate">Intermediate</option>
@@ -484,12 +538,14 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                 </div>
 
                                 <div className="c-d-e-form-group">
-                                    <label htmlFor="category">Category</label>
+                                    <label htmlFor="category">Category *</label>
                                     <select
                                         id="category"
                                         name="category"
                                         value={formData.category}
                                         onChange={handleInputChange}
+                                        disabled={isSubmitting}
+                                        className={formErrors.category ? 'error' : ''}
                                     >
                                         <option value="">Select a category</option>
                                         {categories.map(category => (
@@ -499,6 +555,9 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                         ))}
                                     </select>
                                     <small>Choose the course category</small>
+                                    {formErrors.category && (
+                                        <div className="c-d-e-error-message">{formErrors.category}</div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -517,6 +576,7 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                         onChange={(e) => handleTextareaChange('requirements', e.target.value)}
                                         rows="4"
                                         placeholder="What should students know before taking this course? List prerequisites, tools needed, etc."
+                                        disabled={isSubmitting}
                                     />
                                     <small>List each requirement on a new line or separate with commas</small>
                                 </div>
@@ -528,8 +588,8 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                             <LearningObjectivesManager
                                 courseId={course.id}
                                 courseTitle={course.title}
-                                learningObjectives={formData.learning_objectives}
-                                onObjectivesChange={handleObjectivesChange}
+                                initialObjectives={courseObjectives}
+                                onObjectivesUpdated={handleObjectivesUpdated}
                             />
                         </div>
 
@@ -545,6 +605,7 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                             name="certificate_available"
                                             checked={formData.certificate_available}
                                             onChange={handleInputChange}
+                                            disabled={isSubmitting}
                                         />
                                         <span className="checkmark"></span>
                                         Certificate Available
@@ -559,6 +620,7 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                             name="is_featured"
                                             checked={formData.is_featured}
                                             onChange={handleInputChange}
+                                            disabled={isSubmitting}
                                         />
                                         <span className="checkmark"></span>
                                         Featured Course
@@ -575,6 +637,7 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                         name="status"
                                         value={formData.status}
                                         onChange={handleInputChange}
+                                        disabled={isSubmitting}
                                     >
                                         <option value="draft">Draft</option>
                                         <option value="published">Published</option>
@@ -637,7 +700,7 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                     type="button"
                                     onClick={handleReset}
                                     className="c-d-e-btn c-d-e-btn-secondary"
-                                    disabled={isSubmitting}
+                                    disabled={isSubmitting || isLoading}
                                 >
                                     Reset Changes
                                 </button>
@@ -646,6 +709,7 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                         type="button"
                                         onClick={cancelPreview}
                                         className="c-d-e-btn c-d-e-btn-warning"
+                                        disabled={isSubmitting}
                                     >
                                         Cancel Preview
                                     </button>
@@ -682,6 +746,28 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                 <div className="c-d-e-progress-icon">○</div>
                                 <div className="c-d-e-progress-text">Pricing & Settings</div>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <div className="c-d-e-sidebar-section">
+                        <h4>Quick Tips</h4>
+                        <ul className="c-d-e-tips-list">
+                            <li>✅ Use descriptive titles and descriptions</li>
+                            <li>✅ Add a high-quality thumbnail image</li>
+                            <li>✅ Set appropriate difficulty level</li>
+                            <li>✅ Add clear learning objectives</li>
+                            <li>✅ Specify course requirements</li>
+                            <li>✅ Choose the right category</li>
+                        </ul>
+                    </div>
+                    
+                    <div className="c-d-e-sidebar-section">
+                        <h4>Current Course Info</h4>
+                        <div className="c-d-e-course-info">
+                            <p><strong>Course ID:</strong> {course.id}</p>
+                            <p><strong>Slug:</strong> {course.slug || 'Not set'}</p>
+                            <p><strong>Instructor:</strong> {course.instructor_name || 'N/A'}</p>
+                            <p><strong>Last Updated:</strong> {course.updated_at ? new Date(course.updated_at).toLocaleString() : 'N/A'}</p>
                         </div>
                     </div>
                 </div>

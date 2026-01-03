@@ -75,6 +75,7 @@
   z-index: var(--z-sticky);
   border-bottom: 1px solid var(--neutral-200);
   transition: all var(--transition-normal);
+  
 }
 
 .navbar.scrolled {

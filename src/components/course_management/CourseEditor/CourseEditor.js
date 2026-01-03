@@ -44,11 +44,7 @@ const CourseEditor = () => {
     setActiveTab('structure');
   };
 
-const handleCourseUpdate = async (updatedCourseData) => {
-    console.log('📞 handleCourseUpdate called');
-    console.log('Data type received:', typeof updatedCourseData);
-    console.log('Is FormData?', updatedCourseData instanceof FormData);
-    
+const handleCourseUpdate = async (updatedCourseData) => {    
     if (!selectedCourse) {
         console.error('No course selected');
         return;
@@ -62,14 +58,10 @@ const handleCourseUpdate = async (updatedCourseData) => {
                           typeof updatedCourseData === 'object' && 
                           updatedCourseData.id && 
                           updatedCourseData.title;
-    
-    console.log('isFormData:', isFormData);
-    console.log('isResponseData:', isResponseData);
-    
+  
     if (isResponseData && !isFormData) {
         // This is response data from the child's API call
         // Just update state, don't make another API call
-        console.log('📋 Updating state with response data');
         setSelectedCourse(updatedCourseData);
         setCourses(prev => prev.map(course =>
             course.id === updatedCourseData.id ? updatedCourseData : course
@@ -81,11 +73,7 @@ const handleCourseUpdate = async (updatedCourseData) => {
     // If it's form data, make the API call
     setIsLoading(true);
     try {
-        console.log('📤 Making API call with form data');
         const response = await updateCourse(selectedCourse.id, updatedCourseData);
-        
-        console.log('✅ API call successful');
-        console.log('Response:', response.data);
         
         // Update state with response
         setSelectedCourse(response.data);
@@ -93,7 +81,7 @@ const handleCourseUpdate = async (updatedCourseData) => {
             course.id === selectedCourse.id ? response.data : course
         ));
         
-        alert('Course updated successfully!');
+        alert('Course updated successfully111!');
         
     } catch (error) {
         console.error('❌ API call failed:', error);
