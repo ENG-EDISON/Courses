@@ -44,23 +44,85 @@ const CourseEditor = () => {
     setActiveTab('structure');
   };
 
-  const handleCourseUpdate = async (updatedCourseData) => {
-    if (!selectedCourse) return;
-
+const handleCourseUpdate = async (updatedCourseData) => {
+    console.log('📞 handleCourseUpdate called');
+    console.log('Data type received:', typeof updatedCourseData);
+    console.log('Is FormData?', updatedCourseData instanceof FormData);
+    
+    if (!selectedCourse) {
+        console.error('No course selected');
+        return;
+    }
+    
+    // Check if this is form data (from child) or response data
+    // If it's FormData or a plain object with form fields, make API call
+    // If it's response data (has id, thumbnail as URL, etc.), just update state
+    const isFormData = updatedCourseData instanceof FormData;
+    const isResponseData = updatedCourseData && 
+                          typeof updatedCourseData === 'object' && 
+                          updatedCourseData.id && 
+                          updatedCourseData.title;
+    
+    console.log('isFormData:', isFormData);
+    console.log('isResponseData:', isResponseData);
+    
+    if (isResponseData && !isFormData) {
+        // This is response data from the child's API call
+        // Just update state, don't make another API call
+        console.log('📋 Updating state with response data');
+        setSelectedCourse(updatedCourseData);
+        setCourses(prev => prev.map(course =>
+            course.id === updatedCourseData.id ? updatedCourseData : course
+        ));
+        // Don't show alert - child already showed it
+        return;
+    }
+    
+    // If it's form data, make the API call
     setIsLoading(true);
     try {
-      const response = await updateCourse(selectedCourse.id, updatedCourseData);
-      setSelectedCourse(response.data);
-      setCourses(prev => prev.map(course =>
-        course.id === selectedCourse.id ? response.data : course
-      ));
-      alert('Course updated successfully!');
+        console.log('📤 Making API call with form data');
+        const response = await updateCourse(selectedCourse.id, updatedCourseData);
+        
+        console.log('✅ API call successful');
+        console.log('Response:', response.data);
+        
+        // Update state with response
+        setSelectedCourse(response.data);
+        setCourses(prev => prev.map(course =>
+            course.id === selectedCourse.id ? response.data : course
+        ));
+        
+        alert('Course updated successfully!');
+        
     } catch (error) {
-      alert('Error updating course: ' + (error.response?.data?.message || error.message));
+        console.error('❌ API call failed:', error);
+        console.error('Error response:', error.response?.data);
+        
+        let errorMsg = 'Error updating course: ';
+        if (error.response?.data) {
+            if (typeof error.response.data === 'object') {
+                const errors = [];
+                for (const key in error.response.data) {
+                    if (Array.isArray(error.response.data[key])) {
+                        errors.push(`${key}: ${error.response.data[key].join(', ')}`);
+                    } else {
+                        errors.push(`${key}: ${error.response.data[key]}`);
+                    }
+                }
+                errorMsg += errors.join('\n');
+            } else {
+                errorMsg += error.response.data;
+            }
+        } else {
+            errorMsg += error.message || 'Unknown error';
+        }
+        
+        alert(errorMsg);
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  };
+};
 
   const handleCourseCreated = (newCourse) => {
     setCourses(prev => [...prev, newCourse]);

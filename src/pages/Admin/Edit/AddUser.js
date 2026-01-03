@@ -18,6 +18,7 @@ const AddUser = ({ onUserAdded, onCancel }) => {
     password: "",
     password2: ""
   });
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -153,23 +154,25 @@ const AddUser = ({ onUserAdded, onCancel }) => {
   };
 
   return (
-    <div className="um-edit-form-overlay" onClick={onCancel}>
+    <div className="add-user-um-edit-form-overlay" onClick={onCancel}>
       <div 
-        className={`um-edit-form ${success ? 'um-form-success' : ''}`}
+        className={`add-user-um-edit-form ${success ? 'add-user-um-form-success' : ''}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <h3>Add New User</h3>
+        <div className="add-user-modal-header">
+          <h3>Add New User</h3>
+        </div>
         
         {error && (
-          <div className="um-error-message">
-            <div className="error-content">
+          <div className="add-user-um-error-message">
+            <div className="add-user-error-content">
               <strong>Error Details:</strong>
-              <div className="error-message-text">{error}</div>
+              <div className="add-user-error-message-text">{error}</div>
             </div>
             <button 
               type="button"
               onClick={() => setError("")} 
-              className="um-close-error"
+              className="add-user-um-close-error"
               title="Close error message"
               aria-label="Close error message"
             >
@@ -178,32 +181,37 @@ const AddUser = ({ onUserAdded, onCancel }) => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="um-form-sections-container">
-            {/* Basic Information - 3 Column Layout */}
-            <div className="um-form-section">
+        <form onSubmit={handleSubmit} className="add-user-form">
+          <div className="add-user-um-form-sections-container">
+            
+            {/* Basic Information */}
+            <div className="add-user-um-form-section">
               <h4>Basic Information</h4>
-              <div className="um-form-grid">
-                {/* Column 1 */}
-                <div className="um-form-group half-width">
-                  <label>Username <span className="field-required" aria-hidden="true"></span></label>
+              <div className="add-user-um-form-grid">
+                
+                <div className="add-user-um-form-group">
+                  <label>
+                    Username <span className="add-user-field-required">*</span>
+                  </label>
                   <input
                     type="text"
                     name="username"
                     value={formData.username}
                     onChange={handleChange}
                     required
-                    placeholder="Enter unique username"
+                    placeholder="Enter username"
                     disabled={loading}
                     aria-required="true"
                     autoComplete="username"
+                    className="add-user-form-input"
                   />
-                  <small className="field-hint">Required. Must be unique.</small>
+                  <small className="add-user-field-hint">Unique identifier</small>
                 </div>
                 
-                {/* Column 2 */}
-                <div className="um-form-group half-width">
-                  <label>Email <span className="field-required" aria-hidden="true"></span></label>
+                <div className="add-user-um-form-group">
+                  <label>
+                    Email <span className="add-user-field-required">*</span>
+                  </label>
                   <input
                     type="email"
                     name="email"
@@ -214,13 +222,15 @@ const AddUser = ({ onUserAdded, onCancel }) => {
                     disabled={loading}
                     aria-required="true"
                     autoComplete="email"
+                    className="add-user-form-input"
                   />
-                  <small className="field-hint">Required for communication.</small>
+                  <small className="add-user-field-hint">Required for communication</small>
                 </div>
 
-                {/* Column 3 */}
-                <div className="um-form-group half-width">
-                  <label>User Type <span className="field-required" aria-hidden="true"></span></label>
+                <div className="add-user-um-form-group">
+                  <label>
+                    User Type <span className="add-user-field-required">*</span>
+                  </label>
                   <select
                     name="user_type"
                     value={formData.user_type}
@@ -228,57 +238,57 @@ const AddUser = ({ onUserAdded, onCancel }) => {
                     required
                     disabled={loading}
                     aria-required="true"
+                    className="add-user-form-select"
                   >
                     <option value="student">Student</option>
                     <option value="instructor">Instructor</option>
                   </select>
                 </div>
 
-                {/* Column 1 */}
-                <div className="um-form-group half-width">
+                <div className="add-user-um-form-group">
                   <label>First Name</label>
                   <input
                     type="text"
                     name="first_name"
                     value={formData.first_name}
                     onChange={handleChange}
-                    placeholder="Enter first name"
+                    placeholder="First name"
                     disabled={loading}
                     autoComplete="given-name"
+                    className="add-user-form-input"
                   />
                 </div>
                 
-                {/* Column 2 */}
-                <div className="um-form-group half-width">
+                <div className="add-user-um-form-group">
                   <label>Last Name</label>
                   <input
                     type="text"
                     name="last_name"
                     value={formData.last_name}
                     onChange={handleChange}
-                    placeholder="Enter last name"
+                    placeholder="Last name"
                     disabled={loading}
                     autoComplete="family-name"
+                    className="add-user-form-input"
                   />
                 </div>
 
-                {/* Column 3 */}
-                <div className="um-form-group half-width">
+                <div className="add-user-um-form-group">
                   <label>Phone Number</label>
                   <input
                     type="tel"
                     name="phone_number"
                     value={formData.phone_number}
                     onChange={handleChange}
-                    placeholder="+1 (555) 123-4567"
+                    placeholder="+1234567890"
                     disabled={loading}
                     autoComplete="tel"
+                    className="add-user-form-input"
                   />
-                  <small className="field-hint">International format</small>
+                  <small className="add-user-field-hint">International format</small>
                 </div>
 
-                {/* Full width for date of birth */}
-                <div className="um-form-group full-width">
+                <div className="add-user-um-form-group add-user-full-width">
                   <label>Date of Birth</label>
                   <input
                     type="date"
@@ -287,6 +297,7 @@ const AddUser = ({ onUserAdded, onCancel }) => {
                     onChange={handleChange}
                     disabled={loading}
                     max={new Date().toISOString().split('T')[0]}
+                    className="add-user-form-input"
                   />
                 </div>
               </div>
@@ -294,75 +305,80 @@ const AddUser = ({ onUserAdded, onCancel }) => {
 
             {/* Instructor-specific fields */}
             {formData.user_type === 'instructor' && (
-              <div className="um-form-section">
+              <div className="add-user-um-form-section">
                 <h4>Instructor Information</h4>
-                <div className="um-form-group full-width">
+                <div className="add-user-um-form-group add-user-full-width">
                   <label>Professional Bio</label>
                   <textarea
                     name="instructor_bio"
                     value={formData.instructor_bio}
                     onChange={handleChange}
-                    rows="4"
-                    placeholder="Describe your teaching experience, qualifications, areas of expertise, and professional background..."
+                    rows="3"
+                    placeholder="Teaching experience, qualifications, expertise..."
                     disabled={loading}
-                    maxLength={500}
+                    maxLength={300}
+                    className="add-user-form-textarea"
                   />
-                  <small className="field-hint">
-                    {formData.instructor_bio.length}/500 characters. This will be visible to students.
-                  </small>
+                  <div className="add-user-char-count">
+                    {formData.instructor_bio.length}/300 characters
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Security Section - 3 Column Layout */}
-            <div className="um-form-section">
+            {/* Security Section */}
+            <div className="add-user-um-form-section">
               <h4>Security & Authentication</h4>
-              <div className="um-form-grid">
-                {/* Column 1 */}
-                <div className="um-form-group half-width">
-                  <label>Password <span className="field-required" aria-hidden="true"></span></label>
+              <div className="add-user-um-form-grid">
+                
+                <div className="add-user-um-form-group">
+                  <label>
+                    Password <span className="add-user-field-required">*</span>
+                  </label>
                   <input
                     type="password"
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
                     required
-                    placeholder="Enter secure password"
+                    placeholder="Enter password"
                     minLength="8"
                     disabled={loading}
                     aria-required="true"
                     autoComplete="new-password"
+                    className="add-user-form-input"
                   />
-                  <small className="field-hint">Min 8 characters</small>
+                  <small className="add-user-field-hint">Min 8 characters</small>
                 </div>
                 
-                {/* Column 2 */}
-                <div className="um-form-group half-width">
-                  <label>Confirm Password <span className="field-required" aria-hidden="true"></span></label>
+                <div className="add-user-um-form-group">
+                  <label>
+                    Confirm <span className="add-user-field-required">*</span>
+                  </label>
                   <input
                     type="password"
                     name="password2"
                     value={formData.password2}
                     onChange={handleChange}
                     required
-                    placeholder="Re-enter password"
+                    placeholder="Confirm password"
                     minLength="8"
                     disabled={loading}
                     aria-required="true"
                     autoComplete="new-password"
+                    className="add-user-form-input"
                   />
-                  <small className="field-hint">Must match exactly</small>
+                  <small className="add-user-field-hint">Must match</small>
                 </div>
 
-                {/* Column 3 - Empty for balance or could add another field */}
-                <div className="um-form-group half-width">
-                  {/* Optional: Add password strength indicator here */}
+                <div className="add-user-um-form-group">
+                  {/* Empty column for alignment */}
                 </div>
 
-                {/* Full width for checkbox */}
-                <div className="um-form-group full-width">
-                  <div className="um-checkbox-group">
-                    <label className="um-checkbox-label">
+                {/* Email verification checkbox */}
+                <div className="add-user-um-form-group add-user-full-width">
+                  <div className="add-user-um-checkbox-group compact">
+                    <label className="add-user-um-checkbox-label">
                       <input
                         type="checkbox"
                         name="email_verified"
@@ -372,8 +388,8 @@ const AddUser = ({ onUserAdded, onCancel }) => {
                       />
                       <span>Mark Email as Verified</span>
                     </label>
-                    <small className="um-checkbox-description">
-                      Bypass email verification process. User can login immediately.
+                    <small className="add-user-um-checkbox-description">
+                      User can login immediately without email verification
                     </small>
                   </div>
                 </div>
@@ -381,50 +397,46 @@ const AddUser = ({ onUserAdded, onCancel }) => {
             </div>
 
             {/* Admin Permissions Section */}
-            <div className="um-form-section um-admin-permissions">
+            <div className="add-user-um-form-section">
               <h4>Administrative Permissions</h4>
               
-              <div className="um-form-grid">
-                <div className="um-form-group full-width">
-                  <div className="um-checkbox-group">
-                    <label className="um-checkbox-label">
-                      <input
-                        type="checkbox"
-                        name="is_staff"
-                        checked={formData.is_staff}
-                        onChange={handleChange}
-                        disabled={loading || formData.is_superuser}
-                      />
-                      <span>Staff Member Access</span>
-                    </label>
-                    <small className="um-checkbox-description">
-                      Grants access to admin dashboard with content management capabilities.
-                    </small>
-                  </div>
+              <div className="add-user-permissions-grid">
+                <div className="add-user-um-checkbox-group compact">
+                  <label className="add-user-um-checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="is_staff"
+                      checked={formData.is_staff}
+                      onChange={handleChange}
+                      disabled={loading || formData.is_superuser}
+                    />
+                    <span>Staff Member Access</span>
+                  </label>
+                  <small className="add-user-um-checkbox-description">
+                    Access to admin dashboard with content management
+                  </small>
                 </div>
 
-                <div className="um-form-group full-width">
-                  <div className="um-checkbox-group">
-                    <label className="um-checkbox-label">
-                      <input
-                        type="checkbox"
-                        name="is_superuser"
-                        checked={formData.is_superuser}
-                        onChange={handleChange}
-                        disabled={loading}
-                      />
-                      <span>Super Administrator</span>
-                    </label>
-                    <small className="um-checkbox-description">
-                      Full system access with all permissions. Includes all staff privileges.
-                    </small>
-                  </div>
+                <div className="add-user-um-checkbox-group compact">
+                  <label className="add-user-um-checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="is_superuser"
+                      checked={formData.is_superuser}
+                      onChange={handleChange}
+                      disabled={loading}
+                    />
+                    <span>Super Administrator</span>
+                  </label>
+                  <small className="add-user-um-checkbox-description">
+                    Full system access with all permissions
+                  </small>
                 </div>
 
                 {formData.is_superuser && (
-                  <div className="um-form-group full-width">
-                    <div className="um-info-message">
-                      <strong>⚠️ Important Note:</strong> Super Administrator role provides complete system access.
+                  <div className="add-user-warning-message">
+                    <div className="add-user-um-info-message">
+                      <strong>⚠️ Note:</strong> Super Admin has complete system access
                     </div>
                   </div>
                 )}
@@ -432,27 +444,28 @@ const AddUser = ({ onUserAdded, onCancel }) => {
             </div>
           </div>
 
-          <div className="um-form-actions">
+          {/* Form Actions */}
+          <div className="add-user-um-form-actions">
             <button 
               type="button"
               onClick={onCancel} 
-              className="um-btn-secondary"
+              className="add-user-um-btn-secondary"
               disabled={loading}
             >
               Cancel
             </button>
             <button 
               type="submit" 
-              className="um-btn-primary" 
+              className="add-user-um-btn-primary" 
               disabled={loading}
             >
               {loading ? (
                 <>
-                  <span className="loading-spinner"></span>
-                  Creating User Account...
+                  <span className="add-user-loading-spinner"></span>
+                  Creating...
                 </>
               ) : (
-                "Create User Account"
+                "Create User"
               )}
             </button>
           </div>

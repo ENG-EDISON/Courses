@@ -148,11 +148,11 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
 
   if (!user.id) {
     return (
-      <div className="um-edit-form-overlay">
-        <div className="um-edit-form">
-          <div className="um-error-message">
+      <div className="edit-user-um-edit-form-overlay">
+        <div className="edit-user-um-edit-form">
+          <div className="edit-user-um-error-message">
             <strong>Error:</strong> Cannot edit user - User ID is missing or undefined
-            <button type="button" onClick={onCancel} className="um-close-error">
+            <button type="button" onClick={onCancel} className="edit-user-um-close-error">
               ×
             </button>
           </div>
@@ -162,36 +162,36 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
   }
 
   return (
-    <div className="um-edit-form-overlay" onClick={onCancel}>
-      <div className="um-edit-form" onClick={(e) => e.stopPropagation()}>
+    <div className="edit-user-um-edit-form-overlay" onClick={onCancel}>
+      <div className="edit-user-um-edit-form" onClick={(e) => e.stopPropagation()}>
         <h3>
           Edit User: {user.username} 
-          <span className={`um-status-badge ${formData.is_active ? 'active' : 'inactive'}`}>
+          <span className={`edit-user-um-status-badge ${formData.is_active ? 'edit-user-active' : 'edit-user-inactive'}`}>
             {formData.is_active ? 'Active' : 'Inactive'}
           </span>
         </h3>
         
         {error && (
-          <div className="um-error-message">
-            <div className="error-content">
+          <div className="edit-user-um-error-message">
+            <div className="edit-user-error-content">
               <strong>Update Error:</strong>
-              <div className="error-message-text">{error}</div>
+              <div className="edit-user-error-message-text">{error}</div>
             </div>
-            <button type="button" onClick={() => setError("")} className="um-close-error">
+            <button type="button" onClick={() => setError("")} className="edit-user-um-close-error">
               ×
             </button>
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
-          <div className="um-form-sections-container">
+          <div className="edit-user-um-form-sections-container">
             {/* Basic Information - 3 Column Layout */}
-            <div className="um-form-section">
+            <div className="edit-user-um-form-section">
               <h4>Basic Information</h4>
-              <div className="um-form-grid">
+              <div className="edit-user-um-form-grid">
                 {/* Row 1 */}
-                <div className="um-form-group">
-                  <label>Username <span className="field-required">*</span></label>
+                <div className="edit-user-um-form-group">
+                  <label>Username <span className="edit-user-field-required">*</span></label>
                   <input
                     type="text"
                     name="username"
@@ -202,8 +202,8 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
                   />
                 </div>
                 
-                <div className="um-form-group">
-                  <label>Email <span className="field-required">*</span></label>
+                <div className="edit-user-um-form-group">
+                  <label>Email <span className="edit-user-field-required">*</span></label>
                   <input
                     type="email"
                     name="email"
@@ -214,8 +214,8 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
                   />
                 </div>
 
-                <div className="um-form-group">
-                  <label>User Type <span className="field-required">*</span></label>
+                <div className="edit-user-um-form-group">
+                  <label>User Type <span className="edit-user-field-required">*</span></label>
                   <select
                     name="user_type"
                     value={formData.user_type}
@@ -230,7 +230,7 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
                 </div>
 
                 {/* Row 2 */}
-                <div className="um-form-group">
+                <div className="edit-user-um-form-group">
                   <label>First Name</label>
                   <input
                     type="text"
@@ -241,7 +241,7 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
                   />
                 </div>
                 
-                <div className="um-form-group">
+                <div className="edit-user-um-form-group">
                   <label>Last Name</label>
                   <input
                     type="text"
@@ -252,7 +252,7 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
                   />
                 </div>
 
-                <div className="um-form-group">
+                <div className="edit-user-um-form-group">
                   <label>Phone Number</label>
                   <input
                     type="tel"
@@ -264,7 +264,7 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
                 </div>
 
                 {/* Row 3 - Bio spans all 3 columns */}
-                <div className="um-form-group full-width">
+                <div className="edit-user-um-form-group edit-user-full-width">
                   <label>Bio</label>
                   <textarea
                     name="bio"
@@ -279,11 +279,11 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
             </div>
 
             {/* Admin Permissions Section - 3 Column Layout */}
-            <div className="um-admin-permissions">
+            <div className="edit-user-um-admin-permissions">
               <h4>Administrative Permissions</h4>
-              <div className="um-form-grid">
-                <div className="um-form-group">
-                  <label className="um-checkbox-label">
+              <div className="edit-user-um-form-grid">
+                <div className="edit-user-um-form-group">
+                  <label className="edit-user-um-checkbox-label">
                     <input
                       type="checkbox"
                       name="is_staff"
@@ -293,13 +293,13 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
                     />
                     <span>Staff Member</span>
                   </label>
-                  <small className="um-checkbox-description">
+                  <small className="edit-user-um-checkbox-description">
                     Access to admin dashboard
                   </small>
                 </div>
 
-                <div className="um-form-group">
-                  <label className="um-checkbox-label">
+                <div className="edit-user-um-form-group">
+                  <label className="edit-user-um-checkbox-label">
                     <input
                       type="checkbox"
                       name="is_superuser"
@@ -309,13 +309,13 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
                     />
                     <span>Super Admin</span>
                   </label>
-                  <small className="um-checkbox-description">
+                  <small className="edit-user-um-checkbox-description">
                     Full system access
                   </small>
                 </div>
 
-                <div className="um-form-group">
-                  <label className="um-checkbox-label">
+                <div className="edit-user-um-form-group">
+                  <label className="edit-user-um-checkbox-label">
                     <input
                       type="checkbox"
                       name="is_active"
@@ -325,23 +325,23 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
                     />
                     <span>Active Status</span>
                   </label>
-                  <small className="um-checkbox-description">
+                  <small className="edit-user-um-checkbox-description">
                     User can login
                   </small>
                 </div>
 
                 {/* Status Toggle Button - Full Width */}
-                <div className="um-form-group full-width">
-                  <div className="um-status-actions">
+                <div className="edit-user-um-form-group edit-user-full-width">
+                  <div className="edit-user-um-status-actions">
                     <button
                       type="button"
                       onClick={handleStatusToggle}
                       disabled={statusLoading || loading}
-                      className={`um-status-btn ${formData.is_active ? 'deactivate' : 'activate'}`}
+                      className={`edit-user-um-status-btn ${formData.is_active ? 'edit-user-deactivate' : 'edit-user-activate'}`}
                     >
                       {statusLoading ? (
                         <>
-                          <span className="loading-spinner"></span>
+                          <span className="edit-user-loading-spinner"></span>
                           Processing...
                         </>
                       ) : formData.is_active ? (
@@ -350,7 +350,7 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
                         "Activate User"
                       )}
                     </button>
-                    <small className="um-status-hint">
+                    <small className="edit-user-um-status-hint">
                       {formData.is_active 
                         ? 'User can currently login and use the system' 
                         : 'User cannot login or access the system'
@@ -362,18 +362,18 @@ const EditUser = ({ user, onSave, onCancel, onStatusChange }) => {
             </div>
           </div>
 
-          <div className="um-form-actions">
-            <button type="submit" className="um-btn-primary" disabled={loading}>
+          <div className="edit-user-um-form-actions">
+            <button type="submit" className="edit-user-um-btn-primary" disabled={loading}>
               {loading ? (
                 <>
-                  <span className="loading-spinner"></span>
+                  <span className="edit-user-loading-spinner"></span>
                   Saving Changes...
                 </>
               ) : (
                 "Save Changes"
               )}
             </button>
-            <button type="button" onClick={onCancel} className="um-btn-secondary" disabled={loading}>
+            <button type="button" onClick={onCancel} className="edit-user-um-btn-secondary" disabled={loading}>
               Cancel
             </button>
           </div>

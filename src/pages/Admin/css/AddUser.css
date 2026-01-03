@@ -1,532 +1,779 @@
-/* Add User Modal Styles - 3 Column Layout */
-.um-edit-form-overlay {
+/* Add User Modal - Enterprise Excel-Style Compact - NO SCROLL */
+.add-user-um-edit-form-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(15, 23, 42, 0.95);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 10000;
-  padding: 2rem;
-  backdrop-filter: blur(8px);
-  animation: um-fadeIn 0.3s ease-out;
+  padding: 20px;
+  backdrop-filter: blur(2px);
 }
 
-@keyframes um-fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.um-edit-form {
+.add-user-um-edit-form {
   background: white;
-  padding: 2.5rem;
-  border-radius: 16px;
-  width: 100%;
-  max-width: 900px; /* Increased width for 3 columns */
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
-  animation: um-modalSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  border: 1px solid #e1e8ed;
-  position: relative;
-}
-
-@keyframes um-modalSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.um-edit-form::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #3498db, #27ae60, #9b59b6);
-  border-radius: 16px 16px 0 0;
-}
-
-.um-edit-form h3 {
-  margin: 0 0 2rem 0;
-  color: #2c3e50;
-  font-size: 1.75rem;
-  font-weight: 700;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #f8f9fa;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.um-edit-form h3::before {
-  content: '👤';
-  font-size: 1.5rem;
-}
-
-/* Enhanced Form Structure */
-.um-form-sections-container {
-  display: grid;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.um-form-section {
-  background: #ffffff;
-  padding: 1.75rem;
-  border-radius: 12px;
-  border: 1px solid #f1f3f4;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.um-form-section:hover {
-  border-color: #e1e8ed;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.um-form-section h4 {
-  margin: 0 0 1.25rem 0;
-  color: #2c3e50;
-  font-size: 1.125rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.um-form-section h4::before {
-  font-size: 1.1rem;
-}
-
-.um-form-section:nth-child(1) h4::before { content: '📋'; }
-.um-form-section:nth-child(2) h4::before { content: '🎓'; }
-.um-form-section:nth-child(3) h4::before { content: '🔒'; }
-.um-form-section:nth-child(4) h4::before { content: '⚙️'; }
-
-/* 3-Column Grid Layout */
-.um-form-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 columns */
-  gap: 1.25rem;
-}
-
-.um-form-group {
-  margin-bottom: 1.25rem;
-}
-
-.um-form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.um-form-group.two-thirds-width {
-  grid-column: span 2;
-}
-
-.um-form-group.half-width {
-  grid-column: span 1;
-}
-
-/* Enhanced Form Controls */
-.um-form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  color: #2c3e50;
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.um-form-group input,
-.um-form-group select,
-.um-form-group textarea {
-  width: 100%;
-  padding: 0.875rem 1rem;
-  border: 2px solid #e9ecef;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-  font-family: inherit;
-  background: #ffffff;
-}
-
-.um-form-group input:focus,
-.um-form-group select:focus,
-.um-form-group textarea:focus {
-  outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-  background: #fafbfc;
-}
-
-.um-form-group input:disabled,
-.um-form-group select:disabled,
-.um-form-group textarea:disabled {
-  background-color: #f8f9fa;
-  color: #6c757d;
-  cursor: not-allowed;
-  border-color: #e9ecef;
-}
-
-.um-form-group textarea {
-  resize: vertical;
-  min-height: 100px;
-  line-height: 1.5;
-}
-
-/* Enhanced Checkbox System */
-.um-checkbox-group {
-  background: #f8f9fa;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
-  margin-bottom: 1rem;
-  transition: all 0.3s ease;
-}
-
-.um-checkbox-group:hover {
-  background: #f1f3f4;
-  border-color: #3498db;
-}
-
-.um-checkbox-label {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  cursor: pointer;
-  font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 0.5rem;
-}
-
-.um-checkbox-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  margin: 0.1rem 0 0 0;
-  cursor: pointer;
-  accent-color: #3498db;
-}
-
-.um-checkbox-description {
-  display: block;
-  font-size: 0.8rem;
-  color: #6c757d;
-  margin-left: 2.25rem;
-  line-height: 1.5;
-}
-
-/* Field Validation & Hints */
-.field-hint {
-  display: block;
-  font-size: 0.75rem;
-  color: #6c757d;
-  margin-top: 0.375rem;
-  font-style: italic;
-}
-
-.field-required::after {
-  content: ' *';
-  color: #e74c3c;
-}
-
-/* Enhanced Error Handling */
-.um-error-message {
-  background: linear-gradient(135deg, #ffeaea, #ffcdd2);
-  color: #c62828;
-  padding: 1.25rem;
-  border-radius: 10px;
-  margin-bottom: 1.5rem;
-  border: 1px solid #ffcdd2;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.15);
-  position: relative;
-  overflow: hidden;
-}
-
-.um-error-message::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: #e74c3c;
-}
-
-.error-content {
-  flex: 1;
-  padding-right: 1rem;
-}
-
-.error-content strong {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-}
-
-.error-message-text {
-  font-size: 0.85rem;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  background: rgba(255, 255, 255, 0.7);
-  padding: 0.75rem;
-  border-radius: 6px;
-  border: 1px solid rgba(231, 76, 60, 0.2);
-}
-
-.um-close-error {
-  background: rgba(231, 76, 60, 0.1);
-  border: 1px solid rgba(231, 76, 60, 0.3);
-  font-size: 1.125rem;
-  cursor: pointer;
-  color: #e74c3c;
   padding: 0;
-  width: 28px;
-  height: 28px;
+  border-radius: 6px;
+  width: 500px; /* Increased from 450px */
+  height: auto;
+  max-height: 85vh;
+  min-height: auto;
+  overflow: hidden;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  border: 1px solid #d1d5db;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.3s ease;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Compact Header */
+.add-user-modal-header {
+  margin: 0;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(to bottom, #f9fafb, #f3f4f6);
   flex-shrink: 0;
 }
 
-.um-close-error:hover {
-  background: #e74c3c;
-  color: white;
-  transform: scale(1.1);
-}
-
-/* Enhanced Form Actions */
-.um-form-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  align-items: center;
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 2px solid #f1f3f4;
-  background: #fafbfc;
-  padding: 1.5rem;
-  margin: 2rem -2.5rem -2.5rem;
-  border-radius: 0 0 16px 16px;
-}
-
-.um-btn-primary {
-  background: linear-gradient(135deg, #3498db, #2980b9);
-  color: white;
-  padding: 0.875rem 2rem;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 0.9rem;
+.add-user-um-edit-form h3 {
+  margin: 0;
+  color: #111827;
+  font-size: 13px; /* Increased from 12px */
   font-weight: 600;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 140px;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-  position: relative;
-  overflow: hidden;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
-.um-btn-primary::before {
+/* Form Container - NO SCROLL */
+.add-user-um-form-sections-container {
+  flex: 1;
+  overflow: hidden;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Increased from 4px */
+  height: auto;
+  min-height: auto;
+}
+
+/* Excel-Style Sections */
+.add-user-um-form-section {
+  background: #f9fafb;
+  padding: 8px 10px; /* Increased from 5px 6px */
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+  transition: border-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.add-user-um-form-section:hover {
+  border-color: #9ca3af;
+}
+
+.add-user-um-form-section h4 {
+  margin: 0 0 6px 0; /* Increased from 3px */
+  color: #374151;
+  font-size: 10px; /* Increased from 8px */
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Excel-Style 3-Column Grid */
+.add-user-um-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px; /* Increased from 4px */
+}
+
+.add-user-um-form-group {
+  margin-bottom: 0;
+  position: relative;
+}
+
+.add-user-full-width {
+  grid-column: 1 / -1;
+}
+
+/* Excel-Style Micro Inputs - LARGER */
+.add-user-um-form-group label {
+  display: block;
+  margin-bottom: 3px; /* Increased from 1px */
+  font-weight: 500;
+  color: #4b5563;
+  font-size: 9px; /* Increased from 7px */
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  line-height: 1.2;
+}
+
+.add-user-um-form-group input,
+.add-user-um-form-group select,
+.add-user-um-form-group textarea {
+  width: 100%;
+  padding: 5px 8px; /* Increased from 1px 4px */
+  border: 1px solid #d1d5db;
+  border-radius: 3px; /* Increased from 2px */
+  font-size: 11px; /* Increased from 9px */
+  transition: all 0.1s ease;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: white;
+  color: #111827;
+  height: 28px; /* Increased from 20px */
+  line-height: 1.2;
+}
+
+/* Excel-Style Select */
+.add-user-um-form-group select {
+  padding-right: 24px; /* Increased from 16px */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center; /* Adjusted */
+  background-size: 12px; /* Increased from 9px */
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.add-user-um-form-group input:hover,
+.add-user-um-form-group select:hover {
+  border-color: #9ca3af;
+}
+
+.add-user-um-form-group input:focus,
+.add-user-um-form-group select:focus,
+.add-user-um-form-group textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.add-user-um-form-group textarea {
+  height: auto;
+  min-height: 60px; /* Increased from 30px */
+  max-height: 80px; /* Increased from 40px */
+  resize: vertical;
+  line-height: 1.4;
+  padding: 6px 8px; /* Increased from 2px 4px */
+  font-size: 11px; /* Increased from 9px */
+}
+
+/* Field Hints - Excel Style */
+.add-user-field-hint {
+  display: block;
+  font-size: 8px; /* Increased from 6px */
+  color: #6b7280;
+  margin-top: 2px; /* Increased from 1px */
+  line-height: 1.2;
+}
+
+.add-user-field-required {
+  color: #dc2626;
+  font-weight: bold;
+  font-size: 10px; /* Increased from 8px */
+  margin-left: 2px;
+}
+
+.add-user-char-count {
+  font-size: 8px; /* Increased from 6px */
+  color: #6b7280;
+  margin-top: 2px;
+  text-align: right;
+}
+
+/* Excel-Style Checkboxes - Larger */
+.add-user-um-checkbox-group {
+  background: #f3f4f6;
+  padding: 6px 8px; /* Increased from 3px 4px */
+  border-radius: 3px; /* Increased from 2px */
+  border: 1px solid #e5e7eb;
+  margin-bottom: 4px; /* Increased from 1px */
+  position: relative;
+}
+
+.add-user-um-checkbox-group.compact {
+  padding: 5px 6px; /* Increased from 2px 3px */
+  margin-bottom: 3px;
+}
+
+.add-user-um-checkbox-group:hover {
+  background: #e5e7eb;
+}
+
+.add-user-um-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Increased from 4px */
+  cursor: pointer;
+  font-weight: 500;
+  color: #374151;
+  font-size: 10px; /* Increased from 8px */
+}
+
+.add-user-um-checkbox-label input[type="checkbox"] {
+  width: 14px; /* Increased from 9px */
+  height: 14px; /* Increased from 9px */
+  cursor: pointer;
+  border: 1px solid #9ca3af;
+  border-radius: 3px; /* Increased from 2px */
+  transition: all 0.1s ease;
+  position: relative;
+  appearance: none;
+  -webkit-appearance: none;
+  background: white;
+}
+
+.add-user-um-checkbox-label input[type="checkbox"]:checked {
+  background: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.add-user-um-checkbox-label input[type="checkbox"]:checked::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: left 0.5s;
+  top: 2px; /* Adjusted */
+  left: 4px; /* Adjusted */
+  width: 4px; /* Increased from 3px */
+  height: 7px; /* Increased from 4px */
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
-.um-btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+.add-user-um-checkbox-description {
+  display: block;
+  font-size: 8px; /* Increased from 6px */
+  color: #6b7280;
+  margin-left: 20px; /* Increased from 13px */
+  line-height: 1.3;
+  margin-top: 2px;
 }
 
-.um-btn-primary:hover:not(:disabled)::before {
-  left: 100%;
+/* Permissions Grid */
+.add-user-permissions-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.um-btn-primary:disabled {
-  background: #bdc3c7;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+/* Excel-Style Error Message - Larger */
+.add-user-um-error-message {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 6px 8px; /* Increased from 2px 4px */
+  border-radius: 3px;
+  border: 1px solid #fecaca;
+  font-size: 10px; /* Increased from 8px */
+  margin: 0 10px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-shrink: 0;
+  position: relative;
 }
 
-.um-btn-secondary {
-  background: transparent;
-  color: #6c757d;
-  padding: 0.875rem 2rem;
-  border: 2px solid #e9ecef;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 0.9rem;
+.add-user-um-error-message::before {
+  content: '⚠';
+  position: absolute;
+  left: 6px;
+  top: 5px;
+  font-size: 9px; /* Increased from 7px */
+}
+
+.add-user-error-content {
+  flex: 1;
+  padding-left: 14px; /* Increased from 10px */
+  padding-right: 6px; /* Increased from 2px */
+}
+
+.add-user-error-content strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 10px; /* Increased from 8px */
   font-weight: 600;
-  transition: all 0.3s ease;
-  min-width: 120px;
 }
 
-.um-btn-secondary:hover:not(:disabled) {
-  background: #6c757d;
+.add-user-error-message-text {
+  font-size: 9px; /* Increased from 7px */
+  line-height: 1.3;
+  white-space: pre-wrap;
+  font-family: 'SF Mono', monospace;
+}
+
+.add-user-um-close-error {
+  background: none;
+  border: none;
+  font-size: 14px; /* Increased from 10px */
+  cursor: pointer;
+  color: #9ca3af;
+  padding: 0;
+  width: 16px; /* Increased from 10px */
+  height: 16px; /* Increased from 10px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: all 0.1s ease;
+}
+
+.add-user-um-close-error:hover {
+  background: #f3f4f6;
+  color: #dc2626;
+}
+
+/* Excel-Style Form Actions - Larger */
+.add-user-um-form-actions {
+  display: flex;
+  gap: 8px; /* Increased from 4px */
+  justify-content: flex-end;
+  align-items: center;
+  padding: 8px 12px; /* Increased from 4px 8px */
+  border-top: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  background: #f9fafb;
+}
+
+.add-user-um-btn-primary {
+  background: linear-gradient(to bottom, #3b82f6, #2563eb);
   color: white;
-  border-color: #6c757d;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+  padding: 6px 12px; /* Increased from 1px 6px */
+  border: 1px solid #1d4ed8;
+  border-radius: 3px; /* Increased from 2px */
+  cursor: pointer;
+  font-size: 11px; /* Increased from 8px */
+  font-weight: 500;
+  transition: all 0.1s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px; /* Increased from 2px */
+  min-width: 90px; /* Increased from 60px */
+  justify-content: center;
+  height: 30px; /* Increased from 18px */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-/* Enhanced Loading States */
-.loading-spinner {
-  width: 16px;
-  height: 16px;
+.add-user-um-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(to bottom, #2563eb, #1d4ed8);
+  transform: translateY(-1px);
+}
+
+.add-user-um-btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.add-user-um-btn-primary:disabled {
+  background: #9ca3af;
+  border-color: #6b7280;
+  cursor: not-allowed;
+}
+
+.add-user-um-btn-secondary {
+  background: white;
+  color: #4b5563;
+  padding: 6px 12px; /* Increased from 1px 6px */
+  border: 1px solid #d1d5db;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px; /* Increased from 8px */
+  font-weight: 500;
+  transition: all 0.1s ease;
+  min-width: 70px; /* Increased from 40px */
+  height: 30px; /* Increased from 18px */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.add-user-um-btn-secondary:hover:not(:disabled) {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+/* Excel-Style Loading Spinner - Larger */
+.add-user-loading-spinner {
+  width: 12px; /* Increased from 6px */
+  height: 12px; /* Increased from 6px */
   border: 2px solid transparent;
   border-top: 2px solid currentColor;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: add-user-spin 0.8s linear infinite;
+  display: inline-block;
 }
 
-@keyframes spin {
+@keyframes add-user-spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-/* Success State Animation */
-.um-form-success {
-  animation: successPulse 0.6s ease-in-out;
+/* Success State */
+.add-user-um-form-success {
+  animation: add-user-successPulse 0.4s ease-in-out;
 }
 
-@keyframes successPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-  100% { transform: scale(1); }
+@keyframes add-user-successPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.002); }
 }
 
-/* Responsive Design for 3 Columns */
-@media (max-width: 1024px) {
-  .um-edit-form {
-    max-width: 800px;
+/* Warning Message - Larger */
+.add-user-warning-message {
+  margin-top: 4px; /* Increased from 1px */
+}
+
+.add-user-um-info-message {
+  background: #fffbeb;
+  color: #92400e;
+  padding: 4px 6px; /* Increased from 1px 3px */
+  border-radius: 3px;
+  border: 1px solid #fbbf24;
+  font-size: 9px; /* Increased from 7px */
+  line-height: 1.3;
+}
+
+.add-user-um-info-message strong {
+  font-weight: 600;
+  font-size: 9px; /* Increased from 7px */
+}
+
+/* RESPONSIVE - Excel-Style - Adjusted for smaller screens */
+@media (max-width: 850px) {
+  .add-user-um-edit-form-overlay {
+    padding: 15px;
   }
   
-  .um-form-grid {
-    grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets */
+  .add-user-um-edit-form {
+    width: 95vw;
+    max-width: 95vw;
+    max-height: 90vh;
+    height: auto;
+    min-height: auto;
+    border-radius: 4px;
+  }
+  
+  .add-user-um-form-sections-container {
+    padding: 8px;
+    gap: 6px;
+    overflow: hidden;
+    height: auto;
+  }
+  
+  .add-user-um-form-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+  
+  .add-user-um-form-section {
+    padding: 6px 8px;
+  }
+  
+  .add-user-um-form-actions {
+    padding: 6px 10px;
+  }
+  
+  .add-user-um-error-message {
+    margin: 0 8px 6px;
+    padding: 5px 6px;
   }
 }
 
-@media (max-width: 768px) {
-  .um-edit-form-overlay {
-    padding: 1rem;
+@media (max-width: 640px) {
+  .add-user-um-edit-form-overlay {
+    padding: 10px;
   }
   
-  .um-edit-form {
-    padding: 2rem;
-    max-width: 95%;
-  }
-  
-  .um-form-grid {
-    grid-template-columns: 1fr; /* 1 column on mobile */
-    gap: 1rem;
-  }
-  
-  .um-form-group.half-width,
-  .um-form-group.two-thirds-width {
-    grid-column: 1 / -1;
-  }
-  
-  .um-form-actions {
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 1.25rem;
-    margin: 2rem -2rem -2rem;
-  }
-  
-  .um-btn-primary,
-  .um-btn-secondary {
+  .add-user-um-edit-form {
     width: 100%;
-    min-width: auto;
+    max-width: 100%;
+    max-height: 95vh;
+    border-radius: 3px;
+  }
+  
+  .add-user-um-form-grid {
+    gap: 5px;
+  }
+  
+  .add-user-um-form-group input,
+  .add-user-um-form-group select {
+    height: 26px;
+    font-size: 10px;
+    padding: 4px 6px;
+  }
+  
+  .add-user-um-form-group label {
+    font-size: 8px;
   }
 }
 
 @media (max-width: 480px) {
-  .um-edit-form-overlay {
-    padding: 0.5rem;
+  .add-user-um-edit-form-overlay {
+    padding: 8px;
+    align-items: flex-start;
   }
   
-  .um-edit-form {
-    padding: 1.5rem;
-    border-radius: 12px;
+  .add-user-um-edit-form {
+    max-height: 90vh;
+    margin-top: 20px;
   }
   
-  .um-edit-form h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
+  .add-user-um-form-sections-container {
+    padding: 6px;
+    gap: 5px;
   }
   
-  .um-form-section {
-    padding: 1.25rem;
+  .add-user-um-form-grid {
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
   
-  .um-form-actions {
-    padding: 1rem;
-    margin: 1.5rem -1.5rem -1.5rem;
+  .add-user-um-form-section {
+    padding: 5px 6px;
+  }
+  
+  .add-user-modal-header {
+    padding: 8px 10px;
+  }
+  
+  .add-user-um-form-actions {
+    flex-direction: row;
+    gap: 5px;
+    padding: 5px 8px;
+    position: sticky;
+    bottom: 0;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+  }
+  
+  .add-user-um-btn-primary,
+  .add-user-um-btn-secondary {
+    width: auto;
+    min-width: 0;
+    flex: 1;
+    font-size: 9px;
+    height: 26px;
+    padding: 4px 8px;
+  }
+  
+  .add-user-um-error-message {
+    margin: 0 6px 5px;
+    padding: 4px 5px;
+    font-size: 9px;
   }
 }
 
-/* High-DPI Screens Optimization */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .um-edit-form {
-    border-width: 0.5px;
+@media (max-width: 375px) {
+  .add-user-um-edit-form-overlay {
+    padding: 6px;
+  }
+  
+  .add-user-um-edit-form {
+    max-height: 95vh;
+    border-radius: 2px;
+  }
+  
+  .add-user-um-form-sections-container {
+    padding: 5px;
+    gap: 4px;
+  }
+  
+  .add-user-um-form-section {
+    padding: 4px 5px;
+  }
+  
+  .add-user-um-form-group input,
+  .add-user-um-form-group select {
+    height: 24px;
+    font-size: 9px;
+    padding: 3px 5px;
+  }
+  
+  .add-user-um-form-group textarea {
+    min-height: 50px;
+    max-height: 70px;
+    font-size: 9px;
+    padding: 4px 5px;
+  }
+  
+  .add-user-um-checkbox-label {
+    font-size: 9px;
   }
 }
 
-/* Dark Mode Support */
+@media (max-width: 320px) {
+  .add-user-um-edit-form-overlay {
+    padding: 4px;
+  }
+  
+  .add-user-um-edit-form {
+    width: 100vw;
+    max-height: 98vh;
+    border-radius: 0;
+  }
+  
+  .add-user-um-form-sections-container {
+    padding: 4px;
+    gap: 3px;
+  }
+  
+  .add-user-um-form-section {
+    padding: 3px 4px;
+  }
+  
+  .add-user-modal-header {
+    padding: 6px 8px;
+  }
+  
+  .add-user-um-edit-form h3 {
+    font-size: 11px;
+  }
+  
+  .add-user-um-form-section h4 {
+    font-size: 9px;
+    margin-bottom: 3px;
+  }
+  
+  .add-user-um-form-group input,
+  .add-user-um-form-group select {
+    height: 22px;
+    font-size: 8px;
+    padding: 3px 4px;
+  }
+  
+  .add-user-um-form-group label {
+    font-size: 7px;
+    margin-bottom: 2px;
+  }
+  
+  .add-user-um-form-actions {
+    padding: 4px 6px;
+    gap: 4px;
+  }
+  
+  .add-user-um-btn-primary,
+  .add-user-um-btn-secondary {
+    font-size: 8px;
+    height: 24px;
+    padding: 3px 6px;
+    min-width: 60px;
+  }
+  
+  .add-user-um-checkbox-label {
+    font-size: 8px;
+  }
+  
+  .add-user-um-checkbox-label input[type="checkbox"] {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+/* Dark Mode - Excel-Style */
 @media (prefers-color-scheme: dark) {
-  .um-edit-form {
-    background: #1a1a1a;
-    border-color: #333;
-    color: #ffffff;
+  .add-user-um-edit-form {
+    background: #1f2937;
+    border-color: #374151;
+    color: #f9fafb;
   }
   
-  .um-edit-form h3,
-  .um-form-section h4,
-  .um-form-group label {
-    color: #ffffff;
+  .add-user-modal-header {
+    background: linear-gradient(to bottom, #374151, #1f2937);
+    border-color: #4b5563;
   }
   
-  .um-form-section {
-    background: #2d2d2d;
-    border-color: #333;
+  .add-user-um-edit-form h3 {
+    color: #f9fafb;
   }
   
-  .um-form-group input,
-  .um-form-group select,
-  .um-form-group textarea {
-    background: #2d2d2d;
-    border-color: #444;
-    color: #ffffff;
+  .add-user-um-form-section {
+    background: #374151;
+    border-color: #4b5563;
   }
   
-  .um-form-group input:focus,
-  .um-form-group select:focus,
-  .um-form-group textarea:focus {
-    background: #333;
+  .add-user-um-form-section h4 {
+    color: #d1d5db;
+  }
+  
+  .add-user-um-form-group label {
+    color: #9ca3af;
+  }
+  
+  .add-user-um-form-group input,
+  .add-user-um-form-group select,
+  .add-user-um-form-group textarea {
+    background: #4b5563;
+    border-color: #6b7280;
+    color: #f9fafb;
+  }
+  
+  .add-user-um-form-group input:focus,
+  .add-user-um-form-group select:focus,
+  .add-user-um-form-group textarea:focus {
+    background: #4b5563;
+    border-color: #3b82f6;
+  }
+  
+  .add-user-um-checkbox-group {
+    background: #374151;
+    border-color: #4b5563;
+  }
+  
+  .add-user-um-checkbox-group:hover {
+    background: #4b5563;
+  }
+  
+  .add-user-um-checkbox-label {
+    color: #d1d5db;
+  }
+  
+  .add-user-um-checkbox-label input[type="checkbox"] {
+    background: #6b7280;
+    border-color: #9ca3af;
+  }
+  
+  .add-user-um-checkbox-label input[type="checkbox"]:checked {
+    background: #3b82f6;
+  }
+  
+  .add-user-um-checkbox-description {
+    color: #9ca3af;
+  }
+  
+  .add-user-field-hint,
+  .add-user-char-count {
+    color: #9ca3af;
+  }
+  
+  .add-user-um-form-actions {
+    background: #374151;
+    border-color: #4b5563;
+  }
+  
+  .add-user-um-btn-secondary {
+    background: #4b5563;
+    color: #d1d5db;
+    border-color: #6b7280;
+  }
+  
+  .add-user-um-btn-secondary:hover:not(:disabled) {
+    background: #6b7280;
+  }
+  
+  .add-user-um-error-message {
+    background: #7f1d1d;
+    color: #fecaca;
+    border-color: #991b1b;
+  }
+  
+  .add-user-um-info-message {
+    background: #78350f;
+    color: #fed7aa;
+    border-color: #92400e;
   }
 }

@@ -1,8 +1,8 @@
 // components/Admin/CourseAdminManagement.js
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { 
-  getAllenrollements, 
-  updateEnrollment, 
+import {
+  getAllenrollements,
+  updateEnrollment,
   cancelEnrollment,
   getEnrollmentDetails,
   EnrollToCourse
@@ -11,10 +11,10 @@ import { getAllCourses } from '../api/CoursesApi';
 import '../static/CourseAdminManagement.css';
 
 // Enrollment Management Component
-const EnrollmentManagementTab = ({ 
-  enrollments: propEnrollments, 
+const EnrollmentManagementTab = ({
+  enrollments: propEnrollments,
   courses: propCourses,
-  fetchInitialData 
+  fetchInitialData
 }) => {
   const [enrollments, setEnrollments] = useState(propEnrollments || []);
   const [courses, setCourses] = useState(propCourses || []);
@@ -58,14 +58,25 @@ const EnrollmentManagementTab = ({
   const extractStudents = (enrollmentList) => {
     const uniqueStudents = [];
     const studentMap = new Map();
-    
+
     enrollmentList.forEach(enrollment => {
       if (enrollment.student_details && !studentMap.has(enrollment.student_details.id)) {
-        studentMap.set(enrollment.student_details.id, enrollment.student_details);
-        uniqueStudents.push(enrollment.student_details);
+        // Get email from multiple possible locations
+        const studentEmail =
+          enrollment.student_details.email ||
+          enrollment.course_details?.instructor?.email ||
+          `${enrollment.student_details.username}@example.com`;
+
+        const studentWithEmail = {
+          ...enrollment.student_details,
+          email: studentEmail
+        };
+
+        studentMap.set(enrollment.student_details.id, studentWithEmail);
+        uniqueStudents.push(studentWithEmail);
       }
     });
-    
+
     setStudents(uniqueStudents);
   };
 
@@ -83,7 +94,7 @@ const EnrollmentManagementTab = ({
       if (e.enrollment_status === 'cancelled') return true;
       return !e.is_active;
     }).length;
-    const avgProgress = total > 0 
+    const avgProgress = total > 0
       ? Math.round(enrollmentList.reduce((sum, e) => sum + (e.progress || 0), 0) / total)
       : 0;
 
@@ -99,41 +110,50 @@ const EnrollmentManagementTab = ({
 
   const getFilteredEnrollments = () => {
     let filtered = [...enrollments];
-    
+
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(enrollment => {
         const studentUsername = enrollment.student_details?.username?.toLowerCase() || '';
-        const studentEmail = enrollment.student_details?.email?.toLowerCase() || '';
+
+        // Get email from multiple possible locations
+        const studentEmail = (
+          enrollment.student_details?.email ||
+          enrollment.course_details?.instructor?.email ||
+          ''
+        ).toLowerCase();
+
         const courseTitle = enrollment.course_details?.title?.toLowerCase() || '';
-        
-        return studentUsername.includes(term) || 
-               studentEmail.includes(term) || 
-               courseTitle.includes(term);
+        const instructorName = enrollment.course_details?.instructor?.username?.toLowerCase() || '';
+
+        return studentUsername.includes(term) ||
+          studentEmail.includes(term) ||
+          courseTitle.includes(term) ||
+          instructorName.includes(term);
       });
     }
-    
+
     if (filters.courseId && filters.courseId !== 'all') {
-      filtered = filtered.filter(enrollment => 
-        enrollment.course?.toString() === filters.courseId || 
+      filtered = filtered.filter(enrollment =>
+        enrollment.course?.toString() === filters.courseId ||
         enrollment.course_details?.id?.toString() === filters.courseId
       );
     }
-    
+
     if (filters.enrollmentStatus !== 'all') {
       filtered = filtered.filter(enrollment => {
-        const status = enrollment.enrollment_status || 
-                      (enrollment.completed_at ? 'completed' : 
-                       enrollment.is_active ? 'active' : 'cancelled');
+        const status = enrollment.enrollment_status ||
+          (enrollment.completed_at ? 'completed' :
+            enrollment.is_active ? 'active' : 'cancelled');
         return status === filters.enrollmentStatus;
       });
     }
-    
+
     if (filters.dateRange !== 'all') {
       const now = new Date();
       let startDate = new Date();
-      
-      switch(filters.dateRange) {
+
+      switch (filters.dateRange) {
         case 'today':
           startDate.setHours(0, 0, 0, 0);
           break;
@@ -149,27 +169,38 @@ const EnrollmentManagementTab = ({
         default:
           break;
       }
-      
+
       filtered = filtered.filter(enrollment => {
         const enrolledDate = new Date(enrollment.enrolled_at);
         return enrolledDate >= startDate;
       });
     }
-    
+
     filtered.sort((a, b) => {
       let aValue, bValue;
-      
+
       if (sortConfig.key === 'student__username') {
         aValue = a.student_details?.username || '';
         bValue = b.student_details?.username || '';
       } else if (sortConfig.key === 'course__title') {
         aValue = a.course_details?.title || '';
         bValue = b.course_details?.title || '';
+      } else if (sortConfig.key === 'student_email') {
+        aValue = (
+          a.student_details?.email ||
+          a.course_details?.instructor?.email ||
+          ''
+        );
+        bValue = (
+          b.student_details?.email ||
+          b.course_details?.instructor?.email ||
+          ''
+        );
       } else {
         aValue = a[sortConfig.key];
         bValue = b[sortConfig.key];
       }
-      
+
       if (aValue < bValue) {
         return sortConfig.direction === 'asc' ? -1 : 1;
       }
@@ -178,7 +209,7 @@ const EnrollmentManagementTab = ({
       }
       return 0;
     });
-    
+
     return filtered;
   };
 
@@ -197,8 +228,8 @@ const EnrollmentManagementTab = ({
   };
 
   const handleSelectEnrollment = (id) => {
-    setSelectedIds(prev => 
-      prev.includes(id) 
+    setSelectedIds(prev =>
+      prev.includes(id)
         ? prev.filter(selectedId => selectedId !== id)
         : [...prev, id]
     );
@@ -219,12 +250,12 @@ const EnrollmentManagementTab = ({
       setLoading(true);
       await updateEnrollment(enrollmentId, updates);
       await fetchInitialData();
-      
+
       if (selectedEnrollment?.id === enrollmentId) {
         const updated = await getEnrollmentDetails(enrollmentId);
         setSelectedEnrollment(updated.data);
       }
-      
+
       alert('Enrollment updated successfully!');
     } catch (error) {
       console.error('Error updating enrollment:', error);
@@ -240,11 +271,11 @@ const EnrollmentManagementTab = ({
         setLoading(true);
         await cancelEnrollment(enrollmentId);
         await fetchInitialData();
-        
+
         if (selectedEnrollment?.id === enrollmentId) {
           setSelectedEnrollment(null);
         }
-        
+
         alert('Enrollment cancelled successfully!');
       } catch (error) {
         console.error('Error cancelling enrollment:', error);
@@ -279,7 +310,7 @@ const EnrollmentManagementTab = ({
         const updates = { is_active: action === 'activate' };
         await Promise.all(selectedIds.map(id => updateEnrollment(id, updates)));
       }
-      
+
       await fetchInitialData();
       setSelectedIds([]);
       alert(`Successfully ${actionText}ed ${selectedIds.length} enrollment(s)!`);
@@ -307,7 +338,7 @@ const EnrollmentManagementTab = ({
   const handleAddEnrollment = async () => {
     try {
       setLoading(true);
-      
+
       if (!addFormData.student_id || !addFormData.course_id) {
         alert('Please select both student and course');
         return;
@@ -386,40 +417,44 @@ const EnrollmentManagementTab = ({
         <div className="s-a-m-search-controls">
           <input
             type="text"
-            placeholder="Search by student, email, or course..."
+            placeholder="Search by student, email, course, or instructor..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="s-a-m-search-input"
+            aria-label="Search enrollments"
           />
-          
+
           <select
             value={filters.courseId}
             onChange={(e) => setFilters(prev => ({ ...prev, courseId: e.target.value }))}
             className="s-a-m-filter-select"
+            aria-label="Filter by course"
           >
             <option value="all">All Courses</option>
             {courses.map(course => (
               <option key={course.id} value={course.id}>
-                {course.title} ({course.status})
+                {course.title.length > 30 ? `${course.title.substring(0, 30)}...` : course.title} ({course.status})
               </option>
             ))}
           </select>
-          
+
           <select
             value={filters.enrollmentStatus}
             onChange={(e) => setFilters(prev => ({ ...prev, enrollmentStatus: e.target.value }))}
             className="s-a-m-filter-select"
+            aria-label="Filter by status"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="completed">Completed</option>
             <option value="cancelled">Cancelled</option>
           </select>
-          
+
           <select
             value={filters.dateRange}
             onChange={(e) => setFilters(prev => ({ ...prev, dateRange: e.target.value }))}
             className="s-a-m-filter-select"
+            aria-label="Filter by date range"
           >
             <option value="all">All Time</option>
             <option value="today">Today</option>
@@ -428,16 +463,18 @@ const EnrollmentManagementTab = ({
             <option value="year">Last Year</option>
           </select>
         </div>
-        
+
         <div className="s-a-m-bulk-actions">
-          <button 
+          <button
             className="s-a-m-btn s-a-m-btn-primary"
             onClick={() => setShowAddModal(true)}
+            aria-label="Add new enrollment"
           >
-            + Add Enrollment
+            <span className="s-a-m-btn-icon">+</span>
+            <span className="s-a-m-btn-text">Add Enrollment</span>
           </button>
-          
-          <span className="s-a-m-selected-count">
+
+          <span className="s-a-m-selected-count" aria-live="polite">
             {selectedIds.length} selected
           </span>
           <select
@@ -449,6 +486,7 @@ const EnrollmentManagementTab = ({
               }
             }}
             disabled={selectedIds.length === 0}
+            aria-label="Bulk actions"
           >
             <option value="">Bulk Actions</option>
             <option value="activate">Activate Selected</option>
@@ -474,6 +512,9 @@ const EnrollmentManagementTab = ({
               <th onClick={() => handleSort('student__username')}>
                 Student {sortConfig.key === 'student__username' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
               </th>
+              <th onClick={() => handleSort('student_email')}>
+                Email {sortConfig.key === 'student_email' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+              </th>
               <th onClick={() => handleSort('course__title')}>
                 Course {sortConfig.key === 'course__title' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
               </th>
@@ -488,89 +529,102 @@ const EnrollmentManagementTab = ({
           <tbody>
             {currentEnrollments.length === 0 ? (
               <tr>
-                <td colSpan="7" className="s-a-m-no-data">
+                <td colSpan="8" className="s-a-m-no-data">
                   No enrollments found
                 </td>
               </tr>
             ) : (
-              currentEnrollments.map(enrollment => (
-                <tr key={enrollment.id} className={`s-a-m-table-row ${selectedIds.includes(enrollment.id) ? 's-a-m-row-selected' : ''}`}>
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.includes(enrollment.id)}
-                      onChange={() => handleSelectEnrollment(enrollment.id)}
-                      className="s-a-m-checkbox"
-                    />
-                  </td>
-                  <td>
-                    <div className="s-a-m-student-info">
-                      <strong>{enrollment.student_details?.username || 'Unknown'}</strong>
-                      <small>{enrollment.student_details?.email || 'No email'}</small>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="s-a-m-course-info">
-                      <strong>{enrollment.course_details?.title || 'Unknown Course'}</strong>
-                      <small>{enrollment.course_details?.instructor?.username || 'Unknown Instructor'}</small>
-                    </div>
-                  </td>
-                  <td className="s-a-m-date-cell">
-                    <div>{new Date(enrollment.enrolled_at).toLocaleDateString()}</div>
-                    <small>{new Date(enrollment.enrolled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>
-                  </td>
-                  <td>
-                    <div className="s-a-m-progress-container">
-                      <div className="s-a-m-progress-bar">
-                        <div 
-                          className="s-a-m-progress-fill" 
-                          style={{ width: `${enrollment.progress || 0}%` }}
-                        ></div>
+              currentEnrollments.map(enrollment => {
+                // Get email from multiple locations
+                const studentEmail =
+                  enrollment.student_details?.email ||
+                  enrollment.course_details?.instructor?.email ||
+                  `${enrollment.student_details?.username}@example.com`;
+
+                return (
+                  <tr key={enrollment.id} className={`s-a-m-table-row ${selectedIds.includes(enrollment.id) ? 's-a-m-row-selected' : ''}`}>
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(enrollment.id)}
+                        onChange={() => handleSelectEnrollment(enrollment.id)}
+                        className="s-a-m-checkbox"
+                      />
+                    </td>
+                    <td>
+                      <div className="s-a-m-student-info">
+                        <strong>{enrollment.student_details?.username || 'Unknown'}</strong>
+                        <small>{enrollment.student_details?.user_type || 'Student'}</small>
                       </div>
-                      <span className="s-a-m-progress-text">{Math.round(enrollment.progress || 0)}%</span>
-                    </div>
-                  </td>
-                  <td>
-                    <span className={`s-a-m-status-badge s-a-m-status-${enrollment.enrollment_status || (enrollment.completed_at ? 'completed' : enrollment.is_active ? 'active' : 'cancelled')}`}>
-                      {enrollment.enrollment_status || (enrollment.completed_at ? 'Completed' : enrollment.is_active ? 'Active' : 'Cancelled')}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="s-a-m-action-buttons">
-                      <button 
-                        className="s-a-m-btn s-a-m-btn-view"
-                        onClick={() => handleViewDetails(enrollment.id)}
-                      >
-                        View
-                      </button>
-                      {(enrollment.is_active || enrollment.enrollment_status === 'active') && !enrollment.completed_at && (
-                        <>
-                          <button 
-                            className="s-a-m-btn s-a-m-btn-complete"
-                            onClick={() => handleUpdateStatus(enrollment.id, { completed_at: new Date().toISOString() })}
-                          >
-                            Complete
-                          </button>
-                          <button 
-                            className="s-a-m-btn s-a-m-btn-cancel"
-                            onClick={() => handleCancelEnrollment(enrollment.id)}
-                          >
-                            Cancel
-                          </button>
-                        </>
-                      )}
-                      {(!enrollment.is_active || enrollment.enrollment_status === 'cancelled') && !enrollment.completed_at && (
-                        <button 
-                          className="s-a-m-btn s-a-m-btn-activate"
-                          onClick={() => handleUpdateStatus(enrollment.id, { is_active: true })}
+                    </td>
+                    <td>
+                      <div className="s-a-m-email-info">
+                        <strong>{studentEmail}</strong>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="s-a-m-course-info">
+                        <strong>{enrollment.course_details?.title || 'Unknown Course'}</strong>
+                        <small>{enrollment.course_details?.instructor?.username || 'Unknown Instructor'}</small>
+                      </div>
+                    </td>
+                    <td className="s-a-m-date-cell">
+                      <div>{new Date(enrollment.enrolled_at).toLocaleDateString()}</div>
+                      <small>{new Date(enrollment.enrolled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>
+                    </td>
+                    <td>
+                      <div className="s-a-m-progress-container">
+                        <div className="s-a-m-progress-bar">
+                          <div
+                            className="s-a-m-progress-fill"
+                            style={{ width: `${enrollment.progress || 0}%` }}
+                          ></div>
+                        </div>
+                        <span className="s-a-m-progress-text">{Math.round(enrollment.progress || 0)}%</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span className={`s-a-m-status-badge s-a-m-status-${enrollment.enrollment_status || (enrollment.completed_at ? 'completed' : enrollment.is_active ? 'active' : 'cancelled')}`}>
+                        {enrollment.enrollment_status || (enrollment.completed_at ? 'Completed' : enrollment.is_active ? 'Active' : 'Cancelled')}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="s-a-m-action-buttons">
+                        <button
+                          className="s-a-m-btn s-a-m-btn-view"
+                          onClick={() => handleViewDetails(enrollment.id)}
                         >
-                          Activate
+                          View
                         </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))
+                        {(enrollment.is_active || enrollment.enrollment_status === 'active') && !enrollment.completed_at && (
+                          <>
+                            <button
+                              className="s-a-m-btn s-a-m-btn-complete"
+                              onClick={() => handleUpdateStatus(enrollment.id, { completed_at: new Date().toISOString() })}
+                            >
+                              Complete
+                            </button>
+                            <button
+                              className="s-a-m-btn s-a-m-btn-cancel"
+                              onClick={() => handleCancelEnrollment(enrollment.id)}
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        )}
+                        {(!enrollment.is_active || enrollment.enrollment_status === 'cancelled') && !enrollment.completed_at && (
+                          <button
+                            className="s-a-m-btn s-a-m-btn-activate"
+                            onClick={() => handleUpdateStatus(enrollment.id, { is_active: true })}
+                          >
+                            Activate
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -586,13 +640,13 @@ const EnrollmentManagementTab = ({
           >
             Previous
           </button>
-          
+
           <div className="s-a-m-page-numbers">
             {Array.from({ length: totalPages }, (_, i) => i + 1)
               .filter(page => page === 1 || page === totalPages || (page >= currentPage - 1 && page <= currentPage + 1))
               .map((page, i, arr) => (
                 <React.Fragment key={page}>
-                  {i > 0 && arr[i-1] !== page - 1 && <span className="s-a-m-page-ellipsis">...</span>}
+                  {i > 0 && arr[i - 1] !== page - 1 && <span className="s-a-m-page-ellipsis">...</span>}
                   <button
                     className={`s-a-m-page-btn ${currentPage === page ? 's-a-m-page-active' : ''}`}
                     onClick={() => setCurrentPage(page)}
@@ -603,7 +657,7 @@ const EnrollmentManagementTab = ({
               ))
             }
           </div>
-          
+
           <button
             className="s-a-m-pagination-btn"
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
@@ -622,7 +676,7 @@ const EnrollmentManagementTab = ({
               <h3>➕ Add New Enrollment</h3>
               <button className="s-a-m-close-btn" onClick={() => setShowAddModal(false)}>×</button>
             </div>
-            
+
             <div className="s-a-m-modal-body">
               <div className="s-a-m-form-grid">
                 <div className="s-a-m-form-row">
@@ -638,12 +692,12 @@ const EnrollmentManagementTab = ({
                     <option value="">Select student</option>
                     {students.map(student => (
                       <option key={student.id} value={student.id}>
-                        {student.username} ({student.email})
+                        {student.username} ({student.email || 'No email'})
                       </option>
                     ))}
                   </select>
                 </div>
-                
+
                 <div className="s-a-m-form-row">
                   <label className="s-a-m-form-label" htmlFor="course_id">Course *</label>
                   <select
@@ -662,7 +716,7 @@ const EnrollmentManagementTab = ({
                     ))}
                   </select>
                 </div>
-                
+
                 <div className="s-a-m-form-row">
                   <label className="s-a-m-form-label" htmlFor="progress">Progress (%)</label>
                   <input
@@ -677,7 +731,7 @@ const EnrollmentManagementTab = ({
                     placeholder="0"
                   />
                 </div>
-                
+
                 <div className="s-a-m-form-check">
                   <input
                     type="checkbox"
@@ -692,16 +746,16 @@ const EnrollmentManagementTab = ({
                   </label>
                 </div>
               </div>
-              
+
               <div className="s-a-m-modal-actions">
-                <button 
+                <button
                   className="s-a-m-btn s-a-m-btn-primary s-a-m-modal-btn"
                   onClick={handleAddEnrollment}
                   disabled={!addFormData.student_id || !addFormData.course_id || loading}
                 >
                   {loading ? 'Adding...' : 'Add'}
                 </button>
-                <button 
+                <button
                   className="s-a-m-btn s-a-m-btn-close s-a-m-modal-btn"
                   onClick={() => setShowAddModal(false)}
                   disabled={loading}
@@ -722,7 +776,7 @@ const EnrollmentManagementTab = ({
               <h3>📋 Enrollment Details</h3>
               <button className="s-a-m-close-btn" onClick={() => setSelectedEnrollment(null)}>×</button>
             </div>
-            
+
             <div className="s-a-m-modal-body">
               <div className="s-a-m-detail-grid">
                 <div className="s-a-m-detail-section">
@@ -733,14 +787,18 @@ const EnrollmentManagementTab = ({
                   </div>
                   <div className="s-a-m-detail-item">
                     <span className="s-a-m-detail-label">Email:</span>
-                    <span className="s-a-m-detail-value">{selectedEnrollment.student_details?.email}</span>
+                    <span className="s-a-m-detail-value">
+                      {selectedEnrollment.student_details?.email ||
+                        selectedEnrollment.course_details?.instructor?.email ||
+                        'No email available'}
+                    </span>
                   </div>
                   <div className="s-a-m-detail-item">
                     <span className="s-a-m-detail-label">Type:</span>
                     <span className="s-a-m-detail-value">{selectedEnrollment.student_details?.user_type}</span>
                   </div>
                 </div>
-                
+
                 <div className="s-a-m-detail-section">
                   <h4>📚 Course</h4>
                   <div className="s-a-m-detail-item">
@@ -756,7 +814,7 @@ const EnrollmentManagementTab = ({
                     <span className="s-a-m-detail-value">{selectedEnrollment.course_details?.category}</span>
                   </div>
                 </div>
-                
+
                 <div className="s-a-m-detail-section">
                   <h4>📊 Enrollment</h4>
                   <div className="s-a-m-detail-item">
@@ -787,11 +845,11 @@ const EnrollmentManagementTab = ({
                   )}
                 </div>
               </div>
-              
+
               <div className="s-a-m-modal-actions">
                 {selectedEnrollment.is_active && !selectedEnrollment.completed_at && (
                   <>
-                    <button 
+                    <button
                       className="s-a-m-btn s-a-m-btn-complete s-a-m-modal-btn"
                       onClick={() => {
                         handleUpdateStatus(selectedEnrollment.id, { completed_at: new Date().toISOString() });
@@ -799,7 +857,7 @@ const EnrollmentManagementTab = ({
                     >
                       Mark Complete
                     </button>
-                    <button 
+                    <button
                       className="s-a-m-btn s-a-m-btn-cancel s-a-m-modal-btn"
                       onClick={() => {
                         handleCancelEnrollment(selectedEnrollment.id);
@@ -811,7 +869,7 @@ const EnrollmentManagementTab = ({
                   </>
                 )}
                 {!selectedEnrollment.is_active && !selectedEnrollment.completed_at && (
-                  <button 
+                  <button
                     className="s-a-m-btn s-a-m-btn-activate s-a-m-modal-btn"
                     onClick={() => {
                       handleUpdateStatus(selectedEnrollment.id, { is_active: true });
@@ -820,7 +878,7 @@ const EnrollmentManagementTab = ({
                     Reactivate
                   </button>
                 )}
-                <button 
+                <button
                   className="s-a-m-btn s-a-m-btn-close s-a-m-modal-btn"
                   onClick={() => setSelectedEnrollment(null)}
                 >
@@ -843,7 +901,7 @@ const CoursesManagementTab = () => {
         <h3>📚 Courses Management</h3>
         <p>Manage all courses in the platform</p>
       </div>
-      
+
       <div className="s-a-m-placeholder">
         <h4>Courses Management Features</h4>
         <ul>
@@ -867,7 +925,7 @@ const ProgressTrackingTab = () => {
         <h3>📊 Progress Tracking</h3>
         <p>Track student progress and analytics</p>
       </div>
-      
+
       <div className="s-a-m-placeholder">
         <h4>Progress Tracking Features</h4>
         <ul>
@@ -904,11 +962,11 @@ const CourseAdminManagement = () => {
         getAllenrollements(),
         getAllCourses()
       ]);
-      
+
       const enrollmentData = enrollmentsRes.data?.enrollments || enrollmentsRes.data || [];
       setEnrollments(enrollmentData);
       setCourses(coursesRes.data || []);
-      
+
       if (enrollmentsRes.data) {
         setEnrollmentStats({
           total: enrollmentsRes.data.total_enrollments || enrollmentData.length,
@@ -987,7 +1045,7 @@ const CourseAdminManagement = () => {
       {/* Tab Content */}
       <div className="s-a-m-tab-content-container">
         {activeTab === 'enrollment' && (
-          <EnrollmentManagementTab 
+          <EnrollmentManagementTab
             enrollments={enrollments}
             courses={courses}
             fetchInitialData={fetchInitialData}

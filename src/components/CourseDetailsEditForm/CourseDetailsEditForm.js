@@ -189,52 +189,49 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!course) return;
-
-        // Show preview before submitting
-        if (!showPreview) {
-            showCompleteStructure();
-            return;
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!course) return;
+    
+    if (isSubmitting) {
+        console.log('Already submitting, skipping');
+        return;
+    }
+    
+    if (!showPreview) {
+        showCompleteStructure();
+        return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+        const submitData = createFormData();
+        
+        console.log('=== CHILD: Making API call ===');
+        
+        // Child handles the API call
+        const response = await updateCourse(course.id, submitData);
+        
+        console.log('Child API call successful');
+        
+        if (onUpdate) {
+            console.log('Passing response data to parent');
+            // Pass ONLY the response data
+            onUpdate(response.data);
         }
-
-        setIsSubmitting(true);
-        try {
-            const submitData = createFormData();
-
-            const formDataObj = {};
-            for (let pair of submitData.entries()) {
-                if (pair[0] === 'thumbnail' && pair[1] instanceof File) {
-                    formDataObj[pair[0]] = `File: ${pair[1].name}`;
-                } else if (pair[0] === 'learning_objectives') {
-                    formDataObj[pair[0]] = JSON.parse(pair[1]);
-                } else {
-                    formDataObj[pair[0]] = pair[1];
-                }
-            }
-
-            // Call update API
-            const response = await updateCourse(course.id, submitData);
-
-            if (onUpdate) {
-                onUpdate(response.data);
-            }
-
-
-            setShowPreview(false);
-
-        } catch (error) {
-            console.error('=== DEBUG: ERROR IN COURSE UPDATE ===');
-            console.error('Error:', error);
-            console.error('Error Response:', error.response);
-            console.error('Error Data:', error.response?.data);
-            console.error('Error Status:', error.response?.status);
-
-            alert('Error updating course: ' + (error.response?.data?.message || error.response?.data?.detail || error.message));
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+        
+        setShowPreview(false);
+        alert('Course updated successfully!');
+        
+    } catch (error) {
+        console.error('Child API call failed:', error);
+        alert('Error updating course: ' + (error.response?.data?.message || error.message));
+    } finally {
+        setIsSubmitting(false);
+    }
+};
 
     const handleReset = () => {
         if (course) {
