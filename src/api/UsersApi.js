@@ -1,6 +1,11 @@
 import apiClient from "../utils/Http";
 
 export const getAllUsers = () => apiClient.get('api/');
+export const getStudentsUsers = () =>apiClient.get('api/', {
+    params: {
+      user_type: 'student',
+    },
+  });
 export const getUserById = (id) => apiClient.get(`api/user/${id}/`);
 export const createUser = (data) => apiClient.post('api/', data);
 export const signup = (data) => apiClient.post('api/auth/signup/', data);

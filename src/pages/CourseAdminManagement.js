@@ -8,6 +8,7 @@ import {
   EnrollToCourse
 } from '../api/EnrollmentApis';
 import { getAllCourses } from '../api/CoursesApi';
+import { getStudentsUsers } from '../api/UsersApi'; // Import the students API
 import '../static/CourseAdminManagement.css';
 
 // Enrollment Management Component
@@ -46,30 +47,50 @@ const EnrollmentManagementTab = ({
     cancelled: 0,
     averageProgress: 0
   });
+  const [studentSearchTerm, setStudentSearchTerm] = useState('');
+  const [courseSearchTerm, setCourseSearchTerm] = useState('');
 
-  // Update when props change
-  useEffect(() => {
-    setEnrollments(propEnrollments || []);
-    setCourses(propCourses || []);
-    calculateStats(propEnrollments || []);
-    extractStudents(propEnrollments || []);
-  }, [propEnrollments, propCourses]);
+  // Filter students based on search term
+  const filteredStudents = students.filter(student => {
+    if (!studentSearchTerm) return true;
 
-  const extractStudents = (enrollmentList) => {
+    const term = studentSearchTerm.toLowerCase();
+    const username = student.username?.toLowerCase() || '';
+    const email = student.email?.toLowerCase() || '';
+    const firstName = student.first_name?.toLowerCase() || '';
+    const lastName = student.last_name?.toLowerCase() || '';
+    const fullName = `${firstName} ${lastName}`.toLowerCase().trim();
+
+    return (
+      username.includes(term) ||
+      email.includes(term) ||
+      firstName.includes(term) ||
+      lastName.includes(term) ||
+      fullName.includes(term)
+    );
+  });
+
+  // Filter courses based on search term
+  const filteredCourses = courses.filter(course => {
+    if (!courseSearchTerm) return true;
+
+    const term = courseSearchTerm.toLowerCase();
+    const title = course.title?.toLowerCase() || '';
+
+    return title.includes(term);
+  });
+
+
+  // Extract students from enrollments (standalone function, no dependencies)
+  const extractStudentsFromEnrollments = useCallback((enrollmentList, currentStudents) => {
     const uniqueStudents = [];
     const studentMap = new Map();
 
     enrollmentList.forEach(enrollment => {
       if (enrollment.student_details && !studentMap.has(enrollment.student_details.id)) {
-        // Get email from multiple possible locations
-        const studentEmail =
-          enrollment.student_details.email ||
-          enrollment.course_details?.instructor?.email ||
-          `${enrollment.student_details.username}@example.com`;
-
         const studentWithEmail = {
           ...enrollment.student_details,
-          email: studentEmail
+          email: enrollment.student_details?.email || `${enrollment.student_details.username}@example.com`
         };
 
         studentMap.set(enrollment.student_details.id, studentWithEmail);
@@ -77,8 +98,43 @@ const EnrollmentManagementTab = ({
       }
     });
 
-    setStudents(uniqueStudents);
-  };
+    // Only set as fallback if we don't have students from API
+    if (currentStudents.length === 0) {
+      return uniqueStudents;
+    }
+    return currentStudents;
+  }, []); // No dependencies needed
+
+  // Fetch students from API
+  const fetchStudents = useCallback(async () => {
+    try {
+      const response = await getStudentsUsers();
+      if (response.data && Array.isArray(response.data)) {
+        // Filter only students (user_type === 'student')
+        const studentList = response.data.filter(user => user.user_type === 'student');
+        setStudents(studentList);
+      }
+    } catch (error) {
+      console.error('Error fetching students:', error);
+      // Fallback: extract from enrollments if API fails
+      const fallbackStudents = extractStudentsFromEnrollments(enrollments, students);
+      if (fallbackStudents.length > 0) {
+        setStudents(fallbackStudents);
+      }
+    }
+  }, [enrollments, students, extractStudentsFromEnrollments]); // Added extractStudentsFromEnrollments to dependencies
+
+  // Update when props change
+  useEffect(() => {
+    setEnrollments(propEnrollments || []);
+    setCourses(propCourses || []);
+    calculateStats(propEnrollments || []);
+
+    // Fetch students when component mounts or enrollments change
+    if (propEnrollments && propEnrollments.length > 0) {
+      fetchStudents();
+    }
+  }, [propEnrollments, propCourses, fetchStudents]);
 
   const calculateStats = (enrollmentList) => {
     const total = enrollmentList.length;
@@ -115,6 +171,8 @@ const EnrollmentManagementTab = ({
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(enrollment => {
         const studentUsername = enrollment.student_details?.username?.toLowerCase() || '';
+        const studentFirstName = enrollment.student_details?.first_name?.toLowerCase() || '';
+        const studentLastName = enrollment.student_details?.last_name?.toLowerCase() || '';
 
         // Get email from multiple possible locations
         const studentEmail = (
@@ -126,10 +184,14 @@ const EnrollmentManagementTab = ({
         const courseTitle = enrollment.course_details?.title?.toLowerCase() || '';
         const instructorName = enrollment.course_details?.instructor?.username?.toLowerCase() || '';
 
-        return studentUsername.includes(term) ||
+        return (
+          studentUsername.includes(term) ||
+          studentFirstName.includes(term) ||
+          studentLastName.includes(term) ||
           studentEmail.includes(term) ||
           courseTitle.includes(term) ||
-          instructorName.includes(term);
+          instructorName.includes(term)
+        );
       });
     }
 
@@ -344,12 +406,27 @@ const EnrollmentManagementTab = ({
         return;
       }
 
-      // Use the EnrollToCourse API to create enrollment
-      const response = await EnrollToCourse(addFormData.course_id, {
+      // Check if enrollment already exists
+      const existingEnrollment = enrollments.find(
+        e => e.student?.toString() === addFormData.student_id &&
+          e.course?.toString() === addFormData.course_id
+      );
+
+      if (existingEnrollment) {
+        alert('This student is already enrolled in this course');
+        return;
+      }
+
+      // Prepare enrollment data
+      const enrollmentData = {
         student_id: addFormData.student_id,
+        course_id: addFormData.course_id,
         is_active: addFormData.is_active,
-        progress: addFormData.progress
-      });
+        progress: parseInt(addFormData.progress) || 0
+      };
+
+      // Call the API to enroll student
+      const response = await EnrollToCourse(addFormData.course_id, enrollmentData);
 
       if (response.data) {
         alert('Enrollment added successfully!');
@@ -360,11 +437,14 @@ const EnrollmentManagementTab = ({
           is_active: true,
           progress: 0
         });
-        await fetchInitialData();
+        await fetchInitialData(); // Refresh the data
       }
     } catch (error) {
       console.error('Error adding enrollment:', error);
-      alert(`Failed to add enrollment: ${error.response?.data?.error || error.message}`);
+      const errorMessage = error.response?.data?.error ||
+        error.response?.data?.message ||
+        error.message;
+      alert(`Failed to add enrollment: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -417,7 +497,7 @@ const EnrollmentManagementTab = ({
         <div className="s-a-m-search-controls">
           <input
             type="text"
-            placeholder="Search by student, email, course, or instructor..."
+            placeholder="Search by student name, email, course, or instructor..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="s-a-m-search-input"
@@ -669,98 +749,181 @@ const EnrollmentManagementTab = ({
       )}
 
       {/* Compact Add Enrollment Modal */}
+      {/* Add Enrollment Modal - Search Only */}
       {showAddModal && (
         <div className="s-a-m-modal-overlay">
           <div className="s-a-m-modal-content">
             <div className="s-a-m-modal-header">
-              <h3>➕ Add New Enrollment</h3>
-              <button className="s-a-m-close-btn" onClick={() => setShowAddModal(false)}>×</button>
+              <h3>Add Enrollment</h3>
+              <button className="s-a-m-close-btn" onClick={() => {
+                setShowAddModal(false);
+                setStudentSearchTerm('');
+                setCourseSearchTerm('');
+              }}>×</button>
             </div>
 
             <div className="s-a-m-modal-body">
-              <div className="s-a-m-form-grid">
-                <div className="s-a-m-form-row">
-                  <label className="s-a-m-form-label" htmlFor="student_id">Student *</label>
-                  <select
-                    id="student_id"
-                    name="student_id"
-                    value={addFormData.student_id}
-                    onChange={handleAddFormChange}
-                    className="s-a-m-form-select"
-                    required
+            {/* Student Search */}
+            <div className="s-a-m-form-group">
+              <label>Student *</label>
+              <input
+                type="text"
+                placeholder="Search student by name, email, or username..."
+                value={studentSearchTerm}
+                onChange={(e) => setStudentSearchTerm(e.target.value)}
+                className="s-a-m-form-input-search"
+                autoComplete="off"
+              />
+              
+              {/* Search results dropdown */}
+              {studentSearchTerm && filteredStudents.length > 0 && !addFormData.student_id && (
+                <div className="s-a-m-form-search-dropdown">
+                  {filteredStudents.map(student => (
+                    <div 
+                      key={student.id}
+                      className="s-a-m-form-search-item"
+                      onClick={() => {
+                        setAddFormData(prev => ({ ...prev, student_id: student.id.toString() }));
+                        setStudentSearchTerm(''); // Clear search term to close dropdown
+                      }}
+                    >
+                      <strong>{student.username}</strong>
+                      <div className="s-a-m-form-search-details">
+                        {student.email && <span>{student.email}</span>}
+                        {(student.first_name || student.last_name) && (
+                          <span>{student.first_name} {student.last_name}</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* No results */}
+              {studentSearchTerm && filteredStudents.length === 0 && !addFormData.student_id && (
+                <div className="s-a-m-form-no-results">No students found</div>
+              )}
+              
+              {/* Selected student info */}
+              {addFormData.student_id && (
+                <div className="s-a-m-form-selected">
+                  ✓ Selected: {students.find(s => s.id.toString() === addFormData.student_id)?.username}
+                  <button 
+                    onClick={() => {
+                      setAddFormData(prev => ({ ...prev, student_id: '' }));
+                      setStudentSearchTerm('');
+                    }}
+                    className="s-a-m-form-clear-btn"
                   >
-                    <option value="">Select student</option>
-                    {students.map(student => (
-                      <option key={student.id} value={student.id}>
-                        {student.username} ({student.email || 'No email'})
-                      </option>
+                    Clear
+                  </button>
+                </div>
+              )}
+            </div>
+
+              {/* Course Search */}
+              <div className="s-a-m-form-group">
+                <label>Course *</label>
+                <input
+                  type="text"
+                  placeholder="Search course by title..."
+                  value={courseSearchTerm}
+                  onChange={(e) => setCourseSearchTerm(e.target.value)}
+                  className="s-a-m-form-input-search"
+                  autoComplete="off"
+                />
+                
+                {/* Search results dropdown - only show if searching AND no course is selected OR selected course doesn't match search */}
+                {courseSearchTerm && filteredCourses.length > 0 && !addFormData.course_id && (
+                  <div className="s-a-m-form-search-dropdown">
+                    {filteredCourses.map(course => (
+                      <div 
+                        key={course.id}
+                        className="s-a-m-form-search-item"
+                        onClick={() => {
+                          setAddFormData(prev => ({ ...prev, course_id: course.id.toString() }));
+                          setCourseSearchTerm(''); // Clear search term to close dropdown
+                        }}
+                      >
+                        <strong>{course.title}</strong>
+                        <div className="s-a-m-form-search-details">
+                          <span>Instructor ID: {course.instructor}</span>
+                          {course.category_details?.name && <span>{course.category_details.name}</span>}
+                        </div>
+                      </div>
                     ))}
-                  </select>
-                </div>
-
-                <div className="s-a-m-form-row">
-                  <label className="s-a-m-form-label" htmlFor="course_id">Course *</label>
-                  <select
-                    id="course_id"
-                    name="course_id"
-                    value={addFormData.course_id}
-                    onChange={handleAddFormChange}
-                    className="s-a-m-form-select"
-                    required
-                  >
-                    <option value="">Select course</option>
-                    {courses.map(course => (
-                      <option key={course.id} value={course.id}>
-                        {course.title} ({course.instructor?.username})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="s-a-m-form-row">
-                  <label className="s-a-m-form-label" htmlFor="progress">Progress (%)</label>
-                  <input
-                    type="number"
-                    id="progress"
-                    name="progress"
-                    value={addFormData.progress}
-                    onChange={handleAddFormChange}
-                    min="0"
-                    max="100"
-                    className="s-a-m-form-input"
-                    placeholder="0"
-                  />
-                </div>
-
-                <div className="s-a-m-form-check">
-                  <input
-                    type="checkbox"
-                    id="is_active"
-                    name="is_active"
-                    checked={addFormData.is_active}
-                    onChange={handleAddFormChange}
-                    className="s-a-m-checkbox-input"
-                  />
-                  <label htmlFor="is_active" className="s-a-m-checkbox-label">
-                    Active Enrollment
-                  </label>
-                </div>
+                  </div>
+                )}
+                
+                {/* No results - only show if searching AND no course is selected */}
+                {courseSearchTerm && filteredCourses.length === 0 && !addFormData.course_id && (
+                  <div className="s-a-m-form-no-results">No courses found</div>
+                )}
+                
+                {/* Selected course info */}
+                {addFormData.course_id && (
+                  <div className="s-a-m-form-selected">
+                    ✓ Selected: {courses.find(c => c.id.toString() === addFormData.course_id)?.title}
+                    <button 
+                      onClick={() => {
+                        setAddFormData(prev => ({ ...prev, course_id: '' }));
+                        setCourseSearchTerm('');
+                      }}
+                      className="s-a-m-form-clear-btn"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                )}
               </div>
 
-              <div className="s-a-m-modal-actions">
+              {/* Progress */}
+              <div className="s-a-m-form-group">
+                <label>Progress (%)</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  placeholder="0"
+                  value={addFormData.progress}
+                  onChange={handleAddFormChange}
+                  name="progress"
+                  className="s-a-m-form-input"
+                />
+              </div>
+
+              {/* Active checkbox */}
+              <div className="s-a-m-form-checkbox">
+                <input
+                  type="checkbox"
+                  id="is_active"
+                  name="is_active"
+                  checked={addFormData.is_active}
+                  onChange={handleAddFormChange}
+                  className="s-a-m-form-checkbox-input"
+                />
+                <label htmlFor="is_active">Active enrollment</label>
+              </div>
+
+              {/* Buttons */}
+              <div className="s-a-m-form-actions">
                 <button
-                  className="s-a-m-btn s-a-m-btn-primary s-a-m-modal-btn"
-                  onClick={handleAddEnrollment}
-                  disabled={!addFormData.student_id || !addFormData.course_id || loading}
-                >
-                  {loading ? 'Adding...' : 'Add'}
-                </button>
-                <button
-                  className="s-a-m-btn s-a-m-btn-close s-a-m-modal-btn"
-                  onClick={() => setShowAddModal(false)}
+                  className="s-a-m-btn s-a-m-btn-secondary"
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setStudentSearchTerm('');
+                    setCourseSearchTerm('');
+                  }}
                   disabled={loading}
                 >
                   Cancel
+                </button>
+                <button
+                  className="s-a-m-btn s-a-m-btn-primary"
+                  onClick={handleAddEnrollment}
+                  disabled={!addFormData.student_id || !addFormData.course_id || loading}
+                >
+                  {loading ? 'Adding...' : 'Add Enrollment'}
                 </button>
               </div>
             </div>
