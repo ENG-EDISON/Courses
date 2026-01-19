@@ -5,6 +5,8 @@ import UserManagement from "./Admin/UserManagement";
 import Footer from "../components/common/Footer";
 import TestimonialsManagement from "./TestimonialsManagement";
 import CourseAdminManagement from "./CourseAdminManagement";
+import AuditLogs from "./AuditLogs";
+
 const menuItems = [
   { id: "overview", label: "Overview", icon: "📊" },
   { id: "users", label: "Users", icon: "👤" },
@@ -13,6 +15,7 @@ const menuItems = [
   { id: "analytics", label: "Analytics", icon: "📈" },
   { id: "messages", label: "Messages", icon: "💬" },
   { id: "settings", label: "Settings", icon: "⚙️" },
+  { id: "audit", label: "Audit Logs", icon: "📋" }, // Add this line
 ];
 
 // ------------------ PAGE COMPONENTS ------------------
@@ -33,25 +36,6 @@ const AdminOverview = () => (
     </div>
   </div>
 );
-
-// Remove or comment out the old CoursesManagement component since we're replacing it
-// const CoursesManagement = () => (
-//   <div className="admin-page">
-//     <div className="content-section">
-//       <h2>📚 Courses Management</h2>
-//       <div className="content-grid">
-//         <div className="ad-content-card">
-//           <h3>Course Catalog</h3>
-//           <p>Manage all courses in the platform.</p>
-//         </div>
-//         <div className="ad-content-card">
-//           <h3>Content Moderation</h3>
-//           <p>Review and approve course content.</p>
-//         </div>
-//       </div>
-//     </div>
-//   </div>
-// );
 
 const AnalyticsDashboard = () => (
   <div className="admin-page">
@@ -105,6 +89,8 @@ const renderPage = (page) => {
       return <AdminMessagesList />;
     case "settings":
       return <AdminSettings />;
+    case "audit":
+      return <AuditLogs />; // Add this line
     default:
       return <AdminOverview />;
   }
