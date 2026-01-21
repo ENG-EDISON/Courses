@@ -616,7 +616,6 @@ const AdminMessagesList = () => {
                 />
             )}
         </div>
-        <Footer/>
         </div>
     );
 };
