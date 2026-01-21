@@ -33,7 +33,7 @@ const AuditLogs = () => {
   const [cleanupDays, setCleanupDays] = useState(90);
   const [quickStatsDays, setQuickStatsDays] = useState(30);
   const [suspiciousDays, setSuspiciousDays] = useState(7);
-  
+
   const searchTimeout = useRef(null);
 
   // Fetch available filters from API
@@ -77,8 +77,8 @@ const AuditLogs = () => {
         todayCount++;
       }
 
-      if (log.action === "LOGIN_FAILED" || 
-          (log.changes && log.changes.security_alert)) {
+      if (log.action === "LOGIN_FAILED" ||
+        (log.changes && log.changes.security_alert)) {
         suspiciousCount++;
       }
     });
@@ -156,17 +156,17 @@ const AuditLogs = () => {
         const logs = response.data.results || response.data;
         setAuditLogs(logs);
         setTotalPages(response.data.total_pages || 1);
-        
+
         const apiTotalCount = response.data.count || logs.length;
         setTotalCount(apiTotalCount);
-        
+
         setStats(prev => ({
           total_logs: apiTotalCount,
           active_users: prev.active_users,
           suspicious_activities: prev.suspicious_activities,
           today_logs: prev.today_logs
         }));
-        
+
         calculateStats(logs);
       }
     } catch (err) {
@@ -238,82 +238,82 @@ const AuditLogs = () => {
   const daysOptions = [1, 7, 30, 60, 90, 180, 365];
 
   // Handle search suspicious activities
-const handleSearchSuspicious = async () => {
-  try {
-    setLoading(true);
-    
-    // First try to get LOGIN_FAILED logs (most common suspicious activity)
-    let suspiciousLogs = [];
-    
+  const handleSearchSuspicious = async () => {
     try {
-      const response = await AuditLogsApi.getAuditLogsByAction("LOGIN_FAILED", {
-        page: 1,
-        page_size: pageSize,
-        days: suspiciousDays
-      });
-      
-      if (response.data) {
-        const logs = response.data.results || response.data || [];
-        suspiciousLogs = Array.isArray(logs) ? logs : [logs];
+      setLoading(true);
+
+      // First try to get LOGIN_FAILED logs (most common suspicious activity)
+      let suspiciousLogs = [];
+
+      try {
+        const response = await AuditLogsApi.getAuditLogsByAction("LOGIN_FAILED", {
+          page: 1,
+          page_size: pageSize,
+          days: suspiciousDays
+        });
+
+        if (response.data) {
+          const logs = response.data.results || response.data || [];
+          suspiciousLogs = Array.isArray(logs) ? logs : [logs];
+        }
+      } catch (actionErr) {
+        console.log("Failed to get LOGIN_FAILED logs:", actionErr.message);
       }
-    } catch (actionErr) {
-      console.log("Failed to get LOGIN_FAILED logs:", actionErr.message);
-    }
-    
-    // If no failed logins, try other suspicious actions
-    if (suspiciousLogs.length === 0) {
-      const otherActions = ["LOGIN_ATTEMPT", "UNAUTHORIZED", "SECURITY"];
-      for (const action of otherActions) {
-        try {
-          const response = await AuditLogsApi.searchAuditLogs(action, {
-            page: 1,
-            page_size: pageSize,
-            days: suspiciousDays
-          });
-          
-          if (response.data) {
-            const logs = response.data.results || response.data || [];
-            if (Array.isArray(logs) && logs.length > 0) {
-              suspiciousLogs = logs;
-              break;
+
+      // If no failed logins, try other suspicious actions
+      if (suspiciousLogs.length === 0) {
+        const otherActions = ["LOGIN_ATTEMPT", "UNAUTHORIZED", "SECURITY"];
+        for (const action of otherActions) {
+          try {
+            const response = await AuditLogsApi.searchAuditLogs(action, {
+              page: 1,
+              page_size: pageSize,
+              days: suspiciousDays
+            });
+
+            if (response.data) {
+              const logs = response.data.results || response.data || [];
+              if (Array.isArray(logs) && logs.length > 0) {
+                suspiciousLogs = logs;
+                break;
+              }
             }
+          } catch (searchErr) {
+            continue;
           }
-        } catch (searchErr) {
-          continue;
         }
       }
+
+      // Update the display
+      setAuditLogs(suspiciousLogs);
+      setTotalCount(suspiciousLogs.length);
+      setTotalPages(1);
+      setSelectedFilter("all");
+      setSelectedModel("all");
+      setSelectedUser("all");
+      setSearchQuery("");
+      setSelectedTimeRange("all");
+      setCurrentPage(1);
+
+      // Update stats
+      setStats(prev => ({
+        ...prev,
+        suspicious_activities: suspiciousLogs.length
+      }));
+
+      if (suspiciousLogs.length === 0) {
+        alert(`No suspicious activities found in the last ${suspiciousDays} days.`);
+      } else {
+        alert(`Found ${suspiciousLogs.length} suspicious activities in the last ${suspiciousDays} days.`);
+      }
+
+    } catch (err) {
+      console.error("Error searching suspicious logs:", err);
+      setError("Failed to search suspicious activities. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    
-    // Update the display
-    setAuditLogs(suspiciousLogs);
-    setTotalCount(suspiciousLogs.length);
-    setTotalPages(1);
-    setSelectedFilter("all");
-    setSelectedModel("all");
-    setSelectedUser("all");
-    setSearchQuery("");
-    setSelectedTimeRange("all");
-    setCurrentPage(1);
-    
-    // Update stats
-    setStats(prev => ({
-      ...prev,
-      suspicious_activities: suspiciousLogs.length
-    }));
-    
-    if (suspiciousLogs.length === 0) {
-      alert(`No suspicious activities found in the last ${suspiciousDays} days.`);
-    } else {
-      alert(`Found ${suspiciousLogs.length} suspicious activities in the last ${suspiciousDays} days.`);
-    }
-    
-  } catch (err) {
-    console.error("Error searching suspicious logs:", err);
-    setError("Failed to search suspicious activities. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   // Handle cleanup with days input
   const handleCleanup = async () => {
@@ -335,40 +335,125 @@ const handleSearchSuspicious = async () => {
   };
 
   // Handle export - using main endpoint with export param
-  const handleExport = async (format = "csv") => {
+  // Simple export function that always works
+  const handleExport = async () => {
     setExporting(true);
     try {
+      // Fetch data using the same logic as fetchAuditLogs but with more records
       const params = {
-        format: format,
-        page: currentPage,
-        page_size: pageSize,
-        export: 'csv' // This triggers export on the main endpoint
+        page: 1,
+        page_size: 5000, // Get more records for export
       };
 
       if (selectedFilter !== "all") params.action = selectedFilter;
       if (selectedModel !== "all") params.model_name = selectedModel;
-      if (selectedUser !== "all") params.user_id = selectedUser;
-      if (searchQuery) params.search = searchQuery;
-      if (selectedTimeRange !== "all") params.date_range = selectedTimeRange;
-
-      const response = await AuditLogsApi.getAllAuditLogs(params);
-      
-      if (response.data) {
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement("a");
-        link.href = url;
-        const dateStr = new Date().toISOString().split('T')[0];
-        link.setAttribute("download", `audit-logs-${dateStr}.${format}`);
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
+      if (selectedUser !== "all") {
+        const userId = typeof selectedUser === 'object' ? selectedUser.id || selectedUser.value : selectedUser;
+        params.user_id = userId;
       }
+      if (searchQuery && searchQuery.trim() !== "") params.search = searchQuery;
+
+      let response;
+      switch (selectedTimeRange) {
+        case "today":
+          response = await AuditLogsApi.getTodayAuditLogs(params);
+          break;
+        case "yesterday":
+          response = await AuditLogsApi.getYesterdayAuditLogs(params);
+          break;
+        case "last7":
+          response = await AuditLogsApi.getLast7DaysAuditLogs(params);
+          break;
+        case "last30":
+          response = await AuditLogsApi.getLast30DaysAuditLogs(params);
+          break;
+        case "month":
+          response = await AuditLogsApi.getThisMonthAuditLogs(params);
+          break;
+        default:
+          response = await AuditLogsApi.getAllAuditLogs(params);
+          break;
+      }
+
+      const logs = response.data.results || response.data || [];
+
+      if (logs.length === 0) {
+        alert("No data to export");
+        return;
+      }
+
+      // Convert to CSV
+      const csvContent = convertToCSV(logs);
+
+      // Create download
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      const dateStr = new Date().toISOString().split('T')[0];
+      link.setAttribute("download", `audit-logs-${dateStr}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      alert(`Exported ${logs.length} records to CSV`);
+
     } catch (err) {
-      console.error("Error exporting logs:", err);
-      alert("Failed to export audit logs");
+      console.error("Export error:", err);
+      alert("Failed to export data: " + (err.message || "Unknown error"));
     } finally {
       setExporting(false);
     }
+  };
+
+  // Improved CSV conversion
+  const convertToCSV = (logs) => {
+    if (!logs || logs.length === 0) return '';
+
+    // Define headers
+    const headers = [
+      'ID',
+      'Timestamp',
+      'User',
+      'Action',
+      'Model',
+      'Object ID',
+      'IP Address',
+      'Request Path',
+      'Method',
+      'User Agent',
+      'Changes'
+    ];
+
+    // Convert to CSV rows
+    const rows = logs.map(log => [
+      log.id || '',
+      log.timestamp || '',
+      getUserDisplay(log),
+      log.action || '',
+      log.model_name || '',
+      log.object_id || '',
+      log.ip_address || '',
+      log.request_path || '',
+      log.request_method || '',
+      (log.user_agent || '').substring(0, 100), // Truncate long user agents
+      log.changes ? JSON.stringify(log.changes).replace(/"/g, '""') : ''
+    ]);
+
+    // Combine headers and rows
+    const csvArray = [headers, ...rows];
+
+    // Convert to CSV string
+    return csvArray.map(row =>
+      row.map(cell => {
+        const cellStr = String(cell || '');
+        // Wrap in quotes if contains comma, quote, or newline
+        if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n') || cellStr.includes('\r')) {
+          return '"' + cellStr.replace(/"/g, '""') + '"';
+        }
+        return cellStr;
+      }).join(',')
+    ).join('\n');
   };
 
   // Handle pagination
@@ -410,11 +495,11 @@ const handleSearchSuspicious = async () => {
       const response = await AuditLogsApi.getAuditLogSystemHealth();
       if (response.data) {
         alert(`System Health:\n\n` +
-              `Database Size: ${response.data.database_size || 'N/A'}\n` +
-              `Logs Count: ${response.data.logs_count || 0}\n` +
-              `Average Log Size: ${response.data.avg_log_size || 'N/A'}\n` +
-              `Last Cleanup: ${response.data.last_cleanup || 'Never'}\n` +
-              `Status: ${response.data.status || 'Unknown'}`);
+          `Database Size: ${response.data.database_size || 'N/A'}\n` +
+          `Logs Count: ${response.data.logs_count || 0}\n` +
+          `Average Log Size: ${response.data.avg_log_size || 'N/A'}\n` +
+          `Last Cleanup: ${response.data.last_cleanup || 'Never'}\n` +
+          `Status: ${response.data.status || 'Unknown'}`);
       }
     } catch (err) {
       console.error("Error getting system health:", err);
@@ -467,7 +552,7 @@ const handleSearchSuspicious = async () => {
         const operations = response.data.operations || [];
         if (operations.length > 0) {
           alert(`Bulk Operations (last ${quickStatsDays} days):\n\n` +
-                operations.map(op => `${op.action}: ${op.count} logs`).join('\n'));
+            operations.map(op => `${op.action}: ${op.count} logs`).join('\n'));
         } else {
           alert(`No bulk operations found in the last ${quickStatsDays} days.`);
         }
@@ -504,10 +589,10 @@ const handleSearchSuspicious = async () => {
       if (response.data) {
         const info = response.data;
         alert(`Pagination Info:\n\n` +
-              `Total Pages: ${info.total_pages || 1}\n` +
-              `Total Items: ${info.total_items || 0}\n` +
-              `Current Page Size: ${info.page_size || pageSize}\n` +
-              `Default Page Size: ${info.default_page_size || 20}`);
+          `Total Pages: ${info.total_pages || 1}\n` +
+          `Total Items: ${info.total_items || 0}\n` +
+          `Current Page Size: ${info.page_size || pageSize}\n` +
+          `Default Page Size: ${info.default_page_size || 20}`);
       }
     } catch (err) {
       console.error("Error getting pagination info:", err);
@@ -562,8 +647,8 @@ const handleSearchSuspicious = async () => {
       if (isNaN(date.getTime())) {
         return "Invalid Date";
       }
-      return date.toLocaleDateString() + " " + date.toLocaleTimeString([], { 
-        hour: '2-digit', 
+      return date.toLocaleDateString() + " " + date.toLocaleTimeString([], {
+        hour: '2-digit',
         minute: '2-digit',
         second: '2-digit'
       });
@@ -575,7 +660,7 @@ const handleSearchSuspicious = async () => {
   // Get action icon
   const getActionIcon = (action) => {
     if (!action) return "📝";
-    
+
     const actionStr = action.toLowerCase();
     if (actionStr.includes("login") && actionStr.includes("success")) return "✅";
     if (actionStr.includes("login") && actionStr.includes("failed")) return "❌";
@@ -594,7 +679,7 @@ const handleSearchSuspicious = async () => {
   // Get severity color based on action
   const getSeverityColor = (action) => {
     if (!action) return "#6c757d";
-    
+
     const actionStr = action.toLowerCase();
     if (actionStr.includes("login_failed")) return "#dc3545";
     if (actionStr.includes("login_success")) return "#28a745";
@@ -683,10 +768,10 @@ const handleSearchSuspicious = async () => {
             Monitor and track all system activities and user actions
           </p>
         </div>
-        
+
         {/* Quick Stats */}
         <div className="audit-logs-quick-actions">
-          <button 
+          <button
             className="audit-logs-quick-button"
             onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
           >
@@ -756,7 +841,7 @@ const handleSearchSuspicious = async () => {
         <div className="audit-logs-advanced-filters">
           <div className="audit-logs-advanced-header">
             <h3>🔍 Advanced Filters</h3>
-            <button 
+            <button
               className="audit-logs-reset-filters"
               onClick={resetFilters}
             >
@@ -781,7 +866,7 @@ const handleSearchSuspicious = async () => {
                 ))}
               </select>
             </div>
-            
+
             <div className="audit-logs-filter-group">
               <label>Model:</label>
               <select
@@ -799,7 +884,7 @@ const handleSearchSuspicious = async () => {
                 ))}
               </select>
             </div>
-            
+
             <div className="audit-logs-filter-group">
               <label>User:</label>
               <select
@@ -817,7 +902,7 @@ const handleSearchSuspicious = async () => {
                 ))}
               </select>
             </div>
-            
+
             <div className="audit-logs-filter-group">
               <label>Time Range:</label>
               <select
@@ -906,7 +991,7 @@ const handleSearchSuspicious = async () => {
           >
             {exporting ? "⏳" : "📥"} {exporting ? "Exporting..." : "Export CSV"}
           </button>
-          
+
           <div className="audit-logs-cleanup-section">
             <div className="audit-logs-days-input-group">
               <label>Cleanup older than:</label>
@@ -950,7 +1035,7 @@ const handleSearchSuspicious = async () => {
             </button>
           </div>
         </div>
-        
+
         <div className="audit-logs-action-group">
           <button
             className="audit-logs-action-button audit-logs-action-button-info"
@@ -999,14 +1084,14 @@ const handleSearchSuspicious = async () => {
         <div className="audit-logs-filter-info">
           <span className="audit-logs-filter-info-icon">🔍</span>
           <span className="audit-logs-active-filters">
-            Active filters: 
+            Active filters:
             {selectedFilter !== "all" && <span className="audit-logs-filter-tag">{getActionDisplayLabel(selectedFilter)}</span>}
             {selectedModel !== "all" && <span className="audit-logs-filter-tag">Model: {selectedModel}</span>}
             {selectedUser !== "all" && <span className="audit-logs-filter-tag">User: {selectedUser}</span>}
             {selectedTimeRange !== "all" && <span className="audit-logs-filter-tag">{timeRangeOptions.find(t => t.value === selectedTimeRange)?.label}</span>}
             {searchQuery && <span className="audit-logs-filter-tag">Search: "{searchQuery}"</span>}
           </span>
-          <button 
+          <button
             className="audit-logs-filter-clear"
             onClick={resetFilters}
           >
@@ -1026,7 +1111,7 @@ const handleSearchSuspicious = async () => {
         <div className="audit-logs-error">
           <span className="audit-logs-error-icon">❌</span>
           {error}
-          <button 
+          <button
             className="audit-logs-error-dismiss"
             onClick={() => setError(null)}
           >
@@ -1054,8 +1139,8 @@ const handleSearchSuspicious = async () => {
               <tbody>
                 {auditLogs.length > 0 ? (
                   auditLogs.map((log) => (
-                    <tr 
-                      key={log.id} 
+                    <tr
+                      key={log.id}
                       className="audit-logs-table-row"
                       onClick={() => setSelectedLog(log)}
                     >
@@ -1063,8 +1148,8 @@ const handleSearchSuspicious = async () => {
                         <span className="audit-logs-id">#{log.id}</span>
                       </td>
                       <td className="audit-logs-table-cell">
-                        <span 
-                          className="audit-logs-action-badge" 
+                        <span
+                          className="audit-logs-action-badge"
                           style={{ backgroundColor: getSeverityColor(log.action) }}
                         >
                           {getActionIcon(log.action)} {getActionDisplay(log)}
@@ -1091,7 +1176,7 @@ const handleSearchSuspicious = async () => {
                       </td>
                       <td className="audit-logs-table-cell">
                         <div className="audit-logs-row-actions">
-                          <button 
+                          <button
                             className="audit-logs-row-action audit-logs-row-action-view"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -1101,7 +1186,7 @@ const handleSearchSuspicious = async () => {
                           >
                             👁️
                           </button>
-                          <button 
+                          <button
                             className="audit-logs-row-action audit-logs-row-action-delete"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -1111,7 +1196,7 @@ const handleSearchSuspicious = async () => {
                           >
                             🗑️
                           </button>
-                          <button 
+                          <button
                             className="audit-logs-row-action audit-logs-row-action-user"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -1132,7 +1217,7 @@ const handleSearchSuspicious = async () => {
                         <div className="audit-logs-empty-icon">📋</div>
                         <h3>No audit logs found</h3>
                         <p>Try adjusting your filters or search criteria</p>
-                        <button 
+                        <button
                           className="audit-logs-empty-action"
                           onClick={resetFilters}
                         >
@@ -1151,8 +1236,8 @@ const handleSearchSuspicious = async () => {
           <div className="audit-logs-timeline">
             {auditLogs.length > 0 ? auditLogs.map((log) => (
               <div key={log.id} className="audit-logs-timeline-item">
-                <div 
-                  className="audit-logs-timeline-dot" 
+                <div
+                  className="audit-logs-timeline-dot"
                   style={{ backgroundColor: getSeverityColor(log.action) }}
                 ></div>
                 <div className="audit-logs-timeline-content">
@@ -1192,13 +1277,13 @@ const handleSearchSuspicious = async () => {
         {viewMode === "compact" && (
           <div className="audit-logs-compact-grid">
             {auditLogs.length > 0 ? auditLogs.map((log) => (
-              <div 
-                key={log.id} 
+              <div
+                key={log.id}
                 className="audit-logs-compact-card"
                 onClick={() => setSelectedLog(log)}
               >
-                <div className="audit-logs-compact-header" style={{ 
-                  borderLeftColor: getSeverityColor(log.action) 
+                <div className="audit-logs-compact-header" style={{
+                  borderLeftColor: getSeverityColor(log.action)
                 }}>
                   <span className="audit-logs-compact-action">
                     {getActionIcon(log.action)}
@@ -1250,11 +1335,11 @@ const handleSearchSuspicious = async () => {
           >
             ← Previous
           </button>
-          
+
           <div className="audit-logs-pagination-info">
             Page {currentPage} of {totalPages}
           </div>
-          
+
           <div className="audit-logs-pagination-pages">
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               let pageNum;
@@ -1267,7 +1352,7 @@ const handleSearchSuspicious = async () => {
               } else {
                 pageNum = currentPage - 2 + i;
               }
-              
+
               return (
                 <button
                   key={pageNum}
@@ -1279,7 +1364,7 @@ const handleSearchSuspicious = async () => {
               );
             })}
           </div>
-          
+
           <button
             className="audit-logs-pagination-button"
             onClick={() => handlePageChange(currentPage + 1)}
@@ -1300,13 +1385,13 @@ const handleSearchSuspicious = async () => {
                 Log Details #{selectedLog.id}
               </h2>
               <div className="audit-logs-modal-actions">
-                <button 
+                <button
                   className="audit-logs-modal-action"
                   onClick={() => handleDeleteLog(selectedLog.id)}
                 >
                   🗑️ Delete
                 </button>
-                <button 
+                <button
                   className="audit-logs-modal-close"
                   onClick={() => setSelectedLog(null)}
                 >
@@ -1350,7 +1435,7 @@ const handleSearchSuspicious = async () => {
                   </div>
                 </div>
               </div>
-              
+
               {selectedLog.changes && Object.keys(selectedLog.changes).length > 0 && (
                 <div className="audit-logs-modal-section">
                   <h3>📝 Changes Details</h3>
@@ -1359,7 +1444,7 @@ const handleSearchSuspicious = async () => {
                   </div>
                 </div>
               )}
-              
+
               {selectedLog.old_values && Object.keys(selectedLog.old_values).length > 0 && (
                 <div className="audit-logs-modal-section">
                   <h3>📄 Old Values</h3>
@@ -1368,7 +1453,7 @@ const handleSearchSuspicious = async () => {
                   </div>
                 </div>
               )}
-              
+
               {selectedLog.new_values && Object.keys(selectedLog.new_values).length > 0 && (
                 <div className="audit-logs-modal-section">
                   <h3>📄 New Values</h3>
@@ -1379,13 +1464,13 @@ const handleSearchSuspicious = async () => {
               )}
             </div>
             <div className="audit-logs-modal-footer">
-              <button 
+              <button
                 className="audit-logs-modal-button"
                 onClick={() => setSelectedLog(null)}
               >
                 Close
               </button>
-              <button 
+              <button
                 className="audit-logs-modal-button audit-logs-modal-button-user"
                 onClick={() => {
                   handleUserActivity(selectedLog.id);
