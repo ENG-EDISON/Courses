@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import "../static/AuditLogs.css";
 import * as AuditLogsApi from "../api/AuditLogsApis";
 
@@ -21,32 +21,37 @@ const AuditLogs = () => {
   });
   const [selectedLog, setSelectedLog] = useState(null);
   const [totalCount, setTotalCount] = useState(0);
+  // Removed unused 'filters' state variable
+  const [availableModels, setAvailableModels] = useState([]);
+  const [availableUsers, setAvailableUsers] = useState([]);
+  const [availableActions, setAvailableActions] = useState([]);
+  const [selectedModel, setSelectedModel] = useState("all");
+  const [selectedUser, setSelectedUser] = useState("all");
+  const [exporting, setExporting] = useState(false);
+  const [cleanupLoading, setCleanupLoading] = useState(false);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [cleanupDays, setCleanupDays] = useState(90);
+  const [quickStatsDays, setQuickStatsDays] = useState(30);
+  const [suspiciousDays, setSuspiciousDays] = useState(7);
+  
+  const searchTimeout = useRef(null);
 
-  // Filter options based on your actual API data
-  const filterOptions = [
-    { value: "all", label: "All Actions" },
-    { value: "LOGIN_SUCCESS", label: "Login Success" },
-    { value: "LOGIN_FAILED", label: "Login Failed" },
-    { value: "LOGIN_ATTEMPT", label: "Login Attempt" },
-    { value: "LOGIN_USER_FOUND", label: "User Found" },
-    { value: "UPDATE", label: "Update" },
-    { value: "UserProfile_UPDATE_ATTEMPT", label: "Profile Update Attempt" },
-    { value: "STAFF_USER_LIST_ACCESS", label: "Staff Access" },
-    { value: "USER_LIST_ACCESS", label: "User List Access" },
-  ];
+  // Fetch available filters from API
+  const fetchFilters = useCallback(async () => {
+    try {
+      const response = await AuditLogsApi.getAuditLogFilters();
+      if (response.data) {
+        // Set the filter data directly without storing in unused variable
+        setAvailableModels(response.data.models || []);
+        setAvailableUsers(response.data.users || []);
+        setAvailableActions(response.data.actions || []);
+      }
+    } catch (err) {
+      console.error("Error fetching filters:", err);
+    }
+  }, []);
 
-  const timeRangeOptions = [
-    { value: "all", label: "All Time" },
-    { value: "today", label: "Today" },
-    { value: "yesterday", label: "Yesterday" },
-    { value: "last7", label: "Last 7 Days" },
-    { value: "last30", label: "Last 30 Days" },
-    { value: "month", label: "This Month" },
-  ];
-
-  const pageSizeOptions = [10, 20, 50, 100];
-
-  // Calculate stats from the current data (but NOT total logs - that comes from API)
+  // Calculate stats from the current data
   const calculateStats = useCallback((logs) => {
     if (!logs || logs.length === 0) {
       setStats(prev => ({
@@ -58,31 +63,26 @@ const AuditLogs = () => {
       return;
     }
 
-    // Get unique users from current page
     const uniqueUsers = new Set();
     const today = new Date().toISOString().split('T')[0];
     let todayCount = 0;
     let suspiciousCount = 0;
 
     logs.forEach(log => {
-      // Count unique users in current page
       if (log.user) {
         uniqueUsers.add(log.user);
       }
 
-      // Count today's logs in current page
       if (log.timestamp && log.timestamp.includes(today)) {
         todayCount++;
       }
 
-      // Count suspicious activities in current page
       if (log.action === "LOGIN_FAILED" || 
           (log.changes && log.changes.security_alert)) {
         suspiciousCount++;
       }
     });
 
-    // Update only the stats that come from current page data
     setStats(prev => ({
       ...prev,
       active_users: uniqueUsers.size,
@@ -91,23 +91,30 @@ const AuditLogs = () => {
     }));
   }, []);
 
-  // Fetch audit logs
+  // Fetch audit logs - USING ONLY EXISTING ENDPOINTS
   const fetchAuditLogs = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
+      let response;
       const params = {
         page: currentPage,
         page_size: pageSize,
-        search: searchQuery,
+        search: searchQuery || undefined,
       };
 
-      // Add action filter if not "all"
+      // Add filters
       if (selectedFilter !== "all") {
         params.action = selectedFilter;
       }
+      if (selectedModel !== "all") {
+        params.model_name = selectedModel;
+      }
+      if (selectedUser !== "all") {
+        params.user_id = selectedUser;
+      }
 
-      let response;
+      // Use dedicated time range endpoints
       switch (selectedTimeRange) {
         case "today":
           response = await AuditLogsApi.getTodayAuditLogs(params);
@@ -125,7 +132,23 @@ const AuditLogs = () => {
           response = await AuditLogsApi.getThisMonthAuditLogs(params);
           break;
         default:
-          response = await AuditLogsApi.getAllAuditLogs(params);
+          // For all time, use different endpoints based on filters
+          if (selectedUser !== "all") {
+            // Use the user-specific endpoint
+            response = await AuditLogsApi.getAuditLogsByUser(selectedUser, params);
+          } else if (selectedModel !== "all") {
+            // Use the model-specific endpoint
+            response = await AuditLogsApi.getAuditLogsByModel(selectedModel, params);
+          } else if (selectedFilter !== "all") {
+            // Use the action-specific endpoint
+            response = await AuditLogsApi.getAuditLogsByAction(selectedFilter, params);
+          } else if (searchQuery) {
+            // Use search endpoint
+            response = await AuditLogsApi.searchAuditLogs(searchQuery, params);
+          } else {
+            // Use the main list endpoint
+            response = await AuditLogsApi.getAllAuditLogs(params);
+          }
           break;
       }
 
@@ -134,103 +157,217 @@ const AuditLogs = () => {
         setAuditLogs(logs);
         setTotalPages(response.data.total_pages || 1);
         
-        // IMPORTANT: Set total count from API (not current page count)
-        const apiTotalCount = response.data.count || 0;
+        const apiTotalCount = response.data.count || logs.length;
         setTotalCount(apiTotalCount);
         
-        // Update stats - get total_logs from API, calculate others from current page
         setStats(prev => ({
-          total_logs: apiTotalCount, // This is the actual total from API
-          active_users: prev.active_users, // Will be updated below
-          suspicious_activities: prev.suspicious_activities, // Will be updated below
-          today_logs: prev.today_logs // Will be updated below
+          total_logs: apiTotalCount,
+          active_users: prev.active_users,
+          suspicious_activities: prev.suspicious_activities,
+          today_logs: prev.today_logs
         }));
         
-        // Calculate page-specific stats
         calculateStats(logs);
       }
     } catch (err) {
-      setError("Failed to fetch audit logs. Please try again.");
+      setError(err.response?.data?.detail || err.message || "Failed to fetch audit logs. Please try again.");
       console.error("Error fetching audit logs:", err);
     } finally {
       setLoading(false);
     }
-  }, [currentPage, pageSize, searchQuery, selectedFilter, selectedTimeRange, calculateStats]);
+  }, [currentPage, pageSize, searchQuery, selectedFilter, selectedTimeRange, selectedModel, selectedUser, calculateStats]);
 
   // Fetch detailed statistics from API
-  const fetchDetailedStats = async () => {
+  const fetchDetailedStats = useCallback(async () => {
     try {
-      const response = await AuditLogsApi.getAuditLogStats();
-      if (response.data) {
-        // Merge API stats with our calculated ones
+      const [statsResponse, quickStatsResponse] = await Promise.all([
+        AuditLogsApi.getAuditLogStats(),
+        AuditLogsApi.getAuditLogQuickStats({ days: quickStatsDays })
+      ]);
+
+      if (statsResponse.data || quickStatsResponse.data) {
         setStats(prev => ({
-          ...prev,
-          total_logs: response.data.total_logs || prev.total_logs,
-          // Keep our calculated values for the other stats
-          active_users: response.data.active_users || prev.active_users,
-          suspicious_activities: response.data.suspicious_activities || prev.suspicious_activities,
-          today_logs: response.data.today_logs || prev.today_logs
+          total_logs: statsResponse.data?.total_logs || quickStatsResponse.data?.total_logs || prev.total_logs,
+          active_users: statsResponse.data?.active_users || quickStatsResponse.data?.active_users || prev.active_users,
+          suspicious_activities: statsResponse.data?.suspicious_activities || quickStatsResponse.data?.suspicious_activities || prev.suspicious_activities,
+          today_logs: statsResponse.data?.today_logs || quickStatsResponse.data?.today_logs || prev.today_logs
         }));
       }
     } catch (err) {
       console.error("Error fetching detailed stats:", err);
-      // If API stats fail, we already have calculated stats
     }
-  };
+  }, [quickStatsDays]);
+
+  // Filter options - now dynamic from API
+  const filterOptions = [
+    { value: "all", label: "All Actions" },
+    ...(availableActions.map(action => ({
+      value: action,
+      label: action.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')
+    })))
+  ];
+
+  // Model options
+  const modelOptions = [
+    { value: "all", label: "All Models" },
+    ...(availableModels.map(model => ({
+      value: model,
+      label: model
+    })))
+  ];
+
+  // User options
+  const userOptions = [
+    { value: "all", label: "All Users" },
+    ...(availableUsers.map(user => ({
+      value: user.id || user,
+      label: user.username || user.name || `User #${user.id || user}`
+    })))
+  ];
+
+  const timeRangeOptions = [
+    { value: "all", label: "All Time" },
+    { value: "today", label: "Today" },
+    { value: "yesterday", label: "Yesterday" },
+    { value: "last7", label: "Last 7 Days" },
+    { value: "last30", label: "Last 30 Days" },
+    { value: "month", label: "This Month" },
+  ];
+
+  const pageSizeOptions = [10, 20, 50, 100];
+  const daysOptions = [1, 7, 30, 60, 90, 180, 365];
 
   // Handle search suspicious activities
-  const handleSearchSuspicious = async () => {
+const handleSearchSuspicious = async () => {
+  try {
+    setLoading(true);
+    
+    // First try to get LOGIN_FAILED logs (most common suspicious activity)
+    let suspiciousLogs = [];
+    
     try {
-      const response = await AuditLogsApi.searchSuspiciousAuditLogs();
+      const response = await AuditLogsApi.getAuditLogsByAction("LOGIN_FAILED", {
+        page: 1,
+        page_size: pageSize,
+        days: suspiciousDays
+      });
+      
       if (response.data) {
-        const logs = response.data.results || response.data;
-        setAuditLogs(logs);
-        setTotalCount(response.data.count || logs.length);
-        setStats(prev => ({
-          ...prev,
-          suspicious_activities: response.data.count || logs.length
-        }));
+        const logs = response.data.results || response.data || [];
+        suspiciousLogs = Array.isArray(logs) ? logs : [logs];
       }
-    } catch (err) {
-      console.error("Error searching suspicious logs:", err);
+    } catch (actionErr) {
+      console.log("Failed to get LOGIN_FAILED logs:", actionErr.message);
     }
-  };
+    
+    // If no failed logins, try other suspicious actions
+    if (suspiciousLogs.length === 0) {
+      const otherActions = ["LOGIN_ATTEMPT", "UNAUTHORIZED", "SECURITY"];
+      for (const action of otherActions) {
+        try {
+          const response = await AuditLogsApi.searchAuditLogs(action, {
+            page: 1,
+            page_size: pageSize,
+            days: suspiciousDays
+          });
+          
+          if (response.data) {
+            const logs = response.data.results || response.data || [];
+            if (Array.isArray(logs) && logs.length > 0) {
+              suspiciousLogs = logs;
+              break;
+            }
+          }
+        } catch (searchErr) {
+          continue;
+        }
+      }
+    }
+    
+    // Update the display
+    setAuditLogs(suspiciousLogs);
+    setTotalCount(suspiciousLogs.length);
+    setTotalPages(1);
+    setSelectedFilter("all");
+    setSelectedModel("all");
+    setSelectedUser("all");
+    setSearchQuery("");
+    setSelectedTimeRange("all");
+    setCurrentPage(1);
+    
+    // Update stats
+    setStats(prev => ({
+      ...prev,
+      suspicious_activities: suspiciousLogs.length
+    }));
+    
+    if (suspiciousLogs.length === 0) {
+      alert(`No suspicious activities found in the last ${suspiciousDays} days.`);
+    } else {
+      alert(`Found ${suspiciousLogs.length} suspicious activities in the last ${suspiciousDays} days.`);
+    }
+    
+  } catch (err) {
+    console.error("Error searching suspicious logs:", err);
+    setError("Failed to search suspicious activities. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
-  // Handle cleanup
+  // Handle cleanup with days input
   const handleCleanup = async () => {
-    if (window.confirm("Are you sure you want to cleanup old audit logs? This action cannot be undone.")) {
+    const days = cleanupDays || 90;
+    if (window.confirm(`Are you sure you want to cleanup audit logs older than ${days} days? This action cannot be undone.`)) {
+      setCleanupLoading(true);
       try {
-        await AuditLogsApi.cleanupAuditLogs({ days_old: 90 });
-        alert("Cleanup completed successfully!");
+        await AuditLogsApi.cleanupAuditLogs({ days: days });
+        alert(`Cleanup completed successfully! Logs older than ${days} days have been removed.`);
         fetchAuditLogs();
+        fetchDetailedStats();
       } catch (err) {
-        alert("Failed to cleanup audit logs.");
+        alert(err.response?.data?.detail || `Failed to cleanup audit logs.`);
         console.error("Error during cleanup:", err);
+      } finally {
+        setCleanupLoading(false);
       }
     }
   };
 
-  // Handle export
-  const handleExport = async () => {
+  // Handle export - using main endpoint with export param
+  const handleExport = async (format = "csv") => {
+    setExporting(true);
     try {
-      const response = await AuditLogsApi.exportAuditLogs({
-        format: "csv",
+      const params = {
+        format: format,
         page: currentPage,
         page_size: pageSize,
-        action: selectedFilter !== "all" ? selectedFilter : undefined,
-      });
+        export: 'csv' // This triggers export on the main endpoint
+      };
+
+      if (selectedFilter !== "all") params.action = selectedFilter;
+      if (selectedModel !== "all") params.model_name = selectedModel;
+      if (selectedUser !== "all") params.user_id = selectedUser;
+      if (searchQuery) params.search = searchQuery;
+      if (selectedTimeRange !== "all") params.date_range = selectedTimeRange;
+
+      const response = await AuditLogsApi.getAllAuditLogs(params);
       
       if (response.data) {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", `audit-logs-${new Date().toISOString().split('T')[0]}.csv`);
+        const dateStr = new Date().toISOString().split('T')[0];
+        link.setAttribute("download", `audit-logs-${dateStr}.${format}`);
         document.body.appendChild(link);
         link.click();
         link.remove();
       }
     } catch (err) {
       console.error("Error exporting logs:", err);
+      alert("Failed to export audit logs");
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -242,24 +379,180 @@ const AuditLogs = () => {
   };
 
   // Handle page size change
-  const handlePageSizeChange = (size) => {
-    setPageSize(size);
-    setCurrentPage(1);
+  const handlePageSizeChange = async (size) => {
+    try {
+      await AuditLogsApi.setAuditLogPageSize({ page_size: size });
+      setPageSize(size);
+      setCurrentPage(1);
+    } catch (err) {
+      console.error("Error setting page size:", err);
+    }
+  };
+
+  // Handle delete log
+  const handleDeleteLog = async (logId) => {
+    if (window.confirm("Are you sure you want to delete this audit log?")) {
+      try {
+        await AuditLogsApi.deleteAuditLog(logId);
+        alert("Audit log deleted successfully!");
+        fetchAuditLogs();
+        fetchDetailedStats();
+      } catch (err) {
+        alert("Failed to delete audit log");
+        console.error("Error deleting log:", err);
+      }
+    }
+  };
+
+  // Get system health
+  const handleSystemHealth = async () => {
+    try {
+      const response = await AuditLogsApi.getAuditLogSystemHealth();
+      if (response.data) {
+        alert(`System Health:\n\n` +
+              `Database Size: ${response.data.database_size || 'N/A'}\n` +
+              `Logs Count: ${response.data.logs_count || 0}\n` +
+              `Average Log Size: ${response.data.avg_log_size || 'N/A'}\n` +
+              `Last Cleanup: ${response.data.last_cleanup || 'Never'}\n` +
+              `Status: ${response.data.status || 'Unknown'}`);
+      }
+    } catch (err) {
+      console.error("Error getting system health:", err);
+      alert("Failed to get system health");
+    }
+  };
+
+  // Get cleanup suggestions
+  const handleCleanupSuggestions = async () => {
+    try {
+      const response = await AuditLogsApi.getAuditLogCleanupSuggestions();
+      if (response.data) {
+        const suggestions = response.data.suggestions || [];
+        if (suggestions.length > 0) {
+          alert(`Cleanup Suggestions:\n\n${suggestions.join('\n')}`);
+        } else {
+          alert("No cleanup suggestions at this time.");
+        }
+      }
+    } catch (err) {
+      console.error("Error getting cleanup suggestions:", err);
+      alert("Failed to get cleanup suggestions");
+    }
+  };
+
+  // Get activity timeline
+  const handleActivityTimeline = async () => {
+    try {
+      const response = await AuditLogsApi.getAuditLogActivityTimeline({
+        days: quickStatsDays
+      });
+      if (response.data) {
+        // Could display this in a modal or separate view
+        console.log("Activity timeline:", response.data);
+        alert(`Activity timeline loaded for last ${quickStatsDays} days. Check console for details.`);
+      }
+    } catch (err) {
+      console.error("Error getting activity timeline:", err);
+      alert("Failed to get activity timeline");
+    }
+  };
+
+  // Get bulk operations
+  const handleBulkOperations = async () => {
+    try {
+      const response = await AuditLogsApi.getAuditLogBulkOperations({
+        days: quickStatsDays
+      });
+      if (response.data) {
+        const operations = response.data.operations || [];
+        if (operations.length > 0) {
+          alert(`Bulk Operations (last ${quickStatsDays} days):\n\n` +
+                operations.map(op => `${op.action}: ${op.count} logs`).join('\n'));
+        } else {
+          alert(`No bulk operations found in the last ${quickStatsDays} days.`);
+        }
+      }
+    } catch (err) {
+      console.error("Error getting bulk operations:", err);
+      alert("Failed to get bulk operations");
+    }
+  };
+
+  // Get user activity for selected log
+  const handleUserActivity = async (logId) => {
+    try {
+      const response = await AuditLogsApi.getUserActivity(logId);
+      if (response.data) {
+        const userLogs = response.data.logs || [];
+        if (userLogs.length > 0) {
+          alert(`User Activity:\n\nFound ${userLogs.length} activities for this user.`);
+          // Could display in modal
+        } else {
+          alert("No additional user activity found.");
+        }
+      }
+    } catch (err) {
+      console.error("Error getting user activity:", err);
+      alert("Failed to get user activity");
+    }
+  };
+
+  // Get pagination info
+  const handlePaginationInfo = async () => {
+    try {
+      const response = await AuditLogsApi.getAuditLogPaginationInfo();
+      if (response.data) {
+        const info = response.data;
+        alert(`Pagination Info:\n\n` +
+              `Total Pages: ${info.total_pages || 1}\n` +
+              `Total Items: ${info.total_items || 0}\n` +
+              `Current Page Size: ${info.page_size || pageSize}\n` +
+              `Default Page Size: ${info.default_page_size || 20}`);
+      }
+    } catch (err) {
+      console.error("Error getting pagination info:", err);
+      alert("Failed to get pagination info");
+    }
   };
 
   // Initialize
   useEffect(() => {
+    const init = async () => {
+      await Promise.all([
+        fetchAuditLogs(),
+        fetchDetailedStats(),
+        fetchFilters()
+      ]);
+    };
+    init();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Refresh when dependencies change
+  useEffect(() => {
     fetchAuditLogs();
+  }, [currentPage, pageSize, selectedFilter, selectedTimeRange, selectedModel, selectedUser, fetchAuditLogs]);
+
+  // Refresh stats when days change
+  useEffect(() => {
     fetchDetailedStats();
-  }, [fetchAuditLogs]);
+  }, [quickStatsDays, fetchDetailedStats]);
 
   // Debounced search
   useEffect(() => {
-    const timer = setTimeout(() => {
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+
+    searchTimeout.current = setTimeout(() => {
+      setCurrentPage(1);
       fetchAuditLogs();
     }, 500);
 
-    return () => clearTimeout(timer);
+    return () => {
+      if (searchTimeout.current) {
+        clearTimeout(searchTimeout.current);
+      }
+    };
   }, [searchQuery, fetchAuditLogs]);
 
   // Format date
@@ -271,7 +564,8 @@ const AuditLogs = () => {
       }
       return date.toLocaleDateString() + " " + date.toLocaleTimeString([], { 
         hour: '2-digit', 
-        minute: '2-digit' 
+        minute: '2-digit',
+        second: '2-digit'
       });
     } catch (err) {
       return "Invalid Date";
@@ -339,7 +633,6 @@ const AuditLogs = () => {
     if (log.action_display && log.action_display.trim()) {
       return log.action_display;
     }
-    // Format the action for display
     const action = log.action || "";
     return action
       .split('_')
@@ -353,6 +646,16 @@ const AuditLogs = () => {
       .split('_')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
+  };
+
+  // Reset all filters
+  const resetFilters = () => {
+    setSelectedFilter("all");
+    setSelectedModel("all");
+    setSelectedUser("all");
+    setSearchQuery("");
+    setSelectedTimeRange("all");
+    setCurrentPage(1);
   };
 
   // Render loading state
@@ -371,13 +674,37 @@ const AuditLogs = () => {
     <div className="audit-logs-container">
       {/* Header */}
       <div className="audit-logs-header">
-        <h1 className="audit-logs-title">
-          <span className="audit-logs-title-icon">📋</span>
-          Audit Logs
-        </h1>
-        <p className="audit-logs-subtitle">
-          Monitor and track all system activities and user actions
-        </p>
+        <div className="audit-logs-header-main">
+          <h1 className="audit-logs-title">
+            <span className="audit-logs-title-icon">📋</span>
+            Audit Logs
+          </h1>
+          <p className="audit-logs-subtitle">
+            Monitor and track all system activities and user actions
+          </p>
+        </div>
+        
+        {/* Quick Stats */}
+        <div className="audit-logs-quick-actions">
+          <button 
+            className="audit-logs-quick-button"
+            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+          >
+            {showAdvancedFilters ? "Hide" : "Show"} Advanced Filters
+          </button>
+          <div className="audit-logs-days-input">
+            <label>Stats Days:</label>
+            <select
+              value={quickStatsDays}
+              onChange={(e) => setQuickStatsDays(Number(e.target.value))}
+              className="audit-logs-days-select"
+            >
+              {daysOptions.map(days => (
+                <option key={days} value={days}>Last {days} days</option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -386,9 +713,9 @@ const AuditLogs = () => {
           <div className="audit-logs-stat-icon">📈</div>
           <div className="audit-logs-stat-content">
             <h3 className="audit-logs-stat-title">Total Logs</h3>
-            <p className="audit-logs-stat-value">{stats.total_logs || totalCount || 0}</p>
+            <p className="audit-logs-stat-value">{stats.total_logs.toLocaleString()}</p>
             <small className="audit-logs-stat-note">
-              From all time
+              Last {quickStatsDays} days
             </small>
           </div>
         </div>
@@ -396,9 +723,9 @@ const AuditLogs = () => {
           <div className="audit-logs-stat-icon">👥</div>
           <div className="audit-logs-stat-content">
             <h3 className="audit-logs-stat-title">Active Users</h3>
-            <p className="audit-logs-stat-value">{stats.active_users || 0}</p>
+            <p className="audit-logs-stat-value">{stats.active_users}</p>
             <small className="audit-logs-stat-note">
-              In current view
+              Last {quickStatsDays} days
             </small>
           </div>
         </div>
@@ -406,9 +733,9 @@ const AuditLogs = () => {
           <div className="audit-logs-stat-icon">⚠️</div>
           <div className="audit-logs-stat-content">
             <h3 className="audit-logs-stat-title">Suspicious</h3>
-            <p className="audit-logs-stat-value">{stats.suspicious_activities || 0}</p>
+            <p className="audit-logs-stat-value">{stats.suspicious_activities}</p>
             <small className="audit-logs-stat-note">
-              Failed logins & alerts
+              Last {quickStatsDays} days
             </small>
           </div>
         </div>
@@ -416,13 +743,101 @@ const AuditLogs = () => {
           <div className="audit-logs-stat-icon">🕒</div>
           <div className="audit-logs-stat-content">
             <h3 className="audit-logs-stat-title">Today's Logs</h3>
-            <p className="audit-logs-stat-value">{stats.today_logs || 0}</p>
+            <p className="audit-logs-stat-value">{stats.today_logs}</p>
             <small className="audit-logs-stat-note">
-              From current view
+              Current view
             </small>
           </div>
         </div>
       </div>
+
+      {/* Advanced Filters */}
+      {showAdvancedFilters && (
+        <div className="audit-logs-advanced-filters">
+          <div className="audit-logs-advanced-header">
+            <h3>🔍 Advanced Filters</h3>
+            <button 
+              className="audit-logs-reset-filters"
+              onClick={resetFilters}
+            >
+              Reset All Filters
+            </button>
+          </div>
+          <div className="audit-logs-filter-grid">
+            <div className="audit-logs-filter-group">
+              <label>Action Type:</label>
+              <select
+                className="audit-logs-advanced-select"
+                value={selectedFilter}
+                onChange={(e) => {
+                  setSelectedFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                {filterOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="audit-logs-filter-group">
+              <label>Model:</label>
+              <select
+                className="audit-logs-advanced-select"
+                value={selectedModel}
+                onChange={(e) => {
+                  setSelectedModel(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                {modelOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="audit-logs-filter-group">
+              <label>User:</label>
+              <select
+                className="audit-logs-advanced-select"
+                value={selectedUser}
+                onChange={(e) => {
+                  setSelectedUser(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                {userOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="audit-logs-filter-group">
+              <label>Time Range:</label>
+              <select
+                className="audit-logs-advanced-select"
+                value={selectedTimeRange}
+                onChange={(e) => {
+                  setSelectedTimeRange(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                {timeRangeOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Controls Bar */}
       <div className="audit-logs-controls">
@@ -430,7 +845,7 @@ const AuditLogs = () => {
         <div className="audit-logs-search-container">
           <input
             type="text"
-            placeholder="Search logs..."
+            placeholder="Search logs by ID, user, action, or content..."
             className="audit-logs-search-input"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -440,38 +855,8 @@ const AuditLogs = () => {
           </button>
         </div>
 
-        {/* Filters */}
+        {/* Quick Filters */}
         <div className="audit-logs-filter-group">
-          <select
-            className="audit-logs-filter-select"
-            value={selectedFilter}
-            onChange={(e) => {
-              setSelectedFilter(e.target.value);
-              setCurrentPage(1);
-            }}
-          >
-            {filterOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-
-          <select
-            className="audit-logs-filter-select"
-            value={selectedTimeRange}
-            onChange={(e) => {
-              setSelectedTimeRange(e.target.value);
-              setCurrentPage(1);
-            }}
-          >
-            {timeRangeOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-
           <select
             className="audit-logs-filter-select"
             value={pageSize}
@@ -511,52 +896,129 @@ const AuditLogs = () => {
         </div>
       </div>
 
-      {/* Action Buttons */}
+      {/* Action Buttons with Days Inputs */}
       <div className="audit-logs-action-buttons">
-        <button
-          className="audit-logs-action-button audit-logs-action-button-export"
-          onClick={handleExport}
-        >
-          📥 Export
-        </button>
-        <button
-          className="audit-logs-action-button audit-logs-action-button-cleanup"
-          onClick={handleCleanup}
-        >
-          🧹 Cleanup
-        </button>
-        <button
-          className="audit-logs-action-button audit-logs-action-button-suspicious"
-          onClick={handleSearchSuspicious}
-        >
-          🔍 Suspicious
-        </button>
-        <button
-          className="audit-logs-action-button audit-logs-action-button-refresh"
-          onClick={fetchAuditLogs}
-        >
-          🔄 Refresh
-        </button>
+        <div className="audit-logs-action-group">
+          <button
+            className="audit-logs-action-button audit-logs-action-button-export"
+            onClick={() => handleExport("csv")}
+            disabled={exporting}
+          >
+            {exporting ? "⏳" : "📥"} {exporting ? "Exporting..." : "Export CSV"}
+          </button>
+          
+          <div className="audit-logs-cleanup-section">
+            <div className="audit-logs-days-input-group">
+              <label>Cleanup older than:</label>
+              <select
+                value={cleanupDays}
+                onChange={(e) => setCleanupDays(Number(e.target.value))}
+                className="audit-logs-days-select"
+              >
+                {daysOptions.map(days => (
+                  <option key={days} value={days}>{days} days</option>
+                ))}
+              </select>
+            </div>
+            <button
+              className="audit-logs-action-button audit-logs-action-button-cleanup"
+              onClick={handleCleanup}
+              disabled={cleanupLoading}
+            >
+              {cleanupLoading ? "⏳" : "🧹"} {cleanupLoading ? "Cleaning..." : "Cleanup"}
+            </button>
+          </div>
+
+          <div className="audit-logs-suspicious-section">
+            <div className="audit-logs-days-input-group">
+              <label>Search last:</label>
+              <select
+                value={suspiciousDays}
+                onChange={(e) => setSuspiciousDays(Number(e.target.value))}
+                className="audit-logs-days-select"
+              >
+                {daysOptions.slice(0, 4).map(days => (
+                  <option key={days} value={days}>{days} days</option>
+                ))}
+              </select>
+            </div>
+            <button
+              className="audit-logs-action-button audit-logs-action-button-suspicious"
+              onClick={handleSearchSuspicious}
+            >
+              🔍 Suspicious
+            </button>
+          </div>
+        </div>
+        
+        <div className="audit-logs-action-group">
+          <button
+            className="audit-logs-action-button audit-logs-action-button-info"
+            onClick={handleSystemHealth}
+          >
+            💾 System Health
+          </button>
+          <button
+            className="audit-logs-action-button audit-logs-action-button-info"
+            onClick={handleCleanupSuggestions}
+          >
+            💡 Cleanup Tips
+          </button>
+          <button
+            className="audit-logs-action-button audit-logs-action-button-info"
+            onClick={handleActivityTimeline}
+          >
+            📊 Timeline
+          </button>
+          <button
+            className="audit-logs-action-button audit-logs-action-button-info"
+            onClick={handleBulkOperations}
+          >
+            📦 Bulk Ops
+          </button>
+          <button
+            className="audit-logs-action-button audit-logs-action-button-info"
+            onClick={handlePaginationInfo}
+          >
+            📄 Page Info
+          </button>
+          <button
+            className="audit-logs-action-button audit-logs-action-button-refresh"
+            onClick={() => {
+              fetchAuditLogs();
+              fetchDetailedStats();
+            }}
+          >
+            🔄 Refresh
+          </button>
+        </div>
       </div>
 
       {/* Filter Info */}
-      {selectedFilter !== "all" && (
+      {(selectedFilter !== "all" || selectedModel !== "all" || selectedUser !== "all" || searchQuery || selectedTimeRange !== "all") && (
         <div className="audit-logs-filter-info">
           <span className="audit-logs-filter-info-icon">🔍</span>
-          Showing: <strong>{getActionDisplayLabel(selectedFilter)}</strong> actions
+          <span className="audit-logs-active-filters">
+            Active filters: 
+            {selectedFilter !== "all" && <span className="audit-logs-filter-tag">{getActionDisplayLabel(selectedFilter)}</span>}
+            {selectedModel !== "all" && <span className="audit-logs-filter-tag">Model: {selectedModel}</span>}
+            {selectedUser !== "all" && <span className="audit-logs-filter-tag">User: {selectedUser}</span>}
+            {selectedTimeRange !== "all" && <span className="audit-logs-filter-tag">{timeRangeOptions.find(t => t.value === selectedTimeRange)?.label}</span>}
+            {searchQuery && <span className="audit-logs-filter-tag">Search: "{searchQuery}"</span>}
+          </span>
           <button 
             className="audit-logs-filter-clear"
-            onClick={() => setSelectedFilter("all")}
+            onClick={resetFilters}
           >
-            Clear filter
+            Clear all filters
           </button>
         </div>
       )}
 
       {/* Table Info */}
       <div className="audit-logs-table-info">
-        Showing {auditLogs.length} of {totalCount} logs
-        {selectedFilter !== "all" && ` (filtered by ${getActionDisplayLabel(selectedFilter)})`}
+        Showing {auditLogs.length} of {totalCount.toLocaleString()} logs
+        {totalPages > 1 && ` (Page ${currentPage} of ${totalPages})`}
       </div>
 
       {/* Error Message */}
@@ -564,6 +1026,12 @@ const AuditLogs = () => {
         <div className="audit-logs-error">
           <span className="audit-logs-error-icon">❌</span>
           {error}
+          <button 
+            className="audit-logs-error-dismiss"
+            onClick={() => setError(null)}
+          >
+            Dismiss
+          </button>
         </div>
       )}
 
@@ -577,10 +1045,10 @@ const AuditLogs = () => {
                   <th className="audit-logs-table-header">ID</th>
                   <th className="audit-logs-table-header">Action</th>
                   <th className="audit-logs-table-header">User</th>
-                  <th className="audit-logs-table-header">Model</th>
+                  <th className="audit-logs-table-header">Model/Object</th>
                   <th className="audit-logs-table-header">Timestamp</th>
                   <th className="audit-logs-table-header">IP Address</th>
-                  <th className="audit-logs-table-header">Request</th>
+                  <th className="audit-logs-table-header">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -603,21 +1071,74 @@ const AuditLogs = () => {
                         </span>
                       </td>
                       <td className="audit-logs-table-cell">{getUserDisplay(log)}</td>
-                      <td className="audit-logs-table-cell">{log.model_name || "N/A"}</td>
-                      <td className="audit-logs-table-cell">{formatDate(log.timestamp)}</td>
-                      <td className="audit-logs-table-cell">{log.ip_address || "N/A"}</td>
                       <td className="audit-logs-table-cell">
-                        <span className="audit-logs-request">
-                          {log.request_method} {log.request_path}
+                        <div className="audit-logs-model-cell">
+                          <span className="audit-logs-model-name">{log.model_name || "N/A"}</span>
+                          {log.object_id && (
+                            <span className="audit-logs-object-id">#{log.object_id}</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="audit-logs-table-cell">
+                        <span className="audit-logs-timestamp">
+                          {formatDate(log.timestamp)}
                         </span>
+                      </td>
+                      <td className="audit-logs-table-cell">
+                        <span className="audit-logs-ip">
+                          {log.ip_address || "N/A"}
+                        </span>
+                      </td>
+                      <td className="audit-logs-table-cell">
+                        <div className="audit-logs-row-actions">
+                          <button 
+                            className="audit-logs-row-action audit-logs-row-action-view"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedLog(log);
+                            }}
+                            title="View Details"
+                          >
+                            👁️
+                          </button>
+                          <button 
+                            className="audit-logs-row-action audit-logs-row-action-delete"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteLog(log.id);
+                            }}
+                            title="Delete Log"
+                          >
+                            🗑️
+                          </button>
+                          <button 
+                            className="audit-logs-row-action audit-logs-row-action-user"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleUserActivity(log.id);
+                            }}
+                            title="User Activity"
+                          >
+                            👤
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td colSpan="7" className="audit-logs-table-empty">
-                      No audit logs found
-                      {selectedFilter !== "all" && ` for action: ${getActionDisplayLabel(selectedFilter)}`}
+                      <div className="audit-logs-empty-state">
+                        <div className="audit-logs-empty-icon">📋</div>
+                        <h3>No audit logs found</h3>
+                        <p>Try adjusting your filters or search criteria</p>
+                        <button 
+                          className="audit-logs-empty-action"
+                          onClick={resetFilters}
+                        >
+                          Reset All Filters
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 )}
@@ -628,7 +1149,7 @@ const AuditLogs = () => {
 
         {viewMode === "timeline" && (
           <div className="audit-logs-timeline">
-            {auditLogs.map((log) => (
+            {auditLogs.length > 0 ? auditLogs.map((log) => (
               <div key={log.id} className="audit-logs-timeline-item">
                 <div 
                   className="audit-logs-timeline-dot" 
@@ -642,33 +1163,43 @@ const AuditLogs = () => {
                     <span className="audit-logs-timeline-time">{formatDate(log.timestamp)}</span>
                   </div>
                   <div className="audit-logs-timeline-body">
-                    <p>
-                      <strong>User:</strong> {getUserDisplay(log)} | 
-                      <strong> Model:</strong> {log.model_name || "N/A"} | 
-                      <strong> IP:</strong> {log.ip_address || "N/A"}
-                    </p>
+                    <div className="audit-logs-timeline-details">
+                      <span><strong>User:</strong> {getUserDisplay(log)}</span>
+                      <span><strong>Model:</strong> {log.model_name || "N/A"}</span>
+                      <span><strong>IP:</strong> {log.ip_address || "N/A"}</span>
+                    </div>
                     {log.changes && Object.keys(log.changes).length > 0 && (
                       <div className="audit-logs-timeline-changes">
-                        <strong>Changes:</strong>
-                        <pre>{JSON.stringify(log.changes, null, 2)}</pre>
+                        <details>
+                          <summary>Show Changes</summary>
+                          <pre>{JSON.stringify(log.changes, null, 2)}</pre>
+                        </details>
                       </div>
                     )}
                   </div>
                 </div>
               </div>
-            ))}
+            )) : (
+              <div className="audit-logs-empty-state">
+                <div className="audit-logs-empty-icon">📅</div>
+                <h3>No audit logs in timeline</h3>
+                <p>Try adjusting your filters or search criteria</p>
+              </div>
+            )}
           </div>
         )}
 
         {viewMode === "compact" && (
           <div className="audit-logs-compact-grid">
-            {auditLogs.map((log) => (
+            {auditLogs.length > 0 ? auditLogs.map((log) => (
               <div 
                 key={log.id} 
                 className="audit-logs-compact-card"
                 onClick={() => setSelectedLog(log)}
               >
-                <div className="audit-logs-compact-header">
+                <div className="audit-logs-compact-header" style={{ 
+                  borderLeftColor: getSeverityColor(log.action) 
+                }}>
                   <span className="audit-logs-compact-action">
                     {getActionIcon(log.action)}
                   </span>
@@ -680,13 +1211,31 @@ const AuditLogs = () => {
                   </span>
                 </div>
                 <div className="audit-logs-compact-body">
-                  <p><strong>User:</strong> {getUserDisplay(log)}</p>
-                  <p><strong>Model:</strong> {log.model_name || "N/A"}</p>
-                  <p><strong>IP:</strong> {log.ip_address || "N/A"}</p>
-                  <p><strong>Request:</strong> {log.request_method} {log.request_path}</p>
+                  <div className="audit-logs-compact-row">
+                    <span className="audit-logs-compact-label">User:</span>
+                    <span className="audit-logs-compact-value">{getUserDisplay(log)}</span>
+                  </div>
+                  <div className="audit-logs-compact-row">
+                    <span className="audit-logs-compact-label">Model:</span>
+                    <span className="audit-logs-compact-value">{log.model_name || "N/A"}</span>
+                  </div>
+                  <div className="audit-logs-compact-row">
+                    <span className="audit-logs-compact-label">IP:</span>
+                    <span className="audit-logs-compact-value">{log.ip_address || "N/A"}</span>
+                  </div>
+                  <div className="audit-logs-compact-row">
+                    <span className="audit-logs-compact-label">Request:</span>
+                    <span className="audit-logs-compact-value">{log.request_method} {log.request_path}</span>
+                  </div>
                 </div>
               </div>
-            ))}
+            )) : (
+              <div className="audit-logs-empty-state">
+                <div className="audit-logs-empty-icon">🔍</div>
+                <h3>No audit logs in compact view</h3>
+                <p>Try adjusting your filters or search criteria</p>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -746,17 +1295,28 @@ const AuditLogs = () => {
         <div className="audit-logs-modal" onClick={() => setSelectedLog(null)}>
           <div className="audit-logs-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="audit-logs-modal-header">
-              <h2>Log Details #{selectedLog.id}</h2>
-              <button 
-                className="audit-logs-modal-close"
-                onClick={() => setSelectedLog(null)}
-              >
-                ×
-              </button>
+              <h2>
+                <span className="audit-logs-modal-icon">{getActionIcon(selectedLog.action)}</span>
+                Log Details #{selectedLog.id}
+              </h2>
+              <div className="audit-logs-modal-actions">
+                <button 
+                  className="audit-logs-modal-action"
+                  onClick={() => handleDeleteLog(selectedLog.id)}
+                >
+                  🗑️ Delete
+                </button>
+                <button 
+                  className="audit-logs-modal-close"
+                  onClick={() => setSelectedLog(null)}
+                >
+                  ×
+                </button>
+              </div>
             </div>
             <div className="audit-logs-modal-body">
               <div className="audit-logs-modal-section">
-                <h3>Basic Information</h3>
+                <h3>📋 Basic Information</h3>
                 <div className="audit-logs-modal-grid">
                   <div className="audit-logs-modal-field">
                     <label>Action</label>
@@ -793,7 +1353,7 @@ const AuditLogs = () => {
               
               {selectedLog.changes && Object.keys(selectedLog.changes).length > 0 && (
                 <div className="audit-logs-modal-section">
-                  <h3>Changes Details</h3>
+                  <h3>📝 Changes Details</h3>
                   <div className="audit-logs-modal-changes">
                     <pre>{JSON.stringify(selectedLog.changes, null, 2)}</pre>
                   </div>
@@ -802,7 +1362,7 @@ const AuditLogs = () => {
               
               {selectedLog.old_values && Object.keys(selectedLog.old_values).length > 0 && (
                 <div className="audit-logs-modal-section">
-                  <h3>Old Values</h3>
+                  <h3>📄 Old Values</h3>
                   <div className="audit-logs-modal-changes">
                     <pre>{JSON.stringify(selectedLog.old_values, null, 2)}</pre>
                   </div>
@@ -811,7 +1371,7 @@ const AuditLogs = () => {
               
               {selectedLog.new_values && Object.keys(selectedLog.new_values).length > 0 && (
                 <div className="audit-logs-modal-section">
-                  <h3>New Values</h3>
+                  <h3>📄 New Values</h3>
                   <div className="audit-logs-modal-changes">
                     <pre>{JSON.stringify(selectedLog.new_values, null, 2)}</pre>
                   </div>
@@ -824,6 +1384,15 @@ const AuditLogs = () => {
                 onClick={() => setSelectedLog(null)}
               >
                 Close
+              </button>
+              <button 
+                className="audit-logs-modal-button audit-logs-modal-button-user"
+                onClick={() => {
+                  handleUserActivity(selectedLog.id);
+                  setSelectedLog(null);
+                }}
+              >
+                👤 User Activity
               </button>
             </div>
           </div>
