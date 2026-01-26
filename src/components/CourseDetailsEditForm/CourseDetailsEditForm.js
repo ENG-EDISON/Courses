@@ -152,8 +152,6 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
     const handleObjectivesUpdated = (updatedObjectives) => {
         // Update local objectives state ONLY
         setCourseObjectives(updatedObjectives);
-        // Objectives save independently via their own API
-        console.log('Objectives updated locally');
     };
 
     const showCompleteStructure = () => {
@@ -215,7 +213,6 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
         if (!course) return;
         
         if (isSubmitting) {
-            console.log('Already submitting, skipping');
             return;
         }
         
@@ -229,15 +226,11 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
         try {
             const submitData = createFormData();
             
-            console.log('=== Making API call for course update ===');
             
             // Update course data only (objectives are managed separately)
             const response = await updateCourse(course.id, submitData);
             
-            console.log('Course update successful');
-            
             if (onUpdate) {
-                console.log('Passing course data to parent');
                 // Pass ONLY the course response data - NO objectives
                 onUpdate(response.data);
                 // Remove the objectives merge - they save independently

@@ -257,7 +257,7 @@ const AuditLogs = () => {
           suspiciousLogs = Array.isArray(logs) ? logs : [logs];
         }
       } catch (actionErr) {
-        console.log("Failed to get LOGIN_FAILED logs:", actionErr.message);
+        
       }
 
       // If no failed logins, try other suspicious actions
@@ -533,7 +533,6 @@ const AuditLogs = () => {
       });
       if (response.data) {
         // Could display this in a modal or separate view
-        console.log("Activity timeline:", response.data);
         alert(`Activity timeline loaded for last ${quickStatsDays} days. Check console for details.`);
       }
     } catch (err) {

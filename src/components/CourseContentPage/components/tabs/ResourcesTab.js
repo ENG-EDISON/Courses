@@ -4,15 +4,6 @@ import "../../css/ResourcesTab.css"
 const ResourcesTab = ({ course, activeLessonId }) => {
     const [resources, setResources] = useState([]);
     const [currentLessonTitle, setCurrentLessonTitle] = useState('');
-    
-    console.log('🔍 ResourcesTab rendered with:', {
-        activeLessonId,
-        hasCourse: !!course,
-        courseId: course?.id,
-        sectionsCount: course?.sections?.length,
-        currentResources: resources.length,
-        currentLessonTitle
-    });
 
     // Helper function to get file type from URL
     const getFileType = (url) => {
@@ -79,35 +70,20 @@ const ResourcesTab = ({ course, activeLessonId }) => {
     };
 
     // Get resources for the active lesson
-    useEffect(() => {
-        console.log('🔄 useEffect triggered with activeLessonId:', activeLessonId);
-        
+    useEffect(() => {        
         if (!activeLessonId || !course.sections) {
-            console.log('❌ No activeLessonId or course.sections, clearing resources');
             setResources([]);
             setCurrentLessonTitle('');
             return;
         }
-
-        console.log('🔍 Searching for lesson with ID:', activeLessonId);
-        console.log('📂 Course sections structure:', course.sections);
-
         const activeResources = [];
         let lessonTitle = '';
         let lessonFound = false;
 
         // Debug: Log all lessons and their IDs
-        console.log('📋 All lessons in course:');
         course.sections.forEach((section, sectionIndex) => {
-            console.log(`  Section ${sectionIndex + 1}: ${section.title}`);
             section.subsections?.forEach((subsection, subIndex) => {
-                console.log(`    Subsection ${subIndex + 1}: ${subsection.title}`);
                 subsection.lessons?.forEach((lesson, lessonIndex) => {
-                    console.log(`      Lesson ${lessonIndex + 1}: ID=${lesson.id}, Title="${lesson.title}"`);
-                    console.log(`        Has resources?`, lesson.resources?.length || 0);
-                    if (lesson.resources?.length) {
-                        console.log(`        Resources:`, lesson.resources);
-                    }
                 });
             });
         });
@@ -115,24 +91,13 @@ const ResourcesTab = ({ course, activeLessonId }) => {
         course.sections.forEach(section => {
             section.subsections?.forEach(subsection => {
                 subsection.lessons?.forEach(lesson => {
-                    console.log(`🔍 Checking lesson: ID=${lesson.id}, Title="${lesson.title}"`);
                     
                     if (lesson.id === activeLessonId) {
                         lessonFound = true;
                         lessonTitle = lesson.title;
-                        console.log(`✅ Found matching lesson: "${lessonTitle}"`);
                         
-                        if (lesson.resources && Array.isArray(lesson.resources)) {
-                            console.log(`📚 Lesson has ${lesson.resources.length} resources:`, lesson.resources);
-                            
+                        if (lesson.resources && Array.isArray(lesson.resources)) {                            
                             lesson.resources.forEach((resource, resourceIndex) => {
-                                console.log(`  Resource ${resourceIndex + 1}:`, {
-                                    id: resource.id,
-                                    title: resource.title,
-                                    file: resource.file,
-                                    file_size: resource.file_size
-                                });
-                                
                                 activeResources.push({
                                     ...resource,
                                     lessonTitle: lesson.title,
@@ -142,7 +107,6 @@ const ResourcesTab = ({ course, activeLessonId }) => {
                                 });
                             });
                         } else {
-                            console.log(`📭 Lesson has no resources array or it's empty`);
                         }
                     }
                 });
@@ -150,17 +114,10 @@ const ResourcesTab = ({ course, activeLessonId }) => {
         });
 
         if (!lessonFound) {
-            console.log(`❌ No lesson found with ID: ${activeLessonId}`);
-        }
-
-        console.log(`📊 Setting resources: ${activeResources.length} resources found`);
-        console.log(`📝 Setting lesson title: "${lessonTitle}"`);
-        
+        }        
         setResources(activeResources);
         setCurrentLessonTitle(lessonTitle);
     }, [activeLessonId, course.sections]);
-
-    console.log('📦 Final resources to render:', resources);
 
     return (
         <div className="resources-tab-container">

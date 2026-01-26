@@ -262,8 +262,6 @@ const CourseContentPage = () => {
     };
 
     const handleVideoSelect = async (lesson, sectionTitle, subsectionTitle) => {
-        console.log("🎬 handleVideoSelect called with lesson ID:", lesson.id); // ✅ ADDED: Debug log
-        
         const videoData = {
             ...lesson,
             sectionTitle,
@@ -273,16 +271,6 @@ const CourseContentPage = () => {
         setActiveVideo(videoData);
         setActiveLessonId(lesson.id); // ✅ ADDED: Set activeLessonId when video is selected
     };
-
-    // ✅ ADDED: Debug log to track state
-    console.log("🔍 CourseContentPage State:", {
-        activeVideo: activeVideo?.title,
-        activeLessonId,
-        hasCourse: !!course,
-        courseTitle: course?.title,
-        courseId: course?.id
-    });
-
     if (loading) return <LoadingState />;
     if (error || !course) return <ErrorState error={error} navigate={navigate} />;
 

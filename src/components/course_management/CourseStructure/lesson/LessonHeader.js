@@ -56,7 +56,6 @@ const LessonHeader = ({
         
         const duration = video.duration;
         const roundedDuration = Math.round(duration);
-        console.log(`🎬 Frontend calculated duration: ${duration}s → ${roundedDuration}s`);
         resolve(roundedDuration);
       };
       
@@ -107,10 +106,8 @@ const LessonHeader = ({
       let videoDuration = lesson.video_duration || 0;
       
       if (lesson.video_file instanceof File) {
-        console.log('📹 Calculating video duration for new lesson...');
         videoDuration = await calculateVideoDuration(lesson.video_file);
         setCalculatedDuration(videoDuration);
-        console.log(`✅ Duration calculated: ${videoDuration} seconds`);
       }
 
       // ✅ FIX: Determine video_source based on actual content
@@ -145,12 +142,7 @@ const LessonHeader = ({
       if (lesson.video_file instanceof File) {
         lessonData.video_file = lesson.video_file;
       }
-      
-      console.log('📤 Sending lesson data to API:', {
-        ...lessonData,
-        video_file: lessonData.video_file ? `File: ${lessonData.video_file.name}` : 'No file'
-      });
-      
+    
       // Create the lesson using your API
       const response = await createLesson(lessonData);
 
@@ -189,10 +181,8 @@ const LessonHeader = ({
       let videoDuration = lesson.video_duration || 0;
       
       if (lesson.video_file instanceof File) {
-        console.log('📹 Calculating video duration for updated lesson...');
         videoDuration = await calculateVideoDuration(lesson.video_file);
         setCalculatedDuration(videoDuration);
-        console.log(`✅ Duration calculated: ${videoDuration} seconds`);
       }
 
       // ✅ COMPREHENSIVE: Handle all video source transitions
@@ -272,14 +262,7 @@ const LessonHeader = ({
         }
       };
 
-      handleFileTransitions();
-      
-      console.log('📤 Sending update data to API:', {
-        ...updateData,
-        video_file: updateData.video_file ? `File: ${updateData.video_file.name}` : 'No file',
-        video_duration: videoDuration
-      });
-      
+      handleFileTransitions();      
       // Update the lesson using your API
       const response = await updateLesson(lesson.id, updateData);
 

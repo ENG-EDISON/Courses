@@ -1,21 +1,13 @@
 
 import apiClient from "../utils/Http";
 
-export const createLesson = (data) => {
-  console.log('📤 [LESSON API] Creating lesson with data:', data);
-  
+export const createLesson = (data) => {  
   const hasFile = data.video_file instanceof File;
   
   if (hasFile) {
-    const formData = new FormData();
-    
-    // Log each item being added to FormData
-    console.log('📋 Adding to FormData:');
-    
+    const formData = new FormData();  
     for (const key in data) {
-      const value = data[key];
-      console.log(`  ${key}:`, value, `(type: ${typeof value})`);
-      
+      const value = data[key];      
       // Handle different data types properly
       if (value === null || value === undefined) {
         // Skip null/undefined
@@ -33,16 +25,9 @@ export const createLesson = (data) => {
       }
     }
     
-    // Debug: Log FormData contents
-    console.log('📄 FormData entries:');
-    for (const pair of formData.entries()) {
-      console.log(`  ${pair[0]}: ${pair[1]}`);
-    }
-    
     return apiClient.post('api/lesson/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }).then(response => {
-      console.log('✅ [LESSON API] POST SUCCESS:', response.data);
       return response;
     }).catch(error => {
       console.error('❌ [LESSON API] POST ERROR:', {
@@ -53,10 +38,8 @@ export const createLesson = (data) => {
       throw error;
     });
   } else {
-    console.log('📤 Sending JSON data:', data);
     return apiClient.post('api/lesson/', data)
       .then(response => {
-        console.log('✅ [LESSON API] POST SUCCESS:', response.data);
         return response;
       })
       .catch(error => {
@@ -100,22 +83,16 @@ export const getLessonById = (id) => {
     });
 };
 
-export const updateLesson = (id, data) => {
-  console.log('Updating lesson with ID:', id, 'and data:', data); // Log ID and data before making request
-  
+export const updateLesson = (id, data) => {  
   const hasFile = data.video_file instanceof File;
   if (hasFile) {
     const formData = new FormData();
     for (const key in data) {
       formData.append(key, data[key]);
     }
-    
-    console.log('Uploading with FormData:', formData); // Log FormData being sent
-
     return apiClient.patch('/api/lesson/' + id + '/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }).then(response => {
-      console.log('Lesson updated successfully:', response.data);  // Log success response
       return response;
     }).catch(error => {
       console.error('❌ [LESSON API] PATCH ERROR:', {
@@ -126,11 +103,8 @@ export const updateLesson = (id, data) => {
       throw error;
     });
   } else {
-    console.log('Sending data without video file:', data);  // Log data without the video file
-
     return apiClient.patch('/api/lesson/' + id + '/', data)
       .then(response => {
-        console.log('Lesson updated successfully:', response.data);  // Log success response
         return response;
       })
       .catch(error => {

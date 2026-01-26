@@ -12,13 +12,7 @@ const CourseLayout = ({
     onVideoSelect,
     onToggleSection,
     onMarkComplete
-}) => {
-    console.log("🏗️ CourseLayout rendered with:", {
-        activeVideo,
-        activeLessonId,
-        courseTitle: course?.title
-    });
-    
+}) => {    
     return (
         <div className="course-content__layout">
             <div className="course-content__main">
