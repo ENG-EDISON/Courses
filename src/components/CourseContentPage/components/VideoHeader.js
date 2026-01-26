@@ -19,12 +19,6 @@ const VideoMeta = ({ activeVideo, isCompleted }) => (
         <span className="meta-badge">{activeVideo.sectionTitle}</span>
         <span className="meta-separator">•</span>
         <span className="meta-badge">{activeVideo.subsectionTitle}</span>
-        {activeVideo.video_duration && (
-            <>
-                <span className="meta-separator">•</span>
-                <span className="meta-duration">{activeVideo.video_duration} min</span>
-            </>
-        )}
         {isCompleted && (
             <>
                 <span className="meta-separator">•</span>

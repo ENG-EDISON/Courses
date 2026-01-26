@@ -24,6 +24,7 @@ const CourseContentPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [activeVideo, setActiveVideo] = useState(null);
+    const [activeLessonId, setActiveLessonId] = useState(null); // ✅ ADDED: Active lesson ID state
     const [expandedSections, setExpandedSections] = useState(new Set());
     const [completionStatus, setCompletionStatus] = useState({});
     const [progressSummary, setProgressSummary] = useState(null);
@@ -165,11 +166,15 @@ const CourseContentPage = () => {
                     activeVideoToSet = findLessonInCourse(courseResponse.data, lastPlayedResponse.data.lesson_id);
                     if (activeVideoToSet) {
                         activeVideoToSet.lastPlayedTime = lastPlayedResponse.data.current_time;
+                        setActiveLessonId(lastPlayedResponse.data.lesson_id); // ✅ ADDED: Set activeLessonId from last played
                     }
                 }
 
                 if (!activeVideoToSet) {
                     activeVideoToSet = findFirstVideo(courseResponse.data);
+                    if (activeVideoToSet) {
+                        setActiveLessonId(activeVideoToSet.id); // ✅ ADDED: Set activeLessonId for first video
+                    }
                 }
 
                 setActiveVideo(activeVideoToSet);
@@ -257,6 +262,7 @@ const CourseContentPage = () => {
     };
 
     const handleVideoSelect = async (lesson, sectionTitle, subsectionTitle) => {
+        console.log("🎬 handleVideoSelect called with lesson ID:", lesson.id); // ✅ ADDED: Debug log
         
         const videoData = {
             ...lesson,
@@ -265,7 +271,18 @@ const CourseContentPage = () => {
             lastPlayedTime: lastPlayed?.lesson_id === lesson.id ? lastPlayed.current_time : 0
         };
         setActiveVideo(videoData);
+        setActiveLessonId(lesson.id); // ✅ ADDED: Set activeLessonId when video is selected
     };
+
+    // ✅ ADDED: Debug log to track state
+    console.log("🔍 CourseContentPage State:", {
+        activeVideo: activeVideo?.title,
+        activeLessonId,
+        hasCourse: !!course,
+        courseTitle: course?.title,
+        courseId: course?.id
+    });
+
     if (loading) return <LoadingState />;
     if (error || !course) return <ErrorState error={error} navigate={navigate} />;
 
@@ -285,6 +302,7 @@ const CourseContentPage = () => {
                 <CourseLayout
                     course={course}
                     activeVideo={activeVideo}
+                    activeLessonId={activeLessonId} // ✅ ADDED: Pass activeLessonId prop
                     expandedSections={expandedSections}
                     completionStatus={completionStatus}
                     progressSummary={progressSummary}
