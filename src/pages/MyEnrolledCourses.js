@@ -195,7 +195,7 @@ function MyEnrolledCourses() {
               <div className="ec-search-container">
                 <input
                   type="text"
-                  placeholder={isSmallScreen ? "Search courses..." : "Search your courses by title, instructor, or category..."}
+                  placeholder={isSmallScreen ? "Search courses..." : "Search your courses"}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="ec-search"
