@@ -4,7 +4,7 @@
 .ls-item {
     display: flex;
     align-items: center;
-    padding: 12px 16px;
+    padding: 2px 10px;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -13,6 +13,7 @@
     background: #ffffff;
     position: relative;
     margin-bottom: 4px;
+    text-align: left;
 }
 
 .ls-item:hover {
@@ -219,31 +220,31 @@
     transition: all 0.2s ease;
 }
 
-/* ===== PLAYING INDICATOR ===== */
-.ls-item__playing {
+
+.ls-item {
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    margin-left: auto;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    gap: 12px;
+    background: #fff;
+    margin-bottom: 4px;
 }
 
-.ls-item-playing-indicator {
-    width: 8px;
-    height: 8px;
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    border-radius: 50%;
-    animation: ls-item-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+.ls-item__duration {
+    margin-left: auto; /* Push to the right */
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+    padding: 0 8px;
+    white-space: nowrap;
 }
 
-.ls-item--active .ls-item-playing-indicator {
-    background: linear-gradient(135deg, #ffffff, #dbeafe);
-    animation: ls-item-pulse-active 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.ls-item-mark-complete {
+    margin-left: 4px; /* Small gap from duration */
 }
-
 /* ===== ANIMATIONS ===== */
 @keyframes ls-item-pulse {
     0% {
@@ -286,9 +287,6 @@
         transition: none;
     }
     
-    .ls-item-playing-indicator {
-        animation: none;
-    }
 }
 
 /* ===== DARK MODE SUPPORT ===== */
@@ -329,8 +327,4 @@
 .ls-item {
     will-change: transform, background-color;
     contain: layout style;
-}
-
-.ls-item-playing-indicator {
-    will-change: transform, opacity;
 }

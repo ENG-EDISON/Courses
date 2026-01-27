@@ -8,7 +8,7 @@
 .sa-section__header {
     display: flex;
     align-items: flex-start;
-    padding: 16px;
+    padding: 12px;
     cursor: pointer;
     transition: background-color 0.2s ease;
     gap: 12px;

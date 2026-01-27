@@ -14,12 +14,20 @@ const LessonItem = ({
     
     const getVideoIcon = () => {
         const icons = {
-            uploaded: '📁',
-            youtube: '📺',
-            'self-hosted': '🎬',
+            uploaded: '▶️',
+            youtube: '▶️',
+            'self-hosted': '▶️',
             none: '📝'
         };
         return icons[videoSource.type] || icons.none;
+    };
+
+    // Format duration from seconds to MM:SS
+    const formatDuration = (seconds) => {
+        if (!seconds) return '';
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
     const handleLessonClick = (e) => {
@@ -63,6 +71,13 @@ const LessonItem = ({
                 </h6>
             </div>
 
+            {/* Duration display */}
+            {lesson.video_duration && (
+                <div className="ls-item__duration">
+                    {formatDuration(lesson.video_duration)}
+                </div>
+            )}
+
             {!isCompleted && (
                 <button
                     className="ls-item-mark-complete"
@@ -73,12 +88,6 @@ const LessonItem = ({
                         <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.5" />
                     </svg>
                 </button>
-            )}
-
-            {isActive && (
-                <div className="ls-item__playing">
-                    <div className="ls-item-playing-indicator"></div>
-                </div>
             )}
         </div>
     );
