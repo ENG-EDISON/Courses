@@ -6,11 +6,13 @@ import apiClient from "../utils/Http";
 
 export const getAllenrollements = () => apiClient.get('/api/enrollment/');
 export const getMyEnrollments = () => apiClient.get('/api/my-enrollments/');
-export const EnrollToCourse = (courseId) => apiClient.post(`/api/enroll/${courseId}/`);
+export const EnrollToCourse = (courseId, enrollmentData) => 
+  apiClient.post(`/api/enroll/${courseId}/`, enrollmentData);
 export const checkEnrollment = (courseId) => apiClient.get(`/api/check-enrollment/${courseId}/`);
 export const getEnrollmentDetails = (enrollmentId) => apiClient.get(`/api/enrollment/${enrollmentId}/`);
 export const updateEnrollment = (enrollmentId, data) => apiClient.patch(`/api/enrollment/${enrollmentId}/`, data);
-export const cancelEnrollment = (enrollmentId) => apiClient.delete(`/api/enrollment/${enrollmentId}/`);
+export const cancelEnrollment = (enrollmentId) => 
+  apiClient.post(`/api/enrollment/${enrollmentId}/cancel/`, {});
 
 // Get enrolled courses for CURRENT user
 export const getMyEnrolledCourses = () => apiClient.get('/api/user/enrolled-courses/');

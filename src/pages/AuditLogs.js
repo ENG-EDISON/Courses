@@ -21,7 +21,6 @@ const AuditLogs = () => {
   });
   const [selectedLog, setSelectedLog] = useState(null);
   const [totalCount, setTotalCount] = useState(0);
-  // Removed unused 'filters' state variable
   const [availableModels, setAvailableModels] = useState([]);
   const [availableUsers, setAvailableUsers] = useState([]);
   const [availableActions, setAvailableActions] = useState([]);
@@ -41,7 +40,6 @@ const AuditLogs = () => {
     try {
       const response = await AuditLogsApi.getAuditLogFilters();
       if (response.data) {
-        // Set the filter data directly without storing in unused variable
         setAvailableModels(response.data.models || []);
         setAvailableUsers(response.data.users || []);
         setAvailableActions(response.data.actions || []);
@@ -91,63 +89,68 @@ const AuditLogs = () => {
     }));
   }, []);
 
-  // Fetch audit logs - USING ONLY EXISTING ENDPOINTS
-  const fetchAuditLogs = useCallback(async () => {
+  // Fetch audit logs - FIXED: Pass all parameters as arguments
+  const fetchAuditLogs = useCallback(async (params = {}) => {
     setLoading(true);
     setError(null);
+    
+    // Use passed params or fallback to current state
+    const page = params.page || currentPage;
+    const pageSizeParam = params.pageSize || pageSize;
+    const search = params.search !== undefined ? params.search : searchQuery;
+    const filter = params.filter !== undefined ? params.filter : selectedFilter;
+    const timeRange = params.timeRange !== undefined ? params.timeRange : selectedTimeRange;
+    const model = params.model !== undefined ? params.model : selectedModel;
+    const user = params.user !== undefined ? params.user : selectedUser;
+
     try {
       let response;
-      const params = {
-        page: currentPage,
-        page_size: pageSize,
-        search: searchQuery || undefined,
+      const apiParams = {
+        page: page,
+        page_size: pageSizeParam,
+        search: search || undefined,
       };
 
       // Add filters
-      if (selectedFilter !== "all") {
-        params.action = selectedFilter;
+      if (filter !== "all") {
+        apiParams.action = filter;
       }
-      if (selectedModel !== "all") {
-        params.model_name = selectedModel;
+      if (model !== "all") {
+        apiParams.model_name = model;
       }
-      if (selectedUser !== "all") {
-        params.user_id = selectedUser;
+      if (user !== "all") {
+        apiParams.user_id = user;
       }
 
       // Use dedicated time range endpoints
-      switch (selectedTimeRange) {
+      switch (timeRange) {
         case "today":
-          response = await AuditLogsApi.getTodayAuditLogs(params);
+          response = await AuditLogsApi.getTodayAuditLogs(apiParams);
           break;
         case "yesterday":
-          response = await AuditLogsApi.getYesterdayAuditLogs(params);
+          response = await AuditLogsApi.getYesterdayAuditLogs(apiParams);
           break;
         case "last7":
-          response = await AuditLogsApi.getLast7DaysAuditLogs(params);
+          response = await AuditLogsApi.getLast7DaysAuditLogs(apiParams);
           break;
         case "last30":
-          response = await AuditLogsApi.getLast30DaysAuditLogs(params);
+          response = await AuditLogsApi.getLast30DaysAuditLogs(apiParams);
           break;
         case "month":
-          response = await AuditLogsApi.getThisMonthAuditLogs(params);
+          response = await AuditLogsApi.getThisMonthAuditLogs(apiParams);
           break;
         default:
           // For all time, use different endpoints based on filters
-          if (selectedUser !== "all") {
-            // Use the user-specific endpoint
-            response = await AuditLogsApi.getAuditLogsByUser(selectedUser, params);
-          } else if (selectedModel !== "all") {
-            // Use the model-specific endpoint
-            response = await AuditLogsApi.getAuditLogsByModel(selectedModel, params);
-          } else if (selectedFilter !== "all") {
-            // Use the action-specific endpoint
-            response = await AuditLogsApi.getAuditLogsByAction(selectedFilter, params);
-          } else if (searchQuery) {
-            // Use search endpoint
-            response = await AuditLogsApi.searchAuditLogs(searchQuery, params);
+          if (user !== "all") {
+            response = await AuditLogsApi.getAuditLogsByUser(user, apiParams);
+          } else if (model !== "all") {
+            response = await AuditLogsApi.getAuditLogsByModel(model, apiParams);
+          } else if (filter !== "all") {
+            response = await AuditLogsApi.getAuditLogsByAction(filter, apiParams);
+          } else if (search) {
+            response = await AuditLogsApi.searchAuditLogs(search, apiParams);
           } else {
-            // Use the main list endpoint
-            response = await AuditLogsApi.getAllAuditLogs(params);
+            response = await AuditLogsApi.getAllAuditLogs(apiParams);
           }
           break;
       }
@@ -257,7 +260,7 @@ const AuditLogs = () => {
           suspiciousLogs = Array.isArray(logs) ? logs : [logs];
         }
       } catch (actionErr) {
-        
+        // Continue to other methods
       }
 
       // If no failed logins, try other suspicious actions
@@ -323,7 +326,7 @@ const AuditLogs = () => {
       try {
         await AuditLogsApi.cleanupAuditLogs({ days: days });
         alert(`Cleanup completed successfully! Logs older than ${days} days have been removed.`);
-        fetchAuditLogs();
+        fetchAuditLogs({ page: 1 }); // Reset to page 1 after cleanup
         fetchDetailedStats();
       } catch (err) {
         alert(err.response?.data?.detail || `Failed to cleanup audit logs.`);
@@ -334,15 +337,14 @@ const AuditLogs = () => {
     }
   };
 
-  // Handle export - using main endpoint with export param
-  // Simple export function that always works
+  // Handle export
   const handleExport = async () => {
     setExporting(true);
     try {
       // Fetch data using the same logic as fetchAuditLogs but with more records
       const params = {
         page: 1,
-        page_size: 5000, // Get more records for export
+        page_size: 5000,
       };
 
       if (selectedFilter !== "all") params.action = selectedFilter;
@@ -436,7 +438,7 @@ const AuditLogs = () => {
       log.ip_address || '',
       log.request_path || '',
       log.request_method || '',
-      (log.user_agent || '').substring(0, 100), // Truncate long user agents
+      (log.user_agent || '').substring(0, 100),
       log.changes ? JSON.stringify(log.changes).replace(/"/g, '""') : ''
     ]);
 
@@ -456,19 +458,23 @@ const AuditLogs = () => {
     ).join('\n');
   };
 
-  // Handle pagination
+  // Handle pagination - FIXED: Pass page parameter explicitly
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
+      // Call fetchAuditLogs with explicit page parameter
+      fetchAuditLogs({ page: newPage });
     }
   };
 
-  // Handle page size change
+  // Handle page size change - FIXED: Pass pageSize parameter explicitly
   const handlePageSizeChange = async (size) => {
     try {
       await AuditLogsApi.setAuditLogPageSize({ page_size: size });
       setPageSize(size);
       setCurrentPage(1);
+      // Call fetchAuditLogs with reset page and new pageSize
+      fetchAuditLogs({ page: 1, pageSize: size });
     } catch (err) {
       console.error("Error setting page size:", err);
     }
@@ -480,7 +486,7 @@ const AuditLogs = () => {
       try {
         await AuditLogsApi.deleteAuditLog(logId);
         alert("Audit log deleted successfully!");
-        fetchAuditLogs();
+        fetchAuditLogs(); // Refresh with current page
         fetchDetailedStats();
       } catch (err) {
         alert("Failed to delete audit log");
@@ -532,7 +538,6 @@ const AuditLogs = () => {
         days: quickStatsDays
       });
       if (response.data) {
-        // Could display this in a modal or separate view
         alert(`Activity timeline loaded for last ${quickStatsDays} days. Check console for details.`);
       }
     } catch (err) {
@@ -570,7 +575,6 @@ const AuditLogs = () => {
         const userLogs = response.data.logs || [];
         if (userLogs.length > 0) {
           alert(`User Activity:\n\nFound ${userLogs.length} activities for this user.`);
-          // Could display in modal
         } else {
           alert("No additional user activity found.");
         }
@@ -599,6 +603,37 @@ const AuditLogs = () => {
     }
   };
 
+  // Handle filter changes - NEW: Explicit handler for filters
+  const handleFilterChange = (filterName, value) => {
+    switch (filterName) {
+      case 'action':
+        setSelectedFilter(value);
+        break;
+      case 'model':
+        setSelectedModel(value);
+        break;
+      case 'user':
+        setSelectedUser(value);
+        break;
+      case 'timeRange':
+        setSelectedTimeRange(value);
+        break;
+      default:
+        return;
+    }
+    
+    setCurrentPage(1); // Reset to page 1 when filters change
+    
+    // Fetch with new filter and reset page
+    fetchAuditLogs({ 
+      filter: filterName === 'action' ? value : selectedFilter,
+      model: filterName === 'model' ? value : selectedModel,
+      user: filterName === 'user' ? value : selectedUser,
+      timeRange: filterName === 'timeRange' ? value : selectedTimeRange,
+      page: 1 
+    });
+  };
+
   // Initialize
   useEffect(() => {
     const init = async () => {
@@ -611,17 +646,7 @@ const AuditLogs = () => {
     init();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Refresh when dependencies change
-  useEffect(() => {
-    fetchAuditLogs();
-  }, [currentPage, pageSize, selectedFilter, selectedTimeRange, selectedModel, selectedUser, fetchAuditLogs]);
-
-  // Refresh stats when days change
-  useEffect(() => {
-    fetchDetailedStats();
-  }, [quickStatsDays, fetchDetailedStats]);
-
-  // Debounced search
+  // Debounced search - FIXED: Call fetchAuditLogs with explicit parameters
   useEffect(() => {
     if (searchTimeout.current) {
       clearTimeout(searchTimeout.current);
@@ -629,7 +654,7 @@ const AuditLogs = () => {
 
     searchTimeout.current = setTimeout(() => {
       setCurrentPage(1);
-      fetchAuditLogs();
+      fetchAuditLogs({ search: searchQuery, page: 1 });
     }, 500);
 
     return () => {
@@ -637,7 +662,13 @@ const AuditLogs = () => {
         clearTimeout(searchTimeout.current);
       }
     };
-  }, [searchQuery, fetchAuditLogs]);
+    // eslint-disable-next-line 
+  }, [searchQuery]);
+
+  // Refresh stats when days change
+  useEffect(() => {
+    fetchDetailedStats();
+  }, [quickStatsDays, fetchDetailedStats]);
 
   // Format date
   const formatDate = (dateString) => {
@@ -740,6 +771,21 @@ const AuditLogs = () => {
     setSearchQuery("");
     setSelectedTimeRange("all");
     setCurrentPage(1);
+    // Fetch with all defaults
+    fetchAuditLogs({ 
+      filter: "all",
+      model: "all",
+      user: "all",
+      search: "",
+      timeRange: "all",
+      page: 1 
+    });
+  };
+
+  // Refresh button handler
+  const handleRefresh = () => {
+    fetchAuditLogs();
+    fetchDetailedStats();
   };
 
   // Render loading state
@@ -853,10 +899,7 @@ const AuditLogs = () => {
               <select
                 className="audit-logs-advanced-select"
                 value={selectedFilter}
-                onChange={(e) => {
-                  setSelectedFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
+                onChange={(e) => handleFilterChange('action', e.target.value)}
               >
                 {filterOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -871,10 +914,7 @@ const AuditLogs = () => {
               <select
                 className="audit-logs-advanced-select"
                 value={selectedModel}
-                onChange={(e) => {
-                  setSelectedModel(e.target.value);
-                  setCurrentPage(1);
-                }}
+                onChange={(e) => handleFilterChange('model', e.target.value)}
               >
                 {modelOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -889,10 +929,7 @@ const AuditLogs = () => {
               <select
                 className="audit-logs-advanced-select"
                 value={selectedUser}
-                onChange={(e) => {
-                  setSelectedUser(e.target.value);
-                  setCurrentPage(1);
-                }}
+                onChange={(e) => handleFilterChange('user', e.target.value)}
               >
                 {userOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -907,10 +944,7 @@ const AuditLogs = () => {
               <select
                 className="audit-logs-advanced-select"
                 value={selectedTimeRange}
-                onChange={(e) => {
-                  setSelectedTimeRange(e.target.value);
-                  setCurrentPage(1);
-                }}
+                onChange={(e) => handleFilterChange('timeRange', e.target.value)}
               >
                 {timeRangeOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -1068,10 +1102,7 @@ const AuditLogs = () => {
           </button>
           <button
             className="audit-logs-action-button audit-logs-action-button-refresh"
-            onClick={() => {
-              fetchAuditLogs();
-              fetchDetailedStats();
-            }}
+            onClick={handleRefresh}
           >
             🔄 Refresh
           </button>
@@ -1325,7 +1356,7 @@ const AuditLogs = () => {
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
+   {totalPages > 1 && (
         <div className="audit-logs-pagination">
           <button
             className="audit-logs-pagination-button"

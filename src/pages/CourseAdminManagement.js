@@ -49,6 +49,7 @@ const EnrollmentManagementTab = ({
   });
   const [studentSearchTerm, setStudentSearchTerm] = useState('');
   const [courseSearchTerm, setCourseSearchTerm] = useState('');
+  const [modalLoading, setModalLoading] = useState(false);
 
   // Filter students based on search term
   const filteredStudents = students.filter(student => {
@@ -80,9 +81,8 @@ const EnrollmentManagementTab = ({
     return title.includes(term);
   });
 
-
   // Extract students from enrollments (standalone function, no dependencies)
-  const extractStudentsFromEnrollments = useCallback((enrollmentList, currentStudents) => {
+  const extractStudentsFromEnrollments = useCallback((enrollmentList) => {
     const uniqueStudents = [];
     const studentMap = new Map();
 
@@ -98,16 +98,16 @@ const EnrollmentManagementTab = ({
       }
     });
 
-    // Only set as fallback if we don't have students from API
-    if (currentStudents.length === 0) {
-      return uniqueStudents;
-    }
-    return currentStudents;
+    return uniqueStudents;
   }, []); // No dependencies needed
 
-  // Fetch students from API
-  const fetchStudents = useCallback(async () => {
+  // Function to fetch students only when needed (for modal)
+  const fetchStudentsForModal = async () => {
+    // If we already have students, don't fetch again
+    if (students.length > 0) return;
+
     try {
+      setModalLoading(true);
       const response = await getStudentsUsers();
       if (response.data && Array.isArray(response.data)) {
         // Filter only students (user_type === 'student')
@@ -117,24 +117,35 @@ const EnrollmentManagementTab = ({
     } catch (error) {
       console.error('Error fetching students:', error);
       // Fallback: extract from enrollments if API fails
-      const fallbackStudents = extractStudentsFromEnrollments(enrollments, students);
+      const fallbackStudents = extractStudentsFromEnrollments(enrollments);
       if (fallbackStudents.length > 0) {
         setStudents(fallbackStudents);
       }
+    } finally {
+      setModalLoading(false);
     }
-  }, [enrollments, students, extractStudentsFromEnrollments]); // Added extractStudentsFromEnrollments to dependencies
+  };
+
+  // Handle opening the add enrollment modal
+  const handleOpenAddModal = async () => {
+    setModalLoading(true);
+    try {
+      await fetchStudentsForModal();
+      setShowAddModal(true);
+    } catch (error) {
+      console.error('Error preparing add modal:', error);
+      alert('Failed to load students data');
+    } finally {
+      setModalLoading(false);
+    }
+  };
 
   // Update when props change
   useEffect(() => {
     setEnrollments(propEnrollments || []);
     setCourses(propCourses || []);
     calculateStats(propEnrollments || []);
-
-    // Fetch students when component mounts or enrollments change
-    if (propEnrollments && propEnrollments.length > 0) {
-      fetchStudents();
-    }
-  }, [propEnrollments, propCourses, fetchStudents]);
+  }, [propEnrollments, propCourses]);
 
   const calculateStats = (enrollmentList) => {
     const total = enrollmentList.length;
@@ -331,17 +342,43 @@ const EnrollmentManagementTab = ({
     if (window.confirm('Are you sure you want to cancel this enrollment?')) {
       try {
         setLoading(true);
-        await cancelEnrollment(enrollmentId);
-        await fetchInitialData();
 
-        if (selectedEnrollment?.id === enrollmentId) {
-          setSelectedEnrollment(null);
+        console.log('Cancelling enrollment ID:', enrollmentId);
+
+        // Use the dedicated cancel endpoint
+        const response = await cancelEnrollment(enrollmentId);
+
+        console.log('Cancel response:', response.data);
+
+        if (response.data?.success) {
+          alert(response.data.message || 'Enrollment cancelled successfully!');
+
+          // Refresh the data
+          await fetchInitialData();
+
+          // Clear selected enrollment if it was the one cancelled
+          if (selectedEnrollment?.id === enrollmentId) {
+            setSelectedEnrollment(null);
+          }
+        } else {
+          alert(response.data?.message || 'Failed to cancel enrollment');
         }
 
-        alert('Enrollment cancelled successfully!');
       } catch (error) {
         console.error('Error cancelling enrollment:', error);
-        alert('Failed to cancel enrollment');
+
+        // Handle specific error cases
+        if (error.response?.status === 404) {
+          alert('Enrollment not found. It may have already been deleted.');
+        } else if (error.response?.status === 403) {
+          alert('Permission denied. You do not have permission to cancel this enrollment.');
+        } else if (error.response?.status === 400) {
+          alert(`Failed: ${error.response.data?.message || 'Bad request'}`);
+        } else if (error.response?.status === 500) {
+          alert('Server error. Please try again later.');
+        } else {
+          alert(`Failed to cancel enrollment: ${error.message || 'Network error'}`);
+        }
       } finally {
         setLoading(false);
       }
@@ -406,10 +443,17 @@ const EnrollmentManagementTab = ({
         return;
       }
 
-      // Check if enrollment already exists
+      // Convert to numbers
+      const studentId = parseInt(addFormData.student_id);
+      const courseId = parseInt(addFormData.course_id);
+
+      // More robust duplicate check
       const existingEnrollment = enrollments.find(
-        e => e.student?.toString() === addFormData.student_id &&
-          e.course?.toString() === addFormData.course_id
+        e => {
+          const existingStudentId = e.student?.id ? parseInt(e.student.id) : parseInt(e.student);
+          const existingCourseId = e.course?.id ? parseInt(e.course.id) : parseInt(e.course);
+          return existingStudentId === studentId && existingCourseId === courseId;
+        }
       );
 
       if (existingEnrollment) {
@@ -419,17 +463,28 @@ const EnrollmentManagementTab = ({
 
       // Prepare enrollment data
       const enrollmentData = {
-        student_id: addFormData.student_id,
-        course_id: addFormData.course_id,
-        is_active: addFormData.is_active,
-        progress: parseInt(addFormData.progress) || 0
+        student_id: studentId,  // Send student_id for admin enrollment
+        progress: parseFloat(addFormData.progress) || 0.0,
+        is_active: addFormData.is_active !== false
       };
 
-      // Call the API to enroll student
-      const response = await EnrollToCourse(addFormData.course_id, enrollmentData);
+      // DEBUG: Log what's being sent
+      console.log('=== Enrollment Request ===');
+      console.log('Course ID:', courseId);
+      console.log('Enrollment Data:', enrollmentData);
+      console.log('Selected student:', students.find(s => s.id === studentId));
+      console.log('==========================');
 
-      if (response.data) {
-        alert('Enrollment added successfully!');
+      // Call the API
+      const response = await EnrollToCourse(courseId, enrollmentData);
+
+      console.log('=== API Response ===');
+      console.log('Response:', response);
+      console.log('Response data:', response.data);
+      console.log('====================');
+
+      if (response.data?.success) {
+        alert(response.data.message || 'Enrollment added successfully!');
         setShowAddModal(false);
         setAddFormData({
           student_id: '',
@@ -438,13 +493,39 @@ const EnrollmentManagementTab = ({
           progress: 0
         });
         await fetchInitialData(); // Refresh the data
+      } else {
+        alert(response.data?.message || 'Failed to add enrollment');
       }
     } catch (error) {
-      console.error('Error adding enrollment:', error);
-      const errorMessage = error.response?.data?.error ||
-        error.response?.data?.message ||
-        error.message;
-      alert(`Failed to add enrollment: ${errorMessage}`);
+      console.error('=== Error Details ===');
+      console.error('Error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      console.error('=====================');
+
+      // Handle specific error cases
+      if (error.response?.status === 400) {
+        const errorData = error.response.data;
+        if (errorData?.message?.includes("already enrolled")) {
+          alert('This student is already enrolled in this course');
+        } else if (errorData?.message?.includes("not a student")) {
+          alert('Cannot enroll this user - they are not a student');
+        } else if (errorData?.message) {
+          alert(`Error: ${errorData.message}`);
+        } else {
+          alert('Bad request. Please check your data.');
+        }
+      } else if (error.response?.status === 401) {
+        alert('Unauthorized. Please login again.');
+      } else if (error.response?.status === 403) {
+        alert('Permission denied. Only admins can enroll other users.');
+      } else if (error.response?.status === 404) {
+        alert('Course or student not found.');
+      } else if (error.response?.status === 500) {
+        alert('Server error. Please try again later.');
+      } else {
+        alert(`Failed to add enrollment: ${error.message || 'Network error'}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -547,11 +628,14 @@ const EnrollmentManagementTab = ({
         <div className="s-a-m-bulk-actions">
           <button
             className="s-a-m-btn s-a-m-btn-primary"
-            onClick={() => setShowAddModal(true)}
+            onClick={handleOpenAddModal}
+            disabled={modalLoading}
             aria-label="Add new enrollment"
           >
             <span className="s-a-m-btn-icon">+</span>
-            <span className="s-a-m-btn-text">Add Enrollment</span>
+            <span className="s-a-m-btn-text">
+              {modalLoading ? 'Loading...' : 'Add Enrollment'}
+            </span>
           </button>
 
           <span className="s-a-m-selected-count" aria-live="polite">
@@ -616,10 +700,8 @@ const EnrollmentManagementTab = ({
             ) : (
               currentEnrollments.map(enrollment => {
                 // Get email from multiple locations
-                const studentEmail =
-                  enrollment.student_details?.email ||
-                  enrollment.course_details?.instructor?.email ||
-                  `${enrollment.student_details?.username}@example.com`;
+                const studentEmail = enrollment.student_details?.email || 
+                  `${enrollment.student_details?.username || 'user'}@example.com`;
 
                 return (
                   <tr key={enrollment.id} className={`s-a-m-table-row ${selectedIds.includes(enrollment.id) ? 's-a-m-row-selected' : ''}`}>
@@ -748,8 +830,7 @@ const EnrollmentManagementTab = ({
         </div>
       )}
 
-      {/* Compact Add Enrollment Modal */}
-      {/* Add Enrollment Modal - Search Only */}
+      {/* Add Enrollment Modal */}
       {showAddModal && (
         <div className="s-a-m-modal-overlay">
           <div className="s-a-m-modal-content">
@@ -759,67 +840,73 @@ const EnrollmentManagementTab = ({
                 setShowAddModal(false);
                 setStudentSearchTerm('');
                 setCourseSearchTerm('');
+                setAddFormData({
+                  student_id: '',
+                  course_id: '',
+                  is_active: true,
+                  progress: 0
+                });
               }}>×</button>
             </div>
 
             <div className="s-a-m-modal-body">
-            {/* Student Search */}
-            <div className="s-a-m-form-group">
-              <label>Student *</label>
-              <input
-                type="text"
-                placeholder="Search student by name, email, or username..."
-                value={studentSearchTerm}
-                onChange={(e) => setStudentSearchTerm(e.target.value)}
-                className="s-a-m-form-input-search"
-                autoComplete="off"
-              />
-              
-              {/* Search results dropdown */}
-              {studentSearchTerm && filteredStudents.length > 0 && !addFormData.student_id && (
-                <div className="s-a-m-form-search-dropdown">
-                  {filteredStudents.map(student => (
-                    <div 
-                      key={student.id}
-                      className="s-a-m-form-search-item"
-                      onClick={() => {
-                        setAddFormData(prev => ({ ...prev, student_id: student.id.toString() }));
-                        setStudentSearchTerm(''); // Clear search term to close dropdown
-                      }}
-                    >
-                      <strong>{student.username}</strong>
-                      <div className="s-a-m-form-search-details">
-                        {student.email && <span>{student.email}</span>}
-                        {(student.first_name || student.last_name) && (
-                          <span>{student.first_name} {student.last_name}</span>
-                        )}
+              {/* Student Search */}
+              <div className="s-a-m-form-group">
+                <label>Student *</label>
+                <input
+                  type="text"
+                  placeholder="Search student by name, email, or username..."
+                  value={studentSearchTerm}
+                  onChange={(e) => setStudentSearchTerm(e.target.value)}
+                  className="s-a-m-form-input-search"
+                  autoComplete="off"
+                />
+
+                {/* Search results dropdown */}
+                {studentSearchTerm && filteredStudents.length > 0 && !addFormData.student_id && (
+                  <div className="s-a-m-form-search-dropdown">
+                    {filteredStudents.map(student => (
+                      <div
+                        key={student.id}
+                        className="s-a-m-form-search-item"
+                        onClick={() => {
+                          setAddFormData(prev => ({ ...prev, student_id: student.id.toString() }));
+                          setStudentSearchTerm(''); // Clear search term to close dropdown
+                        }}
+                      >
+                        <strong>{student.username}</strong>
+                        <div className="s-a-m-form-search-details">
+                          {student.email && <span>{student.email}</span>}
+                          {(student.first_name || student.last_name) && (
+                            <span>{student.first_name} {student.last_name}</span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              {/* No results */}
-              {studentSearchTerm && filteredStudents.length === 0 && !addFormData.student_id && (
-                <div className="s-a-m-form-no-results">No students found</div>
-              )}
-              
-              {/* Selected student info */}
-              {addFormData.student_id && (
-                <div className="s-a-m-form-selected">
-                  ✓ Selected: {students.find(s => s.id.toString() === addFormData.student_id)?.username}
-                  <button 
-                    onClick={() => {
-                      setAddFormData(prev => ({ ...prev, student_id: '' }));
-                      setStudentSearchTerm('');
-                    }}
-                    className="s-a-m-form-clear-btn"
-                  >
-                    Clear
-                  </button>
-                </div>
-              )}
-            </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* No results */}
+                {studentSearchTerm && filteredStudents.length === 0 && !addFormData.student_id && (
+                  <div className="s-a-m-form-no-results">No students found</div>
+                )}
+
+                {/* Selected student info */}
+                {addFormData.student_id && (
+                  <div className="s-a-m-form-selected">
+                    ✓ Selected: {students.find(s => s.id.toString() === addFormData.student_id)?.username}
+                    <button
+                      onClick={() => {
+                        setAddFormData(prev => ({ ...prev, student_id: '' }));
+                        setStudentSearchTerm('');
+                      }}
+                      className="s-a-m-form-clear-btn"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                )}
+              </div>
 
               {/* Course Search */}
               <div className="s-a-m-form-group">
@@ -832,12 +919,12 @@ const EnrollmentManagementTab = ({
                   className="s-a-m-form-input-search"
                   autoComplete="off"
                 />
-                
+
                 {/* Search results dropdown - only show if searching AND no course is selected OR selected course doesn't match search */}
                 {courseSearchTerm && filteredCourses.length > 0 && !addFormData.course_id && (
                   <div className="s-a-m-form-search-dropdown">
                     {filteredCourses.map(course => (
-                      <div 
+                      <div
                         key={course.id}
                         className="s-a-m-form-search-item"
                         onClick={() => {
@@ -854,17 +941,17 @@ const EnrollmentManagementTab = ({
                     ))}
                   </div>
                 )}
-                
+
                 {/* No results - only show if searching AND no course is selected */}
                 {courseSearchTerm && filteredCourses.length === 0 && !addFormData.course_id && (
                   <div className="s-a-m-form-no-results">No courses found</div>
                 )}
-                
+
                 {/* Selected course info */}
                 {addFormData.course_id && (
                   <div className="s-a-m-form-selected">
                     ✓ Selected: {courses.find(c => c.id.toString() === addFormData.course_id)?.title}
-                    <button 
+                    <button
                       onClick={() => {
                         setAddFormData(prev => ({ ...prev, course_id: '' }));
                         setCourseSearchTerm('');
@@ -913,6 +1000,12 @@ const EnrollmentManagementTab = ({
                     setShowAddModal(false);
                     setStudentSearchTerm('');
                     setCourseSearchTerm('');
+                    setAddFormData({
+                      student_id: '',
+                      course_id: '',
+                      is_active: true,
+                      progress: 0
+                    });
                   }}
                   disabled={loading}
                 >
