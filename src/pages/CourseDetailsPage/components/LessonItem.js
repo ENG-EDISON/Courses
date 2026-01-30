@@ -21,21 +21,7 @@ function LessonItem({ lesson, onPlayPreviewVideo }) {
                 </div>
 
                 <div className="lesson-title">{lesson.title}</div>
-                <div className="lesson-meta-horizontal">
-                    <span className="lesson-type">{lesson.lesson_type}</span>
-                    {lesson.video_duration > 0 && (
-                        <span className="lesson-duration">{formatDuration(lesson.video_duration)}</span>
-                    )}
-                    {getVideoBadgeType(lesson) && (
-                        <span
-                            className="video-source-mini-badge"
-                            style={{ color: getVideoBadgeType(lesson).color }}
-                        >
-                            <i className={getVideoBadgeType(lesson).icon}></i>
-                        </span>
-                    )}
-                </div>
-                <div className="lesson-actions">
+                                <div className="lesson-actions">
                     {hasPreviewContent(lesson) ? (
                         <span
                             className="preview-badge clickable"
@@ -51,6 +37,20 @@ function LessonItem({ lesson, onPlayPreviewVideo }) {
                         <span className="locked-badge">
                             <i className="fas fa-lock"></i>
                         </span>
+                    )}
+                </div>
+                <div className="lesson-meta-horizontal">
+                    {getVideoBadgeType(lesson) && (
+                        <span
+                            className="video-source-mini-badge"
+                            style={{ color: getVideoBadgeType(lesson).color }}
+                        >
+                            <i className={getVideoBadgeType(lesson).icon}></i>
+                        </span>
+                    )}
+                    <span className="lesson-type">{lesson.lesson_type}</span>
+                    {lesson.video_duration > 0 && (
+                        <span className="lesson-duration">{formatDuration(lesson.video_duration)}</span>
                     )}
                 </div>
             </div>

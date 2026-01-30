@@ -70,6 +70,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    text-align: left;
 }
 
 .lesson-meta-horizontal {
@@ -112,6 +113,7 @@
     display: flex;
     align-items: center;
     flex-shrink: 0;
+    text-align: left;
 }
 
 .preview-badge {
