@@ -10,7 +10,6 @@ function CourseSidebar({ course }) {
     const courseUrl = typeof window !== 'undefined' ? window.location.href : '';
     const courseTitle = course.title || 'Check out this course';
     const courseDescription = course.description || 'An amazing course I found';
-
     // Close share menu when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -39,13 +38,13 @@ function CourseSidebar({ course }) {
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
             }
-            
+
             setIsCopied(true);
             setTimeout(() => setIsCopied(false), 2000);
-            
+
             // Close menu after copy
             setTimeout(() => setIsShareMenuOpen(false), 500);
-            
+
         } catch (error) {
             console.error('Failed to copy:', error);
             alert('Unable to copy link. Please copy the URL manually.');
@@ -144,7 +143,7 @@ function CourseSidebar({ course }) {
                             <i className="fas fa-users"></i>
                         </div>
                         <div className="c-s-b-stat-info">
-                            <div className="c-s-b-stat-value">{course.enrollment_count || 0}</div>
+                            <div className="c-s-b-stat-value">{course.enrolled_count || 0}</div>
                             <div className="c-s-b-stat-label">Enrolled</div>
                         </div>
                     </div>
@@ -153,7 +152,7 @@ function CourseSidebar({ course }) {
                             <i className="fas fa-star"></i>
                         </div>
                         <div className="c-s-b-stat-info">
-                            <div className="c-s-b-stat-value">{course.average_rating || '0.0'}</div>
+                            <div className="c-s-b-stat-value">{course.course_rating || '0.0'}</div>
                             <div className="c-s-b-stat-label">Rating</div>
                         </div>
                     </div>
@@ -162,7 +161,7 @@ function CourseSidebar({ course }) {
                             <i className="fas fa-comments"></i>
                         </div>
                         <div className="c-s-b-stat-info">
-                            <div className="c-s-b-stat-value">{course.total_reviews || 0}</div>
+                            <div className="c-s-b-stat-value">{course.course_reviews || 0}</div>
                             <div className="c-s-b-stat-label">Reviews</div>
                         </div>
                     </div>
@@ -172,7 +171,7 @@ function CourseSidebar({ course }) {
                         </div>
                         <div className="c-s-b-stat-info">
                             <div className="c-s-b-stat-value">
-                                {course.published_at ? new Date(course.published_at).getFullYear() : 'N/A'}
+                                {course.published_year || 'N/A'}
                             </div>
                             <div className="c-s-b-stat-label">Published</div>
                         </div>
@@ -182,32 +181,32 @@ function CourseSidebar({ course }) {
 
             {/* Additional Actions */}
             <div className="c-s-b-card">
-                <div className="c-s-b-action-buttons">                    
+                <div className="c-s-b-action-buttons">
                     {/* Share Button with Menu */}
                     <div className="c-s-b-share-container" ref={shareMenuRef}>
-                        <button 
+                        <button
                             className={`c-s-b-action-btn ${isShareMenuOpen ? 'active' : ''}`}
                             onClick={handleNativeShare}
                         >
                             <i className="fas fa-share-alt"></i>
                             Share Course
                         </button>
-                        
+
                         {/* Custom Share Menu (shown when native share is not available) */}
                         {!navigator.share && isShareMenuOpen && (
                             <div className="c-s-b-share-menu">
                                 <div className="c-s-b-share-header">
                                     <h4>Share this course</h4>
-                                    <button 
+                                    <button
                                         className="c-s-b-close-menu"
                                         onClick={() => setIsShareMenuOpen(false)}
                                     >
                                         <i className="fas fa-times"></i>
                                     </button>
                                 </div>
-                                
+
                                 <div className="c-s-b-share-options">
-                                    <button 
+                                    <button
                                         className="c-s-b-share-option"
                                         onClick={() => handleSocialShare('facebook')}
                                     >
@@ -216,8 +215,8 @@ function CourseSidebar({ course }) {
                                         </div>
                                         <span>Facebook</span>
                                     </button>
-                                    
-                                    <button 
+
+                                    <button
                                         className="c-s-b-share-option"
                                         onClick={() => handleSocialShare('twitter')}
                                     >
@@ -226,8 +225,8 @@ function CourseSidebar({ course }) {
                                         </div>
                                         <span>Twitter</span>
                                     </button>
-                                    
-                                    <button 
+
+                                    <button
                                         className="c-s-b-share-option"
                                         onClick={() => handleSocialShare('linkedin')}
                                     >
@@ -236,8 +235,8 @@ function CourseSidebar({ course }) {
                                         </div>
                                         <span>LinkedIn</span>
                                     </button>
-                                    
-                                    <button 
+
+                                    <button
                                         className="c-s-b-share-option"
                                         onClick={() => handleSocialShare('whatsapp')}
                                     >
@@ -246,8 +245,8 @@ function CourseSidebar({ course }) {
                                         </div>
                                         <span>WhatsApp</span>
                                     </button>
-                                    
-                                    <button 
+
+                                    <button
                                         className="c-s-b-share-option"
                                         onClick={() => handleSocialShare('telegram')}
                                     >
@@ -256,8 +255,8 @@ function CourseSidebar({ course }) {
                                         </div>
                                         <span>Telegram</span>
                                     </button>
-                                    
-                                    <button 
+
+                                    <button
                                         className="c-s-b-share-option"
                                         onClick={() => handleSocialShare('email')}
                                     >
@@ -267,17 +266,17 @@ function CourseSidebar({ course }) {
                                         <span>Email</span>
                                     </button>
                                 </div>
-                                
+
                                 <div className="c-s-b-copy-link-section">
                                     <div className="c-s-b-url-preview">
-                                        <input 
-                                            type="text" 
+                                        <input
+                                            type="text"
                                             value={courseUrl}
                                             readOnly
                                             className="c-s-b-url-input"
                                         />
                                     </div>
-                                    <button 
+                                    <button
                                         className={`c-s-b-copy-link-btn ${isCopied ? 'copied' : ''}`}
                                         onClick={handleCopyLink}
                                     >
