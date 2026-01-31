@@ -1203,13 +1203,6 @@ const CourseAdminManagement = () => {
   const [loading, setLoading] = useState(true);
   const [enrollments, setEnrollments] = useState([]);
   const [courses, setCourses] = useState([]);
-  const [enrollmentStats, setEnrollmentStats] = useState({
-    total: 0,
-    active: 0,
-    completed: 0,
-    cancelled: 0,
-    averageProgress: 0
-  });
 
   const fetchInitialData = useCallback(async () => {
     setLoading(true);
@@ -1218,20 +1211,9 @@ const CourseAdminManagement = () => {
         getAllenrollements(),
         getAllCourses()
       ]);
-
       const enrollmentData = enrollmentsRes.data?.enrollments || enrollmentsRes.data || [];
       setEnrollments(enrollmentData);
       setCourses(coursesRes.data || []);
-
-      if (enrollmentsRes.data) {
-        setEnrollmentStats({
-          total: enrollmentsRes.data.total_enrollments || enrollmentData.length,
-          active: enrollmentsRes.data.active_enrollments || 0,
-          completed: enrollmentsRes.data.completed_enrollments || 0,
-          cancelled: enrollmentsRes.data.cancelled_enrollments || 0,
-          averageProgress: enrollmentsRes.data.average_progress || 0
-        });
-      }
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -1264,24 +1246,6 @@ const CourseAdminManagement = () => {
       <div className="s-a-m-header">
         <h2>📚 Course Administration</h2>
         <p>Manage courses, enrollments, and student progress</p>
-        <div className="s-a-m-stats-cards" style={{ marginTop: '20px' }}>
-          <div className="s-a-m-stat-card">
-            <h4>Total Enrollments</h4>
-            <p className="s-a-m-stat-number">{enrollmentStats.total}</p>
-          </div>
-          <div className="s-a-m-stat-card">
-            <h4>Active</h4>
-            <p className="s-a-m-stat-number">{enrollmentStats.active}</p>
-          </div>
-          <div className="s-a-m-stat-card">
-            <h4>Completed</h4>
-            <p className="s-a-m-stat-number">{enrollmentStats.completed}</p>
-          </div>
-          <div className="s-a-m-stat-card">
-            <h4>Avg Progress</h4>
-            <p className="s-a-m-stat-number">{enrollmentStats.averageProgress}%</p>
-          </div>
-        </div>
       </div>
 
       {/* Tab Navigation */}

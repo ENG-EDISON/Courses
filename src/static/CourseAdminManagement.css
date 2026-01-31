@@ -296,6 +296,7 @@
 .s-a-m-table-container {
   overflow-x: auto;
   background: white;
+  text-align: left;
 }
 
 .s-a-m-table {
