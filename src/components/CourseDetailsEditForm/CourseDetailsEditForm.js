@@ -571,7 +571,7 @@ const CourseDetailsEditForm = ({ course, onUpdate, isLoading }) => {
                                         placeholder="What should students know before taking this course? List prerequisites, tools needed, etc."
                                         disabled={isSubmitting}
                                     />
-                                    <small>List each requirement on a new line or separate with commas</small>
+                                    <h3 style={{color: "red"}}>List each requirement on a new line or separate with commas</h3>
                                 </div>
                             </div>
                         </div>
