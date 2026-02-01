@@ -314,11 +314,7 @@ const LessonResourceCard = ({
           className="lrc-type-select"
         >
           <option value="document">Document</option>
-          <option value="presentation">Presentation</option>
-          <option value="spreadsheet">Spreadsheet</option>
           <option value="image">Image</option>
-          <option value="code">Code</option>
-          <option value="link">External Link</option>
         </select>
         
         <div className="lrc-status">

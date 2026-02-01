@@ -119,93 +119,87 @@ const ResourcesTab = ({ course, activeLessonId }) => {
         setCurrentLessonTitle(lessonTitle);
     }, [activeLessonId, course.sections]);
 
-    return (
-        <div className="resources-tab-container">
-            <h3>Lesson Resources</h3>
-            {/* Resource Summary */}
-            <div className="resources-tab-summary">
-                <div className="resources-tab-summary-card">
-                    <div className="resources-tab-summary-icon">📚</div>
-                    <div className="resources-tab-summary-content">
-                        {activeLessonId && currentLessonTitle && (
-                            <p className="resources-tab-summary-subtitle">
-                                <strong>{currentLessonTitle} Learning materials</strong>
-                            </p>
-                        )}
-                        {activeLessonId && !currentLessonTitle && (
-                            <p className="resources-tab-summary-subtitle">
-                                <em>Lesson not found</em>
-                            </p>
-                        )}
+ return (
+    <div className="resources-tab-container">
+
+        {/* Show header & summary ONLY if resources exist */}
+        {activeLessonId && resources.length > 0 && (
+            <>
+                <h3>Lesson Resources</h3>
+
+                <div className="resources-tab-summary">
+                    <div className="resources-tab-summary-card">
+                        <div className="resources-tab-summary-icon">📚</div>
+                        <div className="resources-tab-summary-content">
+                            {currentLessonTitle && (
+                                <p className="resources-tab-summary-subtitle">
+                                    <strong>{currentLessonTitle} Learning materials</strong>
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
+            </>
+        )}
 
-            {/* Resources Grid - Only shows if activeLessonId exists */}
-            {activeLessonId ? (
-                resources.length > 0 ? (
-                    <div className="resources-tab-section">
-                        <div className="resources-tab-grid">
-                            {resources.map((resource, index) => (
-                                <div key={resource.id || index} className="resources-tab-card">
-                                    <div className="resources-tab-icon">
-                                        {getResourceIcon(resource.file)}
-                                    </div>
-                                    <div className="resources-tab-content">
-                                        <div className="resources-tab-row">
-                                            <h5>{resource.title || 'Untitled Resource'}</h5>
-                                            <span className="resources-tab-type">
-                                                {getFileType(resource.file)}
-                                            </span>
-                                            {resource.file_size && (
-                                                <span className="resources-tab-size">
-                                                    {formatFileSize(resource.file_size)}
-                                                </span>
-                                            )}
-                                            <a
-                                                href={getFileUrl(resource.file)}
-                                                className="resources-tab-download-btn"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                download
-                                            >
-                                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                                    <path d="M14 10V12.6667C14 13.0203 13.8595 13.3594 13.6095 13.6095C13.3594 13.8595 13.0203 14 12.6667 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                                    <path d="M4.66675 6.66667L8.00008 10L11.3334 6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                                    <path d="M8 10V2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                                </svg>
-                                                Download
-                                            </a>
-                                        </div>
-                                        <div className="resources-tab-meta">
-                                            <div className="resources-tab-section-info">
-                                                {resource.sectionTitle} • {resource.subsectionTitle}
-                                            </div>
-                                        </div>
+        {/* Resources grid */}
+        {activeLessonId && resources.length > 0 && (
+            <div className="resources-tab-section">
+                <div className="resources-tab-grid">
+                    {resources.map((resource, index) => (
+                        <div key={resource.id || index} className="resources-tab-card">
+                            <div className="resources-tab-icon">
+                                {getResourceIcon(resource.file)}
+                            </div>
+
+                            <div className="resources-tab-content">
+                                <div className="resources-tab-row">
+                                    <h5>{resource.title || 'Untitled Resource'}</h5>
+
+                                    <span className="resources-tab-type">
+                                        {getFileType(resource.file)}
+                                    </span>
+
+                                    {resource.file_size && (
+                                        <span className="resources-tab-size">
+                                            {formatFileSize(resource.file_size)}
+                                        </span>
+                                    )}
+
+                                    <a
+                                        href={getFileUrl(resource.file)}
+                                        className="resources-tab-download-btn"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        download
+                                    >
+                                        Download
+                                    </a>
+                                </div>
+
+                                <div className="resources-tab-meta">
+                                    <div className="resources-tab-section-info">
+                                        {resource.sectionTitle} • {resource.subsectionTitle}
                                     </div>
                                 </div>
-                            ))}
+                            </div>
                         </div>
-                    </div>
-                ) : (
-                    <div className="resources-tab-empty">
-                        <div className="resources-tab-empty-icon">📭</div>
-                        <h4>No Resources Available</h4>
-                        <p>This lesson doesn't have any downloadable resources.</p>
-                        <div className="resources-debug-info">
-                            <small>Debug: Lesson ID: {activeLessonId}</small>
-                        </div>
-                    </div>
-                )
-            ) : (
-                <div className="resources-tab-empty">
-                    <div className="resources-tab-empty-icon">📺</div>
-                    <h4>Select a Lesson</h4>
-                    <p>Click on a video lesson to see its resources here.</p>
+                    ))}
                 </div>
-            )}
-        </div>
-    );
+            </div>
+        )}
+        {/* No lesson selected */}
+        {!activeLessonId && (
+            <div className="resources-tab-empty">
+                <div className="resources-tab-empty-icon">📺</div>
+                <h4>Select a Lesson</h4>
+                <p>Click on a video lesson to see its resources here.</p>
+            </div>
+        )}
+
+    </div>
+);
+
 };
 
 export default ResourcesTab;
