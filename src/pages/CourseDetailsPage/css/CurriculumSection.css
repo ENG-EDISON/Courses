@@ -5,6 +5,7 @@
     border-radius: var(--border-radius-md); /* Smaller radius */
     overflow: hidden;
     transition: all 0.3s ease;
+    text-align: left;
 }
 
 .curriculum-section:hover {
