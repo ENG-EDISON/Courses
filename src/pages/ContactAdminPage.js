@@ -110,7 +110,7 @@ function ContactAdminPage() {
                                             <span className="contact-admin-option-label">Direct Line</span>
                                             <button 
                                                 className="contact-admin-copy-btn"
-                                                onClick={() => copyToClipboard('+25427880887')}
+                                                onClick={() => copyToClipboard('+254727880887')}
                                                 aria-label="Copy phone number"
                                             >
                                                 <i className="far fa-copy"></i>
@@ -118,15 +118,15 @@ function ContactAdminPage() {
                                         </div>
                                         <div className="contact-admin-phone-display">
                                             <i className="fas fa-phone"></i>
-                                            <span className="contact-admin-phone-number">+254 278 808 87</span>
+                                            <span className="contact-admin-phone-number">+254 7278 808 887</span>
                                         </div>
                                         <div className="contact-admin-phone-actions">
-                                            <a href="tel:+25427880887" className="contact-admin-action contact-admin-call-action">
+                                            <a href="tel:+254727880887" className="contact-admin-action contact-admin-call-action">
                                                 <i className="fas fa-phone-alt"></i>
                                                 <span className="contact-admin-action-text">Call Now</span>
                                             </a>
                                             <a 
-                                                href="https://wa.me/25427880887" 
+                                                href="https://wa.me/254727880887" 
                                                 target="_blank" 
                                                 rel="noopener noreferrer"
                                                 className="contact-admin-action contact-admin-whatsapp-action"
