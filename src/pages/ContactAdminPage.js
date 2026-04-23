@@ -118,7 +118,7 @@ function ContactAdminPage() {
                                         </div>
                                         <div className="contact-admin-phone-display">
                                             <i className="fas fa-phone"></i>
-                                            <span className="contact-admin-phone-number">+254 7278 808 887</span>
+                                            <span className="contact-admin-phone-number">+254727880887</span>
                                         </div>
                                         <div className="contact-admin-phone-actions">
                                             <a href="tel:+254727880887" className="contact-admin-action contact-admin-call-action">
